@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
     <meta charset="UTF-8">
 
     <meta
@@ -11,7 +10,7 @@
 
     <meta
         name="description"
-        content="SMH Collection — A modern global marketplace for discovering products, stores and everyday essentials."
+        content="SMH Collection — Discover fashion, lifestyle, electronics and everyday essentials from a modern global marketplace."
     >
 
     <meta
@@ -24,29 +23,76 @@
         content="SMH Collection"
     >
 
-    <title>SMH Collection — Global Marketplace</title>
+    <title>SMH Collection — Shop Everything You Love</title>
 
     <link
         rel="stylesheet"
         href="assets/css/style.css"
     >
-
 </head>
 
 <body>
 
     <div id="app">
 
-        <!-- Application Header -->
-        <header id="site-header"></header>
+        <!-- ================================
+             GLOBAL ANNOUNCEMENT
+        ================================= -->
 
-        <!-- Main Application -->
-        <main id="main-content"></main>
+        <div
+            id="announcement-bar"
+            aria-label="Store announcement"
+        ></div>
 
-        <!-- Application Footer -->
-        <footer id="site-footer"></footer>
+
+        <!-- ================================
+             MAIN HEADER
+        ================================= -->
+
+        <header
+            id="site-header"
+            role="banner"
+        ></header>
+
+
+        <!-- ================================
+             APPLICATION CONTENT
+        ================================= -->
+
+        <main
+            id="main-content"
+            role="main"
+        ></main>
+
+
+        <!-- ================================
+             GLOBAL FOOTER
+        ================================= -->
+
+        <footer
+            id="site-footer"
+            role="contentinfo"
+        ></footer>
+
+
+        <!-- ================================
+             GLOBAL UI CONTAINERS
+        ================================= -->
+
+        <div id="modal-root"></div>
+
+        <div id="toast-root"></div>
+
+        <div id="loader-root"></div>
 
     </div>
+
+
+    <!--
+        SMH Collection application entry point.
+        All major application logic will be
+        loaded through the JavaScript architecture.
+    -->
 
     <script
         type="module"
