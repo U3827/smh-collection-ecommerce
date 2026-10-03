@@ -1,644 +1,620 @@
 /* =========================================================
    SMH COLLECTION
-   Application Shell
+   Main Application
    ========================================================= */
 
-const app = document.querySelector("#app");
-const announcementBar = document.querySelector("#announcement-bar");
-const header = document.querySelector("#site-header");
-const mainContent = document.querySelector("#main-content");
-const footer = document.querySelector("#site-footer");
+"use strict";
 
 
 /* =========================================================
-   STORE CONFIGURATION
+   1. APPLICATION CONFIG
    ========================================================= */
 
-const STORE = {
-    name: "SMH Collection",
-    currency: "USD",
-    delivery: "Free Delivery",
-    payment: "Cash on Delivery"
+const SMH = {
+  name: "SMH Collection",
+
+  cartKey: "smh_cart",
+
+  wishlistKey: "smh_wishlist",
+
+  currency: "USD"
 };
 
 
 /* =========================================================
-   ANNOUNCEMENT
+   2. DOM HELPERS
    ========================================================= */
 
-function renderAnnouncement() {
-    announcementBar.innerHTML = `
-        <div class="container">
-            Free delivery • Cash on Delivery • Shop SMH Collection
-        </div>
-    `;
-}
+const $ = (selector) => document.querySelector(selector);
+
+const $$ = (selector) => document.querySelectorAll(selector);
 
 
 /* =========================================================
-   HEADER
+   3. APPLICATION STATE
    ========================================================= */
 
-function renderHeader() {
+let cart = loadStorage(SMH.cartKey, []);
 
-    header.innerHTML = `
-        <div class="container">
-            <div class="header-inner">
-
-                <a
-                    href="#"
-                    class="smh-brand"
-                    aria-label="SMH Collection Home"
-                >
-
-                    <span class="smh-brand-mark">
-                        SMH
-                    </span>
-
-                    <span class="smh-brand-name">
-                        SMH <span>Collection</span>
-                    </span>
-
-                </a>
-
-
-                <nav
-                    class="main-nav"
-                    aria-label="Main navigation"
-                >
-
-                    <a href="#home">
-                        Home
-                    </a>
-
-                    <a href="#shop">
-                        Shop
-                    </a>
-
-                    <a href="#categories">
-                        Categories
-                    </a>
-
-                    <a href="#new-arrivals">
-                        New Arrivals
-                    </a>
-
-                </nav>
-
-
-                <div class="header-actions">
-
-                    <button
-                        class="icon-button"
-                        type="button"
-                        aria-label="Search"
-                        title="Search"
-                    >
-                        🔍
-                    </button>
-
-                    <button
-                        class="icon-button"
-                        type="button"
-                        aria-label="Wishlist"
-                        title="Wishlist"
-                    >
-                        ♡
-                    </button>
-
-                    <button
-                        class="icon-button"
-                        type="button"
-                        aria-label="Shopping Cart"
-                        title="Shopping Cart"
-                    >
-                        🛒
-                    </button>
-
-                    <button
-                        class="btn btn-primary"
-                        type="button"
-                        id="account-button"
-                    >
-                        Account
-                    </button>
-
-                </div>
-
-            </div>
-        </div>
-    `;
-}
+let wishlist = loadStorage(SMH.wishlistKey, []);
 
 
 /* =========================================================
-   HERO
+   4. LOCAL STORAGE
    ========================================================= */
 
-function renderHero() {
+function loadStorage(key, fallback) {
 
-    return `
-        <section
-            class="hero"
-            id="home"
-        >
+  try {
 
-            <div class="container">
+    const saved = localStorage.getItem(key);
 
-                <div class="hero-content">
-
-                    <div class="hero-eyebrow">
-                        Welcome to SMH Collection
-                    </div>
-
-                    <h1>
-                        Everything you love,
-                        <span>all in one place.</span>
-                    </h1>
-
-                    <p>
-                        Discover products for your lifestyle,
-                        explore new collections and enjoy a
-                        simple shopping experience with
-                        free delivery and Cash on Delivery.
-                    </p>
-
-                    <div class="hero-actions">
-
-                        <a
-                            href="#shop"
-                            class="btn btn-primary"
-                        >
-                            Shop Now
-                        </a>
-
-                        <a
-                            href="#categories"
-                            class="btn btn-outline"
-                        >
-                            Explore Categories
-                        </a>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-    `;
-}
-
-
-/* =========================================================
-   CATEGORIES
-   ========================================================= */
-
-const categories = [
-    {
-        name: "Fashion",
-        icon: "👕"
-    },
-    {
-        name: "Electronics",
-        icon: "📱"
-    },
-    {
-        name: "Shoes",
-        icon: "👟"
-    },
-    {
-        name: "Accessories",
-        icon: "⌚"
+    if (!saved) {
+      return fallback;
     }
-];
+
+    return JSON.parse(saved);
+
+  } catch (error) {
+
+    console.error(
+      `Unable to load ${key}:`,
+      error
+    );
+
+    return fallback;
+  }
+}
 
 
-function renderCategories() {
+function saveStorage(key, value) {
 
-    const categoryCards = categories
-        .map(category => {
+  try {
 
-            return `
-                <a
-                    href="#shop"
-                    class="category-card"
-                >
+    localStorage.setItem(
+      key,
+      JSON.stringify(value)
+    );
 
-                    <div>
+  } catch (error) {
 
-                        <div
-                            style="
-                                font-size: 32px;
-                                margin-bottom: 8px;
-                            "
-                        >
-                            ${category.icon}
-                        </div>
-
-                        <h3>
-                            ${category.name}
-                        </h3>
-
-                    </div>
-
-                </a>
-            `;
-        })
-        .join("");
-
-
-    return `
-        <section
-            class="section"
-            id="categories"
-        >
-
-            <div class="container">
-
-                <div class="section-header">
-
-                    <div>
-
-                        <h2 class="section-title">
-                            Shop by Category
-                        </h2>
-
-                        <p class="section-subtitle">
-                            Explore popular product categories.
-                        </p>
-
-                    </div>
-
-                    <a
-                        href="#shop"
-                        class="btn btn-outline"
-                    >
-                        View All
-                    </a>
-
-                </div>
-
-
-                <div class="category-grid">
-
-                    ${categoryCards}
-
-                </div>
-
-            </div>
-
-        </section>
-    `;
+    console.error(
+      `Unable to save ${key}:`,
+      error
+    );
+  }
 }
 
 
 /* =========================================================
-   PRODUCT PLACEHOLDER
+   5. CART
    ========================================================= */
 
-const featuredProducts = [
-    {
-        name: "Featured Product",
-        category: "New Collection",
-        price: "$49.99"
-    },
-    {
-        name: "Premium Selection",
-        category: "Popular",
-        price: "$79.99"
-    },
-    {
-        name: "Everyday Essential",
-        category: "Lifestyle",
-        price: "$29.99"
-    },
-    {
-        name: "SMH Exclusive",
-        category: "Exclusive",
-        price: "$99.99"
-    }
-];
+function updateCartCount() {
+
+  const cartCount = $("#cartCount");
+
+  if (!cartCount) {
+    return;
+  }
+
+  const totalItems = cart.reduce(
+    (total, item) => total + item.quantity,
+    0
+  );
+
+  cartCount.textContent = totalItems;
+}
 
 
-function renderProducts() {
+function addToCart(product) {
 
-    const products = featuredProducts
-        .map(product => {
+  const existingItem = cart.find(
+    item => item.id === product.id
+  );
 
-            return `
-                <article
-                    class="product-card"
-                >
+  if (existingItem) {
 
-                    <div
-                        class="product-image"
-                        aria-label="Product image"
-                    >
-                        <span
-                            style="
-                                font-size: 42px;
-                                opacity: .45;
-                            "
-                        >
-                            🛍️
-                        </span>
-                    </div>
+    existingItem.quantity += 1;
 
-                    <div class="product-info">
+  } else {
 
-                        <div class="product-category">
-                            ${product.category}
-                        </div>
+    cart.push({
+      ...product,
+      quantity: 1
+    });
+  }
 
-                        <h3 class="product-name">
-                            ${product.name}
-                        </h3>
+  saveStorage(
+    SMH.cartKey,
+    cart
+  );
 
-                        <div class="product-price">
-                            ${product.price}
-                        </div>
+  updateCartCount();
 
-                    </div>
-
-                </article>
-            `;
-        })
-        .join("");
+  showToast(
+    `${product.name} added to cart`
+  );
+}
 
 
-    return `
-        <section
-            class="section"
-            id="shop"
-        >
+function removeFromCart(productId) {
 
-            <div class="container">
+  cart = cart.filter(
+    item => item.id !== productId
+  );
 
-                <div class="section-header">
+  saveStorage(
+    SMH.cartKey,
+    cart
+  );
 
-                    <div>
-
-                        <h2 class="section-title">
-                            Featured Products
-                        </h2>
-
-                        <p class="section-subtitle">
-                            Carefully selected products
-                            from SMH Collection.
-                        </p>
-
-                    </div>
-
-                    <a
-                        href="#shop"
-                        class="btn btn-outline"
-                    >
-                        Shop All
-                    </a>
-
-                </div>
-
-
-                <div class="product-grid">
-
-                    ${products}
-
-                </div>
-
-            </div>
-
-        </section>
-    `;
+  updateCartCount();
 }
 
 
 /* =========================================================
-   NEW ARRIVALS
+   6. WISHLIST
    ========================================================= */
 
-function renderNewArrivals() {
+function toggleWishlist(productId) {
 
-    return `
-        <section
-            class="section"
-            id="new-arrivals"
-        >
+  const exists = wishlist.includes(productId);
 
-            <div class="container">
+  if (exists) {
 
-                <div
-                    style="
-                        padding: 50px 30px;
-                        border-radius: 22px;
-                        background: #111827;
-                        color: white;
-                        text-align: center;
-                    "
-                >
+    wishlist = wishlist.filter(
+      id => id !== productId
+    );
 
-                    <div
-                        style="
-                            color: #d4af37;
-                            font-weight: 800;
-                            font-size: 12px;
-                            text-transform: uppercase;
-                            letter-spacing: 1px;
-                        "
-                    >
-                        Coming Soon
-                    </div>
+    showToast(
+      "Removed from wishlist"
+    );
 
-                    <h2
-                        style="
-                            margin-top: 10px;
-                            font-size: clamp(
-                                28px,
-                                5vw,
-                                42px
-                            );
-                        "
-                    >
-                        New Arrivals
-                    </h2>
+  } else {
 
-                    <p
-                        style="
-                            max-width: 550px;
-                            margin: 12px auto 24px;
-                            color: #cbd5e1;
-                        "
-                    >
-                        Fresh products and new collections
-                        will appear here as the SMH Collection
-                        marketplace grows.
-                    </p>
+    wishlist.push(productId);
 
-                    <a
-                        href="#shop"
-                        class="btn btn-accent"
-                    >
-                        Explore Store
-                    </a>
+    showToast(
+      "Added to wishlist"
+    );
+  }
 
-                </div>
-
-            </div>
-
-        </section>
-    `;
+  saveStorage(
+    SMH.wishlistKey,
+    wishlist
+  );
 }
 
 
 /* =========================================================
-   FOOTER
+   7. SEARCH
    ========================================================= */
 
-function renderFooter() {
+function setupSearch() {
 
-    footer.innerHTML = `
-        <div class="container">
+  const searchForm = $("#searchForm");
 
-            <div class="footer-inner">
+  const searchInput = $("#searchInput");
 
-                <div class="footer-brand">
+  if (!searchForm || !searchInput) {
+    return;
+  }
 
-                    <div class="smh-brand">
+  searchForm.addEventListener(
+    "submit",
+    event => {
 
-                        <span class="smh-brand-mark">
-                            SMH
-                        </span>
+      event.preventDefault();
 
-                        <span class="smh-brand-name"
-                            style="color:white;"
-                        >
-                            SMH
-                            <span>Collection</span>
-                        </span>
+      const query =
+        searchInput.value.trim();
 
-                    </div>
+      if (!query) {
 
-                    <p>
-                        A modern global marketplace built
-                        to make shopping simple, convenient
-                        and enjoyable.
-                    </p>
-
-                </div>
-
-
-                <div class="footer-column">
-
-                    <h4>
-                        Shop
-                    </h4>
-
-                    <a href="#shop">
-                        All Products
-                    </a>
-
-                    <a href="#categories">
-                        Categories
-                    </a>
-
-                    <a href="#new-arrivals">
-                        New Arrivals
-                    </a>
-
-                </div>
-
-
-                <div class="footer-column">
-
-                    <h4>
-                        Customer
-                    </h4>
-
-                    <a href="#">
-                        My Account
-                    </a>
-
-                    <a href="#">
-                        Orders
-                    </a>
-
-                    <a href="#">
-                        Wishlist
-                    </a>
-
-                </div>
-
-
-                <div class="footer-column">
-
-                    <h4>
-                        SMH Collection
-                    </h4>
-
-                    <a href="#">
-                        About Us
-                    </a>
-
-                    <a href="#">
-                        Contact
-                    </a>
-
-                    <a href="#">
-                        Privacy Policy
-                    </a>
-
-                </div>
-
-            </div>
-
-
-            <div class="footer-bottom">
-
-                © ${new Date().getFullYear()}
-                SMH Collection.
-                All rights reserved.
-
-            </div>
-
-        </div>
-    `;
-}
-
-
-/* =========================================================
-   RENDER APPLICATION
-   ========================================================= */
-
-function renderApp() {
-
-    renderAnnouncement();
-
-    renderHeader();
-
-    mainContent.innerHTML = `
-        ${renderHero()}
-        ${renderCategories()}
-        ${renderProducts()}
-        ${renderNewArrivals()}
-    `;
-
-    renderFooter();
-}
-
-
-/* =========================================================
-   APPLICATION START
-   ========================================================= */
-
-document.addEventListener(
-    "DOMContentLoaded",
-    () => {
-
-        renderApp();
-
-        console.log(
-            "SMH Collection application started."
+        showToast(
+          "Enter a product to search"
         );
 
+        searchInput.focus();
+
+        return;
+      }
+
+      /*
+       * Product search will later connect
+       * to the Supabase product database.
+       */
+
+      showToast(
+        `Searching for "${query}"...`
+      );
+
+      console.log(
+        "Search query:",
+        query
+      );
     }
-);
+  );
+}
+
+
+/* =========================================================
+   8. HEADER ACTIONS
+   ========================================================= */
+
+function setupHeaderActions() {
+
+  const cartButton =
+    $("#cartButton");
+
+  const wishlistButton =
+    $("#wishlistButton");
+
+
+  if (cartButton) {
+
+    cartButton.addEventListener(
+      "click",
+      event => {
+
+        event.preventDefault();
+
+        if (cart.length === 0) {
+
+          showToast(
+            "Your cart is empty"
+          );
+
+          return;
+        }
+
+        showToast(
+          `${cart.length} item(s) in your cart`
+        );
+
+        console.log(
+          "Cart:",
+          cart
+        );
+      }
+    );
+  }
+
+
+  if (wishlistButton) {
+
+    wishlistButton.addEventListener(
+      "click",
+      event => {
+
+        event.preventDefault();
+
+        if (wishlist.length === 0) {
+
+          showToast(
+            "Your wishlist is empty"
+          );
+
+          return;
+        }
+
+        showToast(
+          `${wishlist.length} item(s) in wishlist`
+        );
+
+        console.log(
+          "Wishlist:",
+          wishlist
+        );
+      }
+    );
+  }
+}
+
+
+/* =========================================================
+   9. CATEGORY ACTIONS
+   ========================================================= */
+
+function setupCategories() {
+
+  const categoryCards =
+    $$(".category-card");
+
+  categoryCards.forEach(
+    card => {
+
+      card.addEventListener(
+        "click",
+        event => {
+
+          event.preventDefault();
+
+          const category =
+            card.querySelector("h3");
+
+          if (!category) {
+            return;
+          }
+
+          showToast(
+            `${category.textContent} products coming soon`
+          );
+
+          /*
+           * Later this will navigate to:
+           *
+           * shop.html?category=fashion
+           *
+           * and load products from Supabase.
+           */
+        }
+      );
+    }
+  );
+}
+
+
+/* =========================================================
+   10. VIEW ALL LINKS
+   ========================================================= */
+
+function setupViewAllLinks() {
+
+  const links =
+    $$(".view-all");
+
+  links.forEach(
+    link => {
+
+      link.addEventListener(
+        "click",
+        event => {
+
+          event.preventDefault();
+
+          const products =
+            $("#products");
+
+          if (products) {
+
+            products.scrollIntoView({
+              behavior: "smooth",
+              block: "start"
+            });
+
+          }
+        }
+      );
+    }
+  );
+}
+
+
+/* =========================================================
+   11. TOAST NOTIFICATION
+   ========================================================= */
+
+function showToast(message) {
+
+  let toast =
+    $("#smhToast");
+
+  if (!toast) {
+
+    toast =
+      document.createElement("div");
+
+    toast.id =
+      "smhToast";
+
+    Object.assign(
+      toast.style,
+      {
+        position: "fixed",
+        left: "50%",
+        bottom: "28px",
+        transform:
+          "translate(-50%, 20px)",
+        zIndex: "9999",
+        padding:
+          "12px 18px",
+        border:
+          "1px solid rgba(216,173,85,.35)",
+        borderRadius:
+          "999px",
+        background:
+          "#121824",
+        color:
+          "#f5f7fb",
+        fontSize:
+          "12px",
+        fontWeight:
+          "700",
+        boxShadow:
+          "0 15px 40px rgba(0,0,0,.35)",
+        opacity: "0",
+        transition:
+          "all .25s ease",
+        pointerEvents:
+          "none"
+      }
+    );
+
+    document.body.appendChild(toast);
+  }
+
+  toast.textContent = message;
+
+  requestAnimationFrame(() => {
+
+    toast.style.opacity = "1";
+
+    toast.style.transform =
+      "translate(-50%, 0)";
+  });
+
+
+  clearTimeout(
+    toast._timeout
+  );
+
+
+  toast._timeout =
+    setTimeout(() => {
+
+      toast.style.opacity = "0";
+
+      toast.style.transform =
+        "translate(-50%, 20px)";
+
+    }, 2600);
+}
+
+
+/* =========================================================
+   12. CURRENT YEAR
+   ========================================================= */
+
+function setCurrentYear() {
+
+  const year =
+    $("#currentYear");
+
+  if (year) {
+
+    year.textContent =
+      new Date().getFullYear();
+  }
+}
+
+
+/* =========================================================
+   13. SMOOTH ANCHOR LINKS
+   ========================================================= */
+
+function setupAnchorLinks() {
+
+  $$('a[href^="#"]').forEach(
+    link => {
+
+      link.addEventListener(
+        "click",
+        event => {
+
+          const targetId =
+            link.getAttribute("href");
+
+          if (
+            !targetId ||
+            targetId === "#"
+          ) {
+            return;
+          }
+
+          const target =
+            document.querySelector(
+              targetId
+            );
+
+          if (!target) {
+            return;
+          }
+
+          event.preventDefault();
+
+          target.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+          });
+        }
+      );
+    }
+  );
+}
+
+
+/* =========================================================
+   14. KEYBOARD SHORTCUT
+   ========================================================= */
+
+function setupKeyboardShortcuts() {
+
+  document.addEventListener(
+    "keydown",
+    event => {
+
+      /*
+       * "/" focuses the search box.
+       */
+
+      if (
+        event.key === "/" &&
+        ![
+          "INPUT",
+          "TEXTAREA"
+        ].includes(
+          document.activeElement.tagName
+        )
+      ) {
+
+        event.preventDefault();
+
+        const search =
+          $("#searchInput");
+
+        if (search) {
+          search.focus();
+        }
+      }
+    }
+  );
+}
+
+
+/* =========================================================
+   15. APPLICATION INITIALIZATION
+   ========================================================= */
+
+function initializeApp() {
+
+  updateCartCount();
+
+  setCurrentYear();
+
+  setupSearch();
+
+  setupHeaderActions();
+
+  setupCategories();
+
+  setupViewAllLinks();
+
+  setupAnchorLinks();
+
+  setupKeyboardShortcuts();
+
+  console.log(
+    `${SMH.name} initialized successfully.`
+  );
+}
+
+
+/* =========================================================
+   16. START APPLICATION
+   ========================================================= */
+
+if (
+  document.readyState === "loading"
+) {
+
+  document.addEventListener(
+    "DOMContentLoaded",
+    initializeApp
+  );
+
+} else {
+
+  initializeApp();
+}
