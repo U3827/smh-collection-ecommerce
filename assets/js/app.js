@@ -1,384 +1,644 @@
-/**
- * SMH COLLECTION
- * Main Application
- */
+/* =========================================================
+   SMH COLLECTION
+   Application Shell
+   ========================================================= */
 
-const app = document.getElementById("app");
-
-function renderApp() {
-    app.innerHTML = `
-        <div class="app-shell">
-
-            <!-- HEADER -->
-            <header class="site-header">
-                <div class="container header-inner">
-
-                    <a href="index.html" class="brand">
-                        <span class="brand-mark">SMH</span>
-                        <span class="brand-name">Collection</span>
-                    </a>
-
-                    <nav class="main-nav" aria-label="Main navigation">
-                        <a href="index.html" class="nav-link active">
-                            Home
-                        </a>
-
-                        <a href="#" class="nav-link">
-                            Shop
-                        </a>
-
-                        <a href="#" class="nav-link">
-                            Categories
-                        </a>
-
-                        <a href="#" class="nav-link">
-                            About
-                        </a>
-
-                        <a href="#" class="nav-link">
-                            Contact
-                        </a>
-                    </nav>
-
-                    <div class="header-actions">
-
-                        <button
-                            class="icon-button"
-                            type="button"
-                            aria-label="Search"
-                        >
-                            Search
-                        </button>
-
-                        <button
-                            class="icon-button"
-                            type="button"
-                            aria-label="Wishlist"
-                        >
-                            Wishlist
-                        </button>
-
-                        <button
-                            class="cart-button"
-                            type="button"
-                            aria-label="Shopping cart"
-                        >
-                            Cart
-                            <span class="cart-count">0</span>
-                        </button>
-
-                        <button
-                            class="account-button"
-                            type="button"
-                        >
-                            Account
-                        </button>
-
-                    </div>
-
-                </div>
-            </header>
+const app = document.querySelector("#app");
+const announcementBar = document.querySelector("#announcement-bar");
+const header = document.querySelector("#site-header");
+const mainContent = document.querySelector("#main-content");
+const footer = document.querySelector("#site-footer");
 
 
-            <!-- MAIN APPLICATION -->
-            <main>
+/* =========================================================
+   STORE CONFIGURATION
+   ========================================================= */
 
-                <!-- HERO -->
-                <section class="hero-section">
-                    <div class="container hero-content">
-
-                        <div class="hero-copy">
-
-                            <span class="eyebrow">
-                                SMH COLLECTION
-                            </span>
-
-                            <h1>
-                                Discover products
-                                made for your lifestyle.
-                            </h1>
-
-                            <p>
-                                Explore a carefully selected collection
-                                of products with a simple and modern
-                                shopping experience.
-                            </p>
-
-                            <div class="hero-actions">
-
-                                <a
-                                    href="#shop"
-                                    class="primary-button"
-                                >
-                                    Shop Now
-                                </a>
-
-                                <a
-                                    href="#featured"
-                                    class="secondary-button"
-                                >
-                                    Explore Collection
-                                </a>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-                </section>
+const STORE = {
+    name: "SMH Collection",
+    currency: "USD",
+    delivery: "Free Delivery",
+    payment: "Cash on Delivery"
+};
 
 
-                <!-- CATEGORIES -->
-                <section class="categories-section">
-                    <div class="container">
+/* =========================================================
+   ANNOUNCEMENT
+   ========================================================= */
 
-                        <div class="section-heading">
-                            <span class="eyebrow">
-                                SHOP BY CATEGORY
-                            </span>
-
-                            <h2>
-                                Find what you need
-                            </h2>
-
-                            <p>
-                                Browse our product categories.
-                            </p>
-                        </div>
-
-                        <div class="category-grid">
-
-                            <button class="category-card">
-                                <span class="category-icon">
-                                    Fashion
-                                </span>
-
-                                <strong>
-                                    Fashion
-                                </strong>
-
-                                <span>
-                                    Explore collection
-                                </span>
-                            </button>
-
-                            <button class="category-card">
-                                <span class="category-icon">
-                                    Electronics
-                                </span>
-
-                                <strong>
-                                    Electronics
-                                </strong>
-
-                                <span>
-                                    Explore collection
-                                </span>
-                            </button>
-
-                            <button class="category-card">
-                                <span class="category-icon">
-                                    Beauty
-                                </span>
-
-                                <strong>
-                                    Beauty
-                                </strong>
-
-                                <span>
-                                    Explore collection
-                                </span>
-                            </button>
-
-                            <button class="category-card">
-                                <span class="category-icon">
-                                    Lifestyle
-                                </span>
-
-                                <strong>
-                                    Lifestyle
-                                </strong>
-
-                                <span>
-                                    Explore collection
-                                </span>
-                            </button>
-
-                        </div>
-
-                    </div>
-                </section>
+function renderAnnouncement() {
+    announcementBar.innerHTML = `
+        <div class="container">
+            Free delivery • Cash on Delivery • Shop SMH Collection
+        </div>
+    `;
+}
 
 
-                <!-- FEATURED PRODUCTS -->
-                <section
-                    class="products-section"
-                    id="featured"
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+function renderHeader() {
+
+    header.innerHTML = `
+        <div class="container">
+            <div class="header-inner">
+
+                <a
+                    href="#"
+                    class="smh-brand"
+                    aria-label="SMH Collection Home"
                 >
 
-                    <div class="container">
+                    <span class="smh-brand-mark">
+                        SMH
+                    </span>
 
-                        <div class="section-heading">
-                            <span class="eyebrow">
-                                FEATURED
-                            </span>
+                    <span class="smh-brand-name">
+                        SMH <span>Collection</span>
+                    </span>
 
-                            <h2>
-                                Featured products
-                            </h2>
+                </a>
 
-                            <p>
-                                Discover products selected for you.
-                            </p>
-                        </div>
+
+                <nav
+                    class="main-nav"
+                    aria-label="Main navigation"
+                >
+
+                    <a href="#home">
+                        Home
+                    </a>
+
+                    <a href="#shop">
+                        Shop
+                    </a>
+
+                    <a href="#categories">
+                        Categories
+                    </a>
+
+                    <a href="#new-arrivals">
+                        New Arrivals
+                    </a>
+
+                </nav>
+
+
+                <div class="header-actions">
+
+                    <button
+                        class="icon-button"
+                        type="button"
+                        aria-label="Search"
+                        title="Search"
+                    >
+                        🔍
+                    </button>
+
+                    <button
+                        class="icon-button"
+                        type="button"
+                        aria-label="Wishlist"
+                        title="Wishlist"
+                    >
+                        ♡
+                    </button>
+
+                    <button
+                        class="icon-button"
+                        type="button"
+                        aria-label="Shopping Cart"
+                        title="Shopping Cart"
+                    >
+                        🛒
+                    </button>
+
+                    <button
+                        class="btn btn-primary"
+                        type="button"
+                        id="account-button"
+                    >
+                        Account
+                    </button>
+
+                </div>
+
+            </div>
+        </div>
+    `;
+}
+
+
+/* =========================================================
+   HERO
+   ========================================================= */
+
+function renderHero() {
+
+    return `
+        <section
+            class="hero"
+            id="home"
+        >
+
+            <div class="container">
+
+                <div class="hero-content">
+
+                    <div class="hero-eyebrow">
+                        Welcome to SMH Collection
+                    </div>
+
+                    <h1>
+                        Everything you love,
+                        <span>all in one place.</span>
+                    </h1>
+
+                    <p>
+                        Discover products for your lifestyle,
+                        explore new collections and enjoy a
+                        simple shopping experience with
+                        free delivery and Cash on Delivery.
+                    </p>
+
+                    <div class="hero-actions">
+
+                        <a
+                            href="#shop"
+                            class="btn btn-primary"
+                        >
+                            Shop Now
+                        </a>
+
+                        <a
+                            href="#categories"
+                            class="btn btn-outline"
+                        >
+                            Explore Categories
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+    `;
+}
+
+
+/* =========================================================
+   CATEGORIES
+   ========================================================= */
+
+const categories = [
+    {
+        name: "Fashion",
+        icon: "👕"
+    },
+    {
+        name: "Electronics",
+        icon: "📱"
+    },
+    {
+        name: "Shoes",
+        icon: "👟"
+    },
+    {
+        name: "Accessories",
+        icon: "⌚"
+    }
+];
+
+
+function renderCategories() {
+
+    const categoryCards = categories
+        .map(category => {
+
+            return `
+                <a
+                    href="#shop"
+                    class="category-card"
+                >
+
+                    <div>
 
                         <div
-                            class="product-grid"
-                            id="featured-products"
+                            style="
+                                font-size: 32px;
+                                margin-bottom: 8px;
+                            "
                         >
-                            <!-- Products will be rendered here -->
+                            ${category.icon}
                         </div>
+
+                        <h3>
+                            ${category.name}
+                        </h3>
 
                     </div>
 
-                </section>
+                </a>
+            `;
+        })
+        .join("");
 
 
-                <!-- NEWSLETTER -->
-                <section class="newsletter-section">
+    return `
+        <section
+            class="section"
+            id="categories"
+        >
 
-                    <div class="container newsletter-card">
+            <div class="container">
 
-                        <div>
-                            <span class="eyebrow">
-                                STAY CONNECTED
-                            </span>
-
-                            <h2>
-                                Get updates from SMH Collection
-                            </h2>
-
-                            <p>
-                                Receive product updates and special offers.
-                            </p>
-                        </div>
-
-                        <form class="newsletter-form">
-
-                            <label
-                                for="newsletter-email"
-                                class="sr-only"
-                            >
-                                Email address
-                            </label>
-
-                            <input
-                                id="newsletter-email"
-                                type="email"
-                                placeholder="Enter your email"
-                                required
-                            >
-
-                            <button
-                                type="submit"
-                                class="primary-button"
-                            >
-                                Subscribe
-                            </button>
-
-                        </form>
-
-                    </div>
-
-                </section>
-
-            </main>
-
-
-            <!-- FOOTER -->
-            <footer class="site-footer">
-
-                <div class="container footer-grid">
+                <div class="section-header">
 
                     <div>
-                        <a
-                            href="index.html"
-                            class="brand footer-brand"
-                        >
-                            <span class="brand-mark">SMH</span>
-                            <span class="brand-name">
-                                Collection
-                            </span>
-                        </a>
 
-                        <p>
-                            A modern shopping experience
-                            built for SMH Collection.
+                        <h2 class="section-title">
+                            Shop by Category
+                        </h2>
+
+                        <p class="section-subtitle">
+                            Explore popular product categories.
                         </p>
+
                     </div>
 
-                    <div>
-                        <h3>Shop</h3>
-
-                        <a href="#">
-                            All Products
-                        </a>
-
-                        <a href="#">
-                            New Arrivals
-                        </a>
-
-                        <a href="#">
-                            Featured
-                        </a>
-                    </div>
-
-                    <div>
-                        <h3>Company</h3>
-
-                        <a href="#">
-                            About
-                        </a>
-
-                        <a href="#">
-                            Contact
-                        </a>
-
-                        <a href="#">
-                            Privacy
-                        </a>
-                    </div>
-
-                    <div>
-                        <h3>Account</h3>
-
-                        <a href="#">
-                            Sign In
-                        </a>
-
-                        <a href="#">
-                            Create Account
-                        </a>
-
-                        <a href="#">
-                            Orders
-                        </a>
-                    </div>
+                    <a
+                        href="#shop"
+                        class="btn btn-outline"
+                    >
+                        View All
+                    </a>
 
                 </div>
 
-                <div class="container footer-bottom">
-                    <p>
-                        © ${new Date().getFullYear()}
-                        SMH Collection.
-                        All rights reserved.
+
+                <div class="category-grid">
+
+                    ${categoryCards}
+
+                </div>
+
+            </div>
+
+        </section>
+    `;
+}
+
+
+/* =========================================================
+   PRODUCT PLACEHOLDER
+   ========================================================= */
+
+const featuredProducts = [
+    {
+        name: "Featured Product",
+        category: "New Collection",
+        price: "$49.99"
+    },
+    {
+        name: "Premium Selection",
+        category: "Popular",
+        price: "$79.99"
+    },
+    {
+        name: "Everyday Essential",
+        category: "Lifestyle",
+        price: "$29.99"
+    },
+    {
+        name: "SMH Exclusive",
+        category: "Exclusive",
+        price: "$99.99"
+    }
+];
+
+
+function renderProducts() {
+
+    const products = featuredProducts
+        .map(product => {
+
+            return `
+                <article
+                    class="product-card"
+                >
+
+                    <div
+                        class="product-image"
+                        aria-label="Product image"
+                    >
+                        <span
+                            style="
+                                font-size: 42px;
+                                opacity: .45;
+                            "
+                        >
+                            🛍️
+                        </span>
+                    </div>
+
+                    <div class="product-info">
+
+                        <div class="product-category">
+                            ${product.category}
+                        </div>
+
+                        <h3 class="product-name">
+                            ${product.name}
+                        </h3>
+
+                        <div class="product-price">
+                            ${product.price}
+                        </div>
+
+                    </div>
+
+                </article>
+            `;
+        })
+        .join("");
+
+
+    return `
+        <section
+            class="section"
+            id="shop"
+        >
+
+            <div class="container">
+
+                <div class="section-header">
+
+                    <div>
+
+                        <h2 class="section-title">
+                            Featured Products
+                        </h2>
+
+                        <p class="section-subtitle">
+                            Carefully selected products
+                            from SMH Collection.
+                        </p>
+
+                    </div>
+
+                    <a
+                        href="#shop"
+                        class="btn btn-outline"
+                    >
+                        Shop All
+                    </a>
+
+                </div>
+
+
+                <div class="product-grid">
+
+                    ${products}
+
+                </div>
+
+            </div>
+
+        </section>
+    `;
+}
+
+
+/* =========================================================
+   NEW ARRIVALS
+   ========================================================= */
+
+function renderNewArrivals() {
+
+    return `
+        <section
+            class="section"
+            id="new-arrivals"
+        >
+
+            <div class="container">
+
+                <div
+                    style="
+                        padding: 50px 30px;
+                        border-radius: 22px;
+                        background: #111827;
+                        color: white;
+                        text-align: center;
+                    "
+                >
+
+                    <div
+                        style="
+                            color: #d4af37;
+                            font-weight: 800;
+                            font-size: 12px;
+                            text-transform: uppercase;
+                            letter-spacing: 1px;
+                        "
+                    >
+                        Coming Soon
+                    </div>
+
+                    <h2
+                        style="
+                            margin-top: 10px;
+                            font-size: clamp(
+                                28px,
+                                5vw,
+                                42px
+                            );
+                        "
+                    >
+                        New Arrivals
+                    </h2>
+
+                    <p
+                        style="
+                            max-width: 550px;
+                            margin: 12px auto 24px;
+                            color: #cbd5e1;
+                        "
+                    >
+                        Fresh products and new collections
+                        will appear here as the SMH Collection
+                        marketplace grows.
                     </p>
+
+                    <a
+                        href="#shop"
+                        class="btn btn-accent"
+                    >
+                        Explore Store
+                    </a>
+
                 </div>
 
-            </footer>
+            </div>
+
+        </section>
+    `;
+}
+
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+function renderFooter() {
+
+    footer.innerHTML = `
+        <div class="container">
+
+            <div class="footer-inner">
+
+                <div class="footer-brand">
+
+                    <div class="smh-brand">
+
+                        <span class="smh-brand-mark">
+                            SMH
+                        </span>
+
+                        <span class="smh-brand-name"
+                            style="color:white;"
+                        >
+                            SMH
+                            <span>Collection</span>
+                        </span>
+
+                    </div>
+
+                    <p>
+                        A modern global marketplace built
+                        to make shopping simple, convenient
+                        and enjoyable.
+                    </p>
+
+                </div>
+
+
+                <div class="footer-column">
+
+                    <h4>
+                        Shop
+                    </h4>
+
+                    <a href="#shop">
+                        All Products
+                    </a>
+
+                    <a href="#categories">
+                        Categories
+                    </a>
+
+                    <a href="#new-arrivals">
+                        New Arrivals
+                    </a>
+
+                </div>
+
+
+                <div class="footer-column">
+
+                    <h4>
+                        Customer
+                    </h4>
+
+                    <a href="#">
+                        My Account
+                    </a>
+
+                    <a href="#">
+                        Orders
+                    </a>
+
+                    <a href="#">
+                        Wishlist
+                    </a>
+
+                </div>
+
+
+                <div class="footer-column">
+
+                    <h4>
+                        SMH Collection
+                    </h4>
+
+                    <a href="#">
+                        About Us
+                    </a>
+
+                    <a href="#">
+                        Contact
+                    </a>
+
+                    <a href="#">
+                        Privacy Policy
+                    </a>
+
+                </div>
+
+            </div>
+
+
+            <div class="footer-bottom">
+
+                © ${new Date().getFullYear()}
+                SMH Collection.
+                All rights reserved.
+
+            </div>
 
         </div>
     `;
 }
 
-renderApp();
+
+/* =========================================================
+   RENDER APPLICATION
+   ========================================================= */
+
+function renderApp() {
+
+    renderAnnouncement();
+
+    renderHeader();
+
+    mainContent.innerHTML = `
+        ${renderHero()}
+        ${renderCategories()}
+        ${renderProducts()}
+        ${renderNewArrivals()}
+    `;
+
+    renderFooter();
+}
+
+
+/* =========================================================
+   APPLICATION START
+   ========================================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        renderApp();
+
+        console.log(
+            "SMH Collection application started."
+        );
+
+    }
+);
