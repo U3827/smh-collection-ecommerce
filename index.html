@@ -1,103 +1,378 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+  <title>SMH Collection</title>
 
-    <meta
-        name="description"
-        content="SMH Collection — Discover fashion, lifestyle, electronics and everyday essentials from a modern global marketplace."
-    >
+  <meta
+    name="description"
+    content="SMH Collection — Discover fashion, electronics, shoes, accessories and more."
+  >
 
-    <meta
-        name="theme-color"
-        content="#0f172a"
-    >
-
-    <meta
-        name="author"
-        content="SMH Collection"
-    >
-
-    <title>SMH Collection — Shop Everything You Love</title>
-
-    <link
-        rel="stylesheet"
-        href="assets/css/style.css"
-    >
+  <link rel="stylesheet" href="assets/css/style.css">
 </head>
 
 <body>
 
-    <div id="app">
+  <!-- =========================================
+       ANNOUNCEMENT MARQUEE
+  ========================================== -->
+  <div class="announcement-bar">
+    <div class="marquee">
+      <div class="marquee-track">
+        <span>SMH COLLECTION</span>
+        <span>FREE DELIVERY</span>
+        <span>CASH ON DELIVERY</span>
+        <span>SHOP WORLDWIDE</span>
 
-        <!-- ================================
-             GLOBAL ANNOUNCEMENT
-        ================================= -->
-
-        <div
-            id="announcement-bar"
-            aria-label="Store announcement"
-        ></div>
-
-
-        <!-- ================================
-             MAIN HEADER
-        ================================= -->
-
-        <header
-            id="site-header"
-            role="banner"
-        ></header>
+        <span>SMH COLLECTION</span>
+        <span>FREE DELIVERY</span>
+        <span>CASH ON DELIVERY</span>
+        <span>SHOP WORLDWIDE</span>
+      </div>
+    </div>
+  </div>
 
 
-        <!-- ================================
-             APPLICATION CONTENT
-        ================================= -->
+  <!-- =========================================
+       HEADER
+  ========================================== -->
+  <header class="site-header">
 
-        <main
-            id="main-content"
-            role="main"
-        ></main>
+    <div class="header-container">
 
-
-        <!-- ================================
-             GLOBAL FOOTER
-        ================================= -->
-
-        <footer
-            id="site-footer"
-            role="contentinfo"
-        ></footer>
+      <!-- Logo -->
+      <a href="index.html" class="brand">
+        <span class="brand-main">SMH</span>
+        <span class="brand-sub">COLLECTION</span>
+      </a>
 
 
-        <!-- ================================
-             GLOBAL UI CONTAINERS
-        ================================= -->
+      <!-- Search -->
+      <form class="search-box" id="searchForm">
+        <input
+          type="search"
+          id="searchInput"
+          placeholder="Search products..."
+          autocomplete="off"
+        >
 
-        <div id="modal-root"></div>
+        <button type="submit" aria-label="Search">
+          <svg
+            viewBox="0 0 24 24"
+            width="20"
+            height="20"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <circle cx="11" cy="11" r="7"></circle>
+            <path d="M20 20l-4-4"></path>
+          </svg>
+        </button>
+      </form>
 
-        <div id="toast-root"></div>
 
-        <div id="loader-root"></div>
+      <!-- Header Actions -->
+      <div class="header-actions">
+
+        <a href="#" class="header-action" id="wishlistButton">
+          <span class="action-icon">♡</span>
+          <span class="action-label">Wishlist</span>
+        </a>
+
+        <a href="#" class="header-action cart-action" id="cartButton">
+          <span class="action-icon">🛒</span>
+          <span class="cart-count" id="cartCount">0</span>
+          <span class="action-label">Cart</span>
+        </a>
+
+        <a href="login.html" class="sign-in-button">
+          Sign In
+        </a>
+
+        <a href="signup.html" class="create-account-button">
+          Create Account
+        </a>
+
+      </div>
+
+    </div>
+
+  </header>
+
+
+  <!-- =========================================
+       MAIN
+  ========================================== -->
+  <main>
+
+
+    <!-- =======================================
+         HERO
+    ======================================== -->
+    <section class="hero">
+
+      <div class="hero-content">
+
+        <p class="hero-small-title">
+          WELCOME TO SMH COLLECTION
+        </p>
+
+        <h1>
+          Everything you love,
+          <span>in one place.</span>
+        </h1>
+
+        <p class="hero-description">
+          Discover products across fashion, electronics,
+          shoes, accessories and more.
+        </p>
+
+        <a href="#products" class="primary-button">
+          Shop Collection
+          <span>→</span>
+        </a>
+
+      </div>
+
+      <div class="hero-visual">
+
+        <div class="hero-circle circle-one"></div>
+        <div class="hero-circle circle-two"></div>
+
+        <div class="hero-card">
+          <div class="hero-card-logo">
+            SMH
+          </div>
+
+          <div class="hero-card-text">
+            COLLECTION
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =======================================
+         CATEGORIES
+    ======================================== -->
+    <section class="categories-section">
+
+      <div class="section-heading">
+        <div>
+          <p class="section-overline">EXPLORE</p>
+          <h2>Shop by Category</h2>
+        </div>
+
+        <a href="#" class="view-all">
+          View all →
+        </a>
+      </div>
+
+
+      <div class="category-grid">
+
+        <a href="#" class="category-card">
+          <div class="category-number">01</div>
+          <div>
+            <h3>Fashion</h3>
+            <p>Clothing & style</p>
+          </div>
+          <span>→</span>
+        </a>
+
+
+        <a href="#" class="category-card">
+          <div class="category-number">02</div>
+          <div>
+            <h3>Electronics</h3>
+            <p>Technology & gadgets</p>
+          </div>
+          <span>→</span>
+        </a>
+
+
+        <a href="#" class="category-card">
+          <div class="category-number">03</div>
+          <div>
+            <h3>Shoes</h3>
+            <p>Step up your style</p>
+          </div>
+          <span>→</span>
+        </a>
+
+
+        <a href="#" class="category-card">
+          <div class="category-number">04</div>
+          <div>
+            <h3>Accessories</h3>
+            <p>Complete your look</p>
+          </div>
+          <span>→</span>
+        </a>
+
+      </div>
+
+    </section>
+
+
+    <!-- =======================================
+         PRODUCTS
+    ======================================== -->
+    <section class="products-section" id="products">
+
+      <div class="section-heading">
+        <div>
+          <p class="section-overline">SHOP</p>
+          <h2>Featured Products</h2>
+        </div>
+
+        <a href="#" class="view-all">
+          View all →
+        </a>
+      </div>
+
+
+      <div class="product-grid" id="productGrid">
+
+        <!-- Products will be loaded here -->
+
+        <div class="product-placeholder">
+          <div class="placeholder-icon">SMH</div>
+
+          <h3>Products Coming Soon</h3>
+
+          <p>
+            Our product catalogue is being prepared.
+          </p>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =======================================
+         TRUST STRIP
+    ======================================== -->
+    <section class="trust-section">
+
+      <div class="trust-item">
+        <span class="trust-icon">✦</span>
+
+        <div>
+          <strong>Free Delivery</strong>
+          <p>Delivery available worldwide</p>
+        </div>
+      </div>
+
+
+      <div class="trust-item">
+        <span class="trust-icon">✓</span>
+
+        <div>
+          <strong>Cash on Delivery</strong>
+          <p>Pay when your order arrives</p>
+        </div>
+      </div>
+
+
+      <div class="trust-item">
+        <span class="trust-icon">◉</span>
+
+        <div>
+          <strong>Secure Account</strong>
+          <p>Your account stays protected</p>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- =========================================
+       FOOTER
+  ========================================== -->
+  <footer class="site-footer">
+
+    <div class="footer-container">
+
+      <div class="footer-brand">
+
+        <a href="index.html" class="brand footer-logo">
+          <span class="brand-main">SMH</span>
+          <span class="brand-sub">COLLECTION</span>
+        </a>
+
+        <p>
+          Everything you love, in one place.
+        </p>
+
+      </div>
+
+
+      <div class="footer-links">
+
+        <div class="footer-column">
+          <h4>Shop</h4>
+
+          <a href="#">All Products</a>
+          <a href="#">Fashion</a>
+          <a href="#">Electronics</a>
+          <a href="#">Shoes</a>
+        </div>
+
+
+        <div class="footer-column">
+          <h4>Account</h4>
+
+          <a href="login.html">Sign In</a>
+          <a href="signup.html">Create Account</a>
+          <a href="#">Wishlist</a>
+          <a href="#">Orders</a>
+        </div>
+
+
+        <div class="footer-column">
+          <h4>Help</h4>
+
+          <a href="#">Contact</a>
+          <a href="#">Delivery</a>
+          <a href="#">Returns</a>
+          <a href="#">FAQ</a>
+        </div>
+
+      </div>
 
     </div>
 
 
-    <!--
-        SMH Collection application entry point.
-        All major application logic will be
-        loaded through the JavaScript architecture.
-    -->
+    <div class="footer-bottom">
 
-    <script
-        type="module"
-        src="assets/js/app.js"
-    ></script>
+      <p>
+        © <span id="currentYear"></span> SMH Collection.
+        All rights reserved.
+      </p>
+
+      <p>
+        Saddiq Musa Hasan
+      </p>
+
+    </div>
+
+  </footer>
+
+
+  <!-- =========================================
+       JAVASCRIPT
+  ========================================== -->
+  <script type="module" src="assets/js/app.js"></script>
 
 </body>
 </html>
