@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Create Account | SMH Collection</title>
+
+  <meta
+    name="description"
+    content="Create your SMH Collection account."
+  >
+
+  <link rel="stylesheet" href="assets/css/auth.css">
+</head>
+
+<body>
+
+  <!-- =========================
+       AUTH HEADER
+  ========================== -->
+
+  <header class="auth-header">
+
+    <a href="index.html" class="auth-logo">
+      <span class="auth-logo-main">SMH</span>
+      <span class="auth-logo-sub">COLLECTION</span>
+    </a>
+
+    <a href="index.html" class="back-home">
+      ← Home
+    </a>
+
+  </header>
+
+
+  <!-- =========================
+       SIGN UP
+  ========================== -->
+
+  <main class="auth-page">
+
+    <section class="auth-card">
+
+      <div class="auth-heading">
+
+        <p class="auth-eyebrow">
+          JOIN SMH COLLECTION
+        </p>
+
+        <h1>
+          Create your account
+        </h1>
+
+        <p>
+          Create your account to get started with
+          the SMH Collection shopping experience.
+        </p>
+
+      </div>
+
+
+      <!-- =========================
+           SIGN UP FORM
+      ========================== -->
+
+      <form id="signupForm" class="auth-form">
+
+        <div class="form-group">
+
+          <label for="fullName">
+            Full Name
+          </label>
+
+          <input
+            type="text"
+            id="fullName"
+            name="fullName"
+            placeholder="Enter your full name"
+            autocomplete="name"
+            required
+          >
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="signupEmail">
+            Email Address
+          </label>
+
+          <input
+            type="email"
+            id="signupEmail"
+            name="email"
+            placeholder="Enter your email"
+            autocomplete="email"
+            required
+          >
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="signupPassword">
+            Password
+          </label>
+
+          <input
+            type="password"
+            id="signupPassword"
+            name="password"
+            placeholder="Create a password"
+            autocomplete="new-password"
+            minlength="8"
+            required
+          >
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="confirmPassword">
+            Confirm Password
+          </label>
+
+          <input
+            type="password"
+            id="confirmPassword"
+            name="confirmPassword"
+            placeholder="Confirm your password"
+            autocomplete="new-password"
+            minlength="8"
+            required
+          >
+
+        </div>
+
+
+        <button
+          type="submit"
+          class="auth-button"
+          id="signupButton"
+        >
+          Create Account
+        </button>
+
+      </form>
+
+
+      <!-- =========================
+           DIVIDER
+      ========================== -->
+
+      <div class="auth-divider">
+        <span>OR</span>
+      </div>
+
+
+      <!-- =========================
+           GOOGLE SIGN UP
+      ========================== -->
+
+      <button
+        type="button"
+        class="google-button"
+        id="googleSignUp"
+      >
+
+        <span class="google-icon">
+          G
+        </span>
+
+        <span>
+          Continue with Google
+        </span>
+
+      </button>
+
+
+      <!-- =========================
+           LOGIN LINK
+      ========================== -->
+
+      <p class="auth-switch">
+
+        Already have an account?
+
+        <a href="login.html">
+          Sign In
+        </a>
+
+      </p>
+
+    </section>
+
+  </main>
+
+
+  <!-- =========================
+       FOOTER
+  ========================== -->
+
+  <footer class="auth-footer">
+
+    <p>
+      © <span id="currentYear"></span>
+      SMH Collection. All rights reserved.
+    </p>
+
+  </footer>
+
+
+  <script src="assets/js/auth.js"></script>
+
+</body>
+</html>
