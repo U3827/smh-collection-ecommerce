@@ -96,15 +96,17 @@
         novalidate
       >
 
+        <!-- EMAIL -->
+
         <div class="form-group">
 
-          <label for="email">
+          <label for="loginEmail">
             Email Address
           </label>
 
           <input
             type="email"
-            id="email"
+            id="loginEmail"
             name="email"
             placeholder="Enter your email"
             autocomplete="email"
@@ -115,15 +117,17 @@
         </div>
 
 
+        <!-- PASSWORD -->
+
         <div class="form-group">
 
-          <label for="password">
+          <label for="loginPassword">
             Password
           </label>
 
           <input
             type="password"
-            id="password"
+            id="loginPassword"
             name="password"
             placeholder="Enter your password"
             autocomplete="current-password"
@@ -173,7 +177,7 @@
         ></div>
 
 
-        <!-- SUBMIT -->
+        <!-- SIGN IN -->
 
         <button
           type="submit"
@@ -187,7 +191,7 @@
 
 
       <!-- ==============================
-           GOOGLE
+           GOOGLE SIGN IN
       =============================== -->
 
       <div class="auth-divider">
@@ -198,7 +202,7 @@
       <button
         type="button"
         class="google-button"
-        id="googleSignIn"
+        id="googleLogin"
       >
 
         <span
@@ -241,7 +245,8 @@
   <footer class="auth-footer">
 
     <p>
-      © <span id="currentYear"></span>
+      ©
+      <span id="currentYear"></span>
       SMH Collection. All rights reserved.
     </p>
 
