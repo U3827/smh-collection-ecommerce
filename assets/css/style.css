@@ -1,40 +1,22 @@
-/* =========================================================
+/* =========================================
    SMH COLLECTION
    Main Stylesheet
-   ========================================================= */
-
-
-/* =========================================================
-   1. ROOT
-   ========================================================= */
+========================================= */
 
 :root {
-  --black: #070707;
-  --black-soft: #0d0d0d;
-  --surface: #121212;
-
-  --white: #f7f7f7;
-  --muted: #999999;
-
-  --gold: #d6ad55;
-
-  --red: #ff4d5a;
-  --blue: #4da3ff;
-  --green: #4fd18b;
-  --purple: #a678ff;
-  --orange: #ff9d4d;
-
-  --border: rgba(255, 255, 255, 0.09);
-
-  --max-width: 1180px;
-
-  --transition: 0.3s ease;
+  --black: #080808;
+  --dark: #101010;
+  --dark-soft: #171717;
+  --gold: #d4af37;
+  --gold-light: #f1d77a;
+  --white: #ffffff;
+  --muted: #a7a7a7;
+  --border: rgba(255, 255, 255, 0.1);
 }
 
-
-/* =========================================================
-   2. RESET
-   ========================================================= */
+/* =========================================
+   RESET
+========================================= */
 
 * {
   margin: 0;
@@ -47,20 +29,9 @@ html {
 }
 
 body {
-  min-height: 100vh;
-
+  font-family: Arial, Helvetica, sans-serif;
   background: var(--black);
-
   color: var(--white);
-
-  font-family:
-    Inter,
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    sans-serif;
-
   line-height: 1.6;
 }
 
@@ -70,157 +41,102 @@ a {
 }
 
 button,
-input {
-  font-family: inherit;
+a {
+  -webkit-tap-highlight-color: transparent;
 }
 
+/* =========================================
+   TOP MARQUEE
+========================================= */
 
-/* =========================================================
-   3. MARQUEE
-   ========================================================= */
-
-.marquee-bar {
+.top-marquee {
   width: 100%;
-
-  height: 58px;
-
   overflow: hidden;
-
-  display: flex;
-  align-items: center;
-
-  background: #030303;
-
-  border-bottom: 1px solid var(--border);
-  border-top: 1px solid var(--border);
-}
-
-.marquee-track {
-  width: max-content;
-
-  display: flex;
-  align-items: center;
-
-  animation:
-    marqueeMove 22s linear infinite;
-}
-
-.marquee-brand {
-  display: flex;
-  align-items: center;
-
+  background: #050505;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.2);
   white-space: nowrap;
 }
 
-.marquee-brand span {
-  display: inline-block;
-
-  font-size: 21px;
-
-  font-weight: 900;
-
-  letter-spacing: 0.08em;
-
-  transition:
-    color 1s ease,
-    text-shadow 1s ease;
-
-  animation:
-    letterColor 5s infinite alternate;
+.marquee-content {
+  display: flex;
+  align-items: center;
+  width: max-content;
+  padding: 11px 0;
+  animation: marqueeMove 18s linear infinite;
 }
 
+.marquee-item {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 0 28px;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 5px;
+}
 
-/* Individual letter colors */
+.marquee-item span:not(.space):nth-child(1) {
+  color: #ff4d4d;
+}
 
-.marquee-brand span:nth-child(1) {
+.marquee-item span:not(.space):nth-child(2) {
+  color: #ffb84d;
+}
+
+.marquee-item span:not(.space):nth-child(3) {
+  color: #ffe14d;
+}
+
+.marquee-item span:not(.space):nth-child(5) {
+  color: #65e572;
+}
+
+.marquee-item span:not(.space):nth-child(6) {
+  color: #4ddcff;
+}
+
+.marquee-item span:not(.space):nth-child(7) {
+  color: #4d8dff;
+}
+
+.marquee-item span:not(.space):nth-child(8) {
+  color: #765cff;
+}
+
+.marquee-item span:not(.space):nth-child(9) {
+  color: #b95cff;
+}
+
+.marquee-item span:not(.space):nth-child(10) {
+  color: #ff5ccf;
+}
+
+.marquee-item span:not(.space):nth-child(11) {
+  color: #ff5c7a;
+}
+
+.marquee-item span:not(.space):nth-child(12) {
+  color: #ff9f4d;
+}
+
+.marquee-item span:not(.space):nth-child(13) {
+  color: #f2d14d;
+}
+
+.marquee-item span:not(.space):nth-child(14) {
+  color: #67e88b;
+}
+
+.marquee-star {
   color: var(--gold);
-  animation-delay: 0s;
+  font-size: 15px;
 }
 
-.marquee-brand span:nth-child(2) {
-  color: var(--blue);
-  animation-delay: 0.25s;
+.space {
+  width: 8px;
 }
-
-.marquee-brand span:nth-child(3) {
-  color: var(--red);
-  animation-delay: 0.5s;
-}
-
-.marquee-brand span:nth-child(5) {
-  color: var(--green);
-  animation-delay: 0.75s;
-}
-
-.marquee-brand span:nth-child(6) {
-  color: var(--purple);
-  animation-delay: 1s;
-}
-
-.marquee-brand span:nth-child(7) {
-  color: var(--orange);
-  animation-delay: 1.25s;
-}
-
-.marquee-brand span:nth-child(8) {
-  color: var(--gold);
-  animation-delay: 1.5s;
-}
-
-.marquee-brand span:nth-child(9) {
-  color: var(--blue);
-  animation-delay: 1.75s;
-}
-
-.marquee-brand span:nth-child(10) {
-  color: var(--red);
-  animation-delay: 2s;
-}
-
-.marquee-brand span:nth-child(11) {
-  color: var(--green);
-  animation-delay: 2.25s;
-}
-
-.marquee-brand span:nth-child(12) {
-  color: var(--purple);
-  animation-delay: 2.5s;
-}
-
-.marquee-brand span:nth-child(13) {
-  color: var(--orange);
-  animation-delay: 2.75s;
-}
-
-.marquee-brand span:nth-child(14) {
-  color: var(--gold);
-  animation-delay: 3s;
-}
-
-
-/* Color animation */
-
-@keyframes letterColor {
-
-  0% {
-    filter: brightness(0.75);
-  }
-
-  50% {
-    filter: brightness(1.25);
-  }
-
-  100% {
-    filter: brightness(0.9);
-  }
-
-}
-
-
-/* Marquee movement */
 
 @keyframes marqueeMove {
-
   from {
     transform: translateX(0);
   }
@@ -228,770 +144,542 @@ input {
   to {
     transform: translateX(-50%);
   }
-
 }
 
+/* =========================================
+   HEADER
+========================================= */
 
-.marquee-separator {
-  margin: 0 42px;
-
-  color: var(--gold);
-
-  font-size: 13px;
-}
-
-
-/* =========================================================
-   4. HEADER
-   ========================================================= */
-
-.site-header {
+.header {
   width: 100%;
-
-  background:
-    rgba(7, 7, 7, 0.94);
-
+  background: rgba(8, 8, 8, 0.96);
   border-bottom: 1px solid var(--border);
-
-  position: sticky;
-
-  top: 0;
-
-  z-index: 100;
 }
 
-.header-container {
-  width: min(
-    calc(100% - 40px),
-    var(--max-width)
-  );
-
+.header-inner {
+  width: min(1180px, 92%);
   min-height: 82px;
-
   margin: auto;
 
   display: flex;
-
   align-items: center;
-
   justify-content: space-between;
+  gap: 25px;
 }
 
+/* =========================================
+   LOGO
+========================================= */
 
-/* =========================================================
-   5. BRAND
-   ========================================================= */
-
-.brand {
-  display: flex;
-
+.logo {
+  display: inline-flex;
   flex-direction: column;
-
   line-height: 1;
 }
 
-.brand-name {
-  color: var(--gold);
-
-  font-size: 27px;
-
+.logo-main {
+  font-size: 30px;
   font-weight: 900;
-
-  letter-spacing: 0.14em;
+  letter-spacing: 4px;
+  color: var(--white);
 }
 
-.brand-title {
-  margin-top: 5px;
-
-  color: var(--muted);
-
-  font-size: 8px;
-
+.logo-sub {
+  margin-top: 6px;
+  font-size: 9px;
   font-weight: 700;
-
-  letter-spacing: 0.45em;
+  letter-spacing: 5px;
+  color: var(--gold);
 }
 
+/* =========================================
+   NAVIGATION
+========================================= */
 
-/* =========================================================
-   6. NAVIGATION
-   ========================================================= */
-
-.main-nav {
+.navigation {
   display: flex;
-
   align-items: center;
-
   gap: 12px;
 }
 
-.nav-link {
+.login-link,
+.signup-link {
   padding: 10px 18px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 700;
+  transition: 0.25s ease;
+}
 
+.login-link {
   color: var(--white);
-
-  font-size: 13px;
-
-  font-weight: 600;
-
-  transition: var(--transition);
+  border: 1px solid transparent;
 }
 
-.nav-link:hover {
-  color: var(--gold);
+.login-link:hover {
+  border-color: var(--border);
+  background: var(--dark-soft);
 }
 
-.nav-button {
-  padding: 11px 20px;
-
-  border-radius: 7px;
-
+.signup-link {
+  color: #080808;
   background: var(--gold);
-
-  color: #090909;
-
-  font-size: 12px;
-
-  font-weight: 800;
-
-  transition: var(--transition);
 }
 
-.nav-button:hover {
-  background: #edca79;
-
-  transform: translateY(-2px);
+.signup-link:hover {
+  background: var(--gold-light);
+  transform: translateY(-1px);
 }
 
-
-/* =========================================================
-   7. HERO
-   ========================================================= */
+/* =========================================
+   HERO
+========================================= */
 
 .hero {
-  width: min(
-    calc(100% - 40px),
-    var(--max-width)
-  );
-
+  position: relative;
+  overflow: hidden;
   min-height: 610px;
 
-  margin: 30px auto 0;
-
-  display: grid;
-
-  grid-template-columns:
-    1.1fr
-    0.9fr;
-
+  display: flex;
   align-items: center;
-
-  border: 1px solid var(--border);
-
-  border-radius: 18px;
-
-  overflow: hidden;
 
   background:
     radial-gradient(
-      circle at 80% 50%,
-      rgba(214, 173, 85, 0.07),
-      transparent 35%
+      circle at 80% 45%,
+      rgba(212, 175, 55, 0.12),
+      transparent 30%
     ),
-
     linear-gradient(
       135deg,
-      #0b0b0b,
-      #101010
+      #080808 0%,
+      #111111 55%,
+      #090909 100%
     );
 }
 
+.hero::before {
+  content: "";
+  position: absolute;
+  width: 420px;
+  height: 420px;
+  right: -170px;
+  top: 70px;
 
-/* =========================================================
-   8. HERO CONTENT
-   ========================================================= */
-
-.hero-content {
-  padding: 70px;
+  border: 1px solid rgba(212, 175, 55, 0.12);
+  border-radius: 50%;
 }
 
-.hero-label {
-  margin-bottom: 20px;
+.hero-inner {
+  position: relative;
+  z-index: 1;
+
+  width: min(1180px, 92%);
+  margin: auto;
+
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  align-items: center;
+  gap: 60px;
+}
+
+/* =========================================
+   HERO CONTENT
+========================================= */
+
+.hero-content {
+  max-width: 680px;
+}
+
+.hero-eyebrow {
+  margin-bottom: 18px;
 
   color: var(--gold);
-
-  font-size: 11px;
-
+  font-size: 12px;
   font-weight: 800;
-
-  letter-spacing: 0.22em;
+  letter-spacing: 3px;
 }
 
 .hero h1 {
-  max-width: 650px;
+  max-width: 700px;
 
-  font-size:
-    clamp(
-      46px,
-      6vw,
-      76px
-    );
-
-  font-weight: 800;
-
-  line-height: 0.98;
-
-  letter-spacing: -0.045em;
+  font-size: clamp(44px, 6vw, 76px);
+  line-height: 1.03;
+  letter-spacing: -2px;
+  font-weight: 900;
 }
 
 .hero h1 span {
   display: block;
-
   color: var(--gold);
 }
 
-.hero-text {
-  max-width: 500px;
-
-  margin-top: 28px;
+.hero-description {
+  max-width: 520px;
+  margin-top: 25px;
 
   color: var(--muted);
-
-  font-size: 15px;
+  font-size: 17px;
 }
 
-.hero-actions {
+/* =========================================
+   HERO BUTTONS
+========================================= */
+
+.hero-buttons {
   display: flex;
-
-  align-items: center;
-
+  flex-wrap: wrap;
   gap: 12px;
-
-  margin-top: 35px;
+  margin-top: 32px;
 }
 
-
-/* =========================================================
-   9. HERO BUTTONS
-   ========================================================= */
-
-.primary-button,
-.secondary-button {
+.button-primary,
+.button-secondary {
   display: inline-flex;
-
   align-items: center;
-
   justify-content: center;
 
-  min-height: 45px;
+  min-height: 48px;
+  padding: 0 24px;
 
-  padding: 0 22px;
-
-  border-radius: 7px;
-
-  font-size: 12px;
-
+  border-radius: 6px;
+  font-size: 14px;
   font-weight: 800;
 
-  transition: var(--transition);
+  transition: 0.25s ease;
 }
 
-.primary-button {
+.button-primary {
   background: var(--gold);
-
-  color: #090909;
+  color: #080808;
 }
 
-.primary-button:hover {
-  background: #edca79;
-
+.button-primary:hover {
+  background: var(--gold-light);
   transform: translateY(-2px);
 }
 
-.secondary-button {
-  border: 1px solid var(--border);
-
+.button-secondary {
+  border: 1px solid rgba(255, 255, 255, 0.2);
   color: var(--white);
 }
 
-.secondary-button:hover {
-  border-color: var(--gold);
-
-  color: var(--gold);
+.button-secondary:hover {
+  background: var(--white);
+  color: #080808;
 }
 
+/* =========================================
+   HERO BRAND
+========================================= */
 
-/* =========================================================
-   10. HERO VISUAL
-   ========================================================= */
-
-.hero-visual {
-  min-height: 610px;
-
+.hero-brand {
   display: flex;
-
   flex-direction: column;
-
   align-items: center;
-
   justify-content: center;
 
-  position: relative;
-}
+  min-height: 360px;
+  padding: 40px;
 
-.brand-display {
-  display: flex;
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: 18px;
 
-  align-items: center;
-
-  justify-content: center;
-
-  gap: 4px;
-
-  position: relative;
-
-  z-index: 2;
-}
-
-.display-letter {
-  font-size:
-    clamp(
-      75px,
-      11vw,
-      145px
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.04),
+      rgba(255, 255, 255, 0.01)
     );
 
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.35);
+}
+
+.hero-letters {
+  display: flex;
+  gap: 4px;
+
+  font-size: clamp(70px, 10vw, 130px);
   font-weight: 900;
-
   line-height: 1;
-
-  letter-spacing: -0.08em;
-
-  animation:
-    displayColor 6s infinite alternate;
+  letter-spacing: -8px;
 }
 
-.display-letter:nth-child(1) {
+.hero-letters span:nth-child(1) {
+  color: #ff4d4d;
+}
+
+.hero-letters span:nth-child(2) {
   color: var(--gold);
-
-  animation-delay: 0s;
 }
 
-.display-letter:nth-child(2) {
-  color: var(--blue);
-
-  animation-delay: 1s;
+.hero-letters span:nth-child(3) {
+  color: #4ddcff;
 }
 
-.display-letter:nth-child(3) {
-  color: var(--red);
-
-  animation-delay: 2s;
-}
-
-@keyframes displayColor {
-
-  0% {
-    opacity: 0.75;
-  }
-
-  50% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 0.82;
-  }
-
-}
-
-.hero-visual p {
+.hero-brand-name {
   margin-top: 18px;
 
-  color: var(--muted);
-
-  font-size: 10px;
-
-  font-weight: 700;
-
-  letter-spacing: 0.65em;
+  color: var(--white);
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 9px;
 }
 
+/* =========================================
+   BRAND SECTION
+========================================= */
 
-/* =========================================================
-   11. BRAND INTRODUCTION
-   ========================================================= */
-
-.brand-introduction {
-  width: min(
-    calc(100% - 40px),
-    780px
-  );
-
-  margin: 130px auto;
+.brand-section {
+  width: min(850px, 90%);
+  margin: 0 auto;
+  padding: 110px 0;
 
   text-align: center;
 }
 
-.section-label {
+.brand-label {
   margin-bottom: 15px;
 
   color: var(--gold);
-
-  font-size: 10px;
-
+  font-size: 11px;
   font-weight: 800;
-
-  letter-spacing: 0.22em;
+  letter-spacing: 3px;
 }
 
-.brand-introduction h2 {
-  font-size:
-    clamp(
-      32px,
-      5vw,
-      52px
-    );
-
-  line-height: 1.05;
-
-  letter-spacing: -0.035em;
+.brand-section h2 {
+  font-size: clamp(32px, 5vw, 52px);
+  line-height: 1.1;
+  letter-spacing: -1px;
 }
 
-.brand-introduction h2 span {
+.brand-section h2 span {
   color: var(--gold);
 }
 
-.introduction-text {
-  max-width: 610px;
-
+.brand-section > p:last-child {
+  max-width: 650px;
   margin: 25px auto 0;
 
   color: var(--muted);
-
-  font-size: 14px;
-
-  line-height: 1.9;
+  font-size: 16px;
 }
 
+/* =========================================
+   FOOTER
+========================================= */
 
-/* =========================================================
-   12. FOOTER
-   ========================================================= */
-
-.site-footer {
-  margin-top: 60px;
-
-  background: #030303;
-
+.footer {
   border-top: 1px solid var(--border);
+  background: #050505;
 }
 
-.footer-container {
-  width: min(
-    calc(100% - 40px),
-    var(--max-width)
-  );
-
-  min-height: 150px;
-
+.footer-inner {
+  width: min(1180px, 92%);
   margin: auto;
+  padding: 38px 0;
 
   display: flex;
-
   align-items: center;
-
   justify-content: space-between;
-}
-
-.footer-logo {
-  color: var(--gold);
-
-  font-size: 25px;
-
-  font-weight: 900;
-
-  letter-spacing: 0.12em;
-}
-
-.footer-brand p {
-  margin-top: 5px;
-
-  color: var(--muted);
-
-  font-size: 8px;
-
-  letter-spacing: 0.4em;
-}
-
-.footer-account {
-  display: flex;
-
   gap: 25px;
 }
 
-.footer-account a {
-  color: var(--muted);
-
-  font-size: 11px;
-
-  transition: var(--transition);
+.footer-logo {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
 }
 
-.footer-account a:hover {
+.footer-logo strong {
+  font-size: 22px;
+  letter-spacing: 3px;
+}
+
+.footer-logo small {
+  margin-top: 6px;
+
   color: var(--gold);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 4px;
 }
 
+.footer-links {
+  display: flex;
+  gap: 22px;
+}
 
-/* =========================================================
-   13. FOOTER BOTTOM
-   ========================================================= */
+.footer-links a {
+  color: var(--muted);
+  font-size: 13px;
+  transition: 0.2s ease;
+}
+
+.footer-links a:hover {
+  color: var(--white);
+}
 
 .footer-bottom {
-  width: min(
-    calc(100% - 40px),
-    var(--max-width)
-  );
-
-  margin: auto;
-
-  padding: 18px 0;
+  padding: 18px 20px;
 
   border-top: 1px solid var(--border);
 
-  color: #666;
-
-  font-size: 10px;
-
   text-align: center;
+  color: #777;
+  font-size: 12px;
 }
 
-
-/* =========================================================
-   14. TABLET
-   ========================================================= */
+/* =========================================
+   RESPONSIVE
+========================================= */
 
 @media (max-width: 850px) {
 
-  .hero {
-    grid-template-columns: 1fr;
+  .header-inner {
+    min-height: 74px;
+  }
 
+  .hero {
     min-height: auto;
+    padding: 80px 0;
+  }
+
+  .hero-inner {
+    grid-template-columns: 1fr;
+    gap: 55px;
   }
 
   .hero-content {
-    padding: 55px 45px 35px;
+    max-width: 100%;
+    text-align: center;
   }
 
-  .hero-visual {
-    min-height: 330px;
+  .hero-description {
+    margin-left: auto;
+    margin-right: auto;
   }
 
-  .footer-container {
-    padding: 35px 0;
-
-    min-height: 120px;
+  .hero-buttons {
+    justify-content: center;
   }
 
+  .hero-brand {
+    min-height: 280px;
+    max-width: 500px;
+    width: 100%;
+    margin: auto;
+  }
+
+  .brand-section {
+    padding: 85px 0;
+  }
 }
-
-
-/* =========================================================
-   15. MOBILE
-   ========================================================= */
 
 @media (max-width: 600px) {
 
-  .marquee-bar {
-    height: 50px;
+  .header-inner {
+    width: 90%;
   }
 
-  .marquee-brand span {
-    font-size: 17px;
+  .logo-main {
+    font-size: 25px;
   }
 
-  .marquee-separator {
-    margin: 0 25px;
-
-    font-size: 10px;
-  }
-
-
-  .header-container {
-    width: min(
-      calc(100% - 24px),
-      var(--max-width)
-    );
-
-    min-height: 70px;
-  }
-
-  .brand-name {
-    font-size: 21px;
-  }
-
-  .brand-title {
+  .logo-sub {
     font-size: 7px;
+    letter-spacing: 4px;
   }
 
-  .main-nav {
-    gap: 3px;
+  .navigation {
+    gap: 5px;
   }
 
-  .nav-link {
-    padding: 9px 10px;
-
-    font-size: 11px;
+  .login-link,
+  .signup-link {
+    padding: 9px 11px;
+    font-size: 12px;
   }
-
-  .nav-button {
-    padding: 10px 12px;
-
-    font-size: 10px;
-  }
-
 
   .hero {
-    width: min(
-      calc(100% - 24px),
-      var(--max-width)
-    );
-
-    margin-top: 18px;
-
-    border-radius: 14px;
+    padding: 65px 0;
   }
 
-  .hero-content {
-    padding: 45px 25px 25px;
+  .hero-inner {
+    width: 90%;
   }
 
   .hero h1 {
-    font-size: 45px;
+    font-size: 43px;
+    letter-spacing: -1.5px;
   }
 
-  .hero-text {
-    font-size: 13px;
+  .hero-description {
+    font-size: 15px;
   }
 
-  .hero-actions {
-    flex-wrap: wrap;
-  }
-
-  .primary-button,
-  .secondary-button {
-    min-height: 43px;
-
-    padding: 0 17px;
-  }
-
-
-  .hero-visual {
-    min-height: 280px;
-  }
-
-  .display-letter {
-    font-size: 80px;
-  }
-
-
-  .brand-introduction {
-    width: min(
-      calc(100% - 30px),
-      780px
-    );
-
-    margin: 90px auto;
-  }
-
-  .brand-introduction h2 {
-    font-size: 34px;
-  }
-
-  .introduction-text {
-    font-size: 13px;
-  }
-
-
-  .footer-container {
-    width: min(
-      calc(100% - 30px),
-      var(--max-width)
-    );
-
+  .hero-buttons {
     flex-direction: column;
-
-    align-items: flex-start;
-
-    gap: 25px;
-
-    padding: 40px 0;
   }
 
-  .footer-account {
-    gap: 18px;
-  }
-
-
-  .footer-bottom {
-    width: min(
-      calc(100% - 30px),
-      var(--max-width)
-    );
-  }
-
-}
-
-
-/* =========================================================
-   16. VERY SMALL DEVICES
-   ========================================================= */
-
-@media (max-width: 380px) {
-
-  .hero h1 {
-    font-size: 38px;
-  }
-
-  .hero-actions {
-    flex-direction: column;
-
-    align-items: stretch;
-  }
-
-  .primary-button,
-  .secondary-button {
+  .button-primary,
+  .button-secondary {
     width: 100%;
   }
 
+  .hero-brand {
+    min-height: 240px;
+    padding: 25px;
+  }
+
+  .hero-letters {
+    font-size: 82px;
+  }
+
+  .hero-brand-name {
+    font-size: 11px;
+    letter-spacing: 6px;
+  }
+
+  .brand-section {
+    width: 88%;
+    padding: 70px 0;
+  }
+
+  .brand-section h2 {
+    font-size: 34px;
+  }
+
+  .brand-section > p:last-child {
+    font-size: 14px;
+  }
+
+  .footer-inner {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .footer-links {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
 }
 
-
-/* =========================================================
-   17. ACCESSIBILITY
-   ========================================================= */
-
-:focus-visible {
-  outline: 2px solid var(--gold);
-
-  outline-offset: 3px;
-}
-
-
-/* =========================================================
-   18. REDUCED MOTION
-   ========================================================= */
+/* =========================================
+   ACCESSIBILITY
+========================================= */
 
 @media (prefers-reduced-motion: reduce) {
 
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-
-    animation-iteration-count: 1 !important;
-
-    transition-duration: 0.01ms !important;
+  html {
+    scroll-behavior: auto;
   }
 
+  .marquee-content {
+    animation: none;
+  }
+
+  * {
+    transition: none !important;
+  }
 }
