@@ -1,8 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
   <title>Create Account | SMH Collection</title>
 
@@ -11,36 +16,57 @@
     content="Create your SMH Collection account."
   >
 
-  <link rel="stylesheet" href="assets/css/auth.css">
+  <link
+    rel="stylesheet"
+    href="assets/css/auth.css"
+  >
+
 </head>
 
 <body>
 
-  <!-- =========================
+  <!-- ================================
        AUTH HEADER
-  ========================== -->
+  ================================= -->
 
   <header class="auth-header">
 
-    <a href="index.html" class="auth-logo">
-      <span class="auth-logo-main">SMH</span>
-      <span class="auth-logo-sub">COLLECTION</span>
+    <a
+      href="index.html"
+      class="auth-logo"
+      aria-label="SMH Collection Home"
+    >
+
+      <span class="auth-logo-main">
+        SMH
+      </span>
+
+      <span class="auth-logo-sub">
+        COLLECTION
+      </span>
+
     </a>
 
-    <a href="index.html" class="back-home">
+    <a
+      href="index.html"
+      class="back-home"
+    >
       ← Home
     </a>
 
   </header>
 
 
-  <!-- =========================
+  <!-- ================================
        SIGN UP
-  ========================== -->
+  ================================= -->
 
   <main class="auth-page">
 
-    <section class="auth-card">
+    <section
+      class="auth-card"
+      aria-labelledby="signupTitle"
+    >
 
       <div class="auth-heading">
 
@@ -48,23 +74,27 @@
           JOIN SMH COLLECTION
         </p>
 
-        <h1>
+        <h1 id="signupTitle">
           Create your account
         </h1>
 
         <p>
-          Create your account to get started with
-          the SMH Collection shopping experience.
+          Create your account to start your
+          SMH Collection journey.
         </p>
 
       </div>
 
 
-      <!-- =========================
+      <!-- ==============================
            SIGN UP FORM
-      ========================== -->
+      =============================== -->
 
-      <form id="signupForm" class="auth-form">
+      <form
+        id="signupForm"
+        class="auth-form"
+        novalidate
+      >
 
         <div class="form-group">
 
@@ -78,6 +108,7 @@
             name="fullName"
             placeholder="Enter your full name"
             autocomplete="name"
+            maxlength="100"
             required
           >
 
@@ -96,6 +127,7 @@
             name="email"
             placeholder="Enter your email"
             autocomplete="email"
+            maxlength="254"
             required
           >
 
@@ -117,6 +149,10 @@
             minlength="8"
             required
           >
+
+          <small class="password-hint">
+            Use at least 8 characters.
+          </small>
 
         </div>
 
@@ -140,6 +176,18 @@
         </div>
 
 
+        <!-- MESSAGE -->
+
+        <div
+          id="authMessage"
+          class="auth-message"
+          aria-live="polite"
+          role="status"
+        ></div>
+
+
+        <!-- SUBMIT -->
+
         <button
           type="submit"
           class="auth-button"
@@ -151,18 +199,14 @@
       </form>
 
 
-      <!-- =========================
-           DIVIDER
-      ========================== -->
+      <!-- ==============================
+           GOOGLE
+      =============================== -->
 
       <div class="auth-divider">
         <span>OR</span>
       </div>
 
-
-      <!-- =========================
-           GOOGLE SIGN UP
-      ========================== -->
 
       <button
         type="button"
@@ -170,7 +214,10 @@
         id="googleSignUp"
       >
 
-        <span class="google-icon">
+        <span
+          class="google-icon"
+          aria-hidden="true"
+        >
           G
         </span>
 
@@ -181,9 +228,9 @@
       </button>
 
 
-      <!-- =========================
+      <!-- ==============================
            LOGIN LINK
-      ========================== -->
+      =============================== -->
 
       <p class="auth-switch">
 
@@ -200,9 +247,9 @@
   </main>
 
 
-  <!-- =========================
+  <!-- ================================
        FOOTER
-  ========================== -->
+  ================================= -->
 
   <footer class="auth-footer">
 
@@ -213,6 +260,16 @@
 
   </footer>
 
+
+  <!-- ================================
+       SCRIPTS
+  ================================= -->
+
+  <script
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+  ></script>
+
+  <script src="assets/js/supabase.js"></script>
 
   <script src="assets/js/auth.js"></script>
 
