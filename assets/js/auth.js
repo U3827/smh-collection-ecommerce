@@ -1,37 +1,28 @@
 // =========================================
 // SMH COLLECTION
-// AUTHENTICATION
+// REAL AUTHENTICATION + ROLE ROUTING
 // =========================================
 
 document.addEventListener("DOMContentLoaded", () => {
+  console.log("SMH Collection Auth loaded.");
 
-  console.log("SMH Auth JS loaded.");
-
-  const currentYear =
-    document.getElementById("currentYear");
+  const currentYear = document.getElementById("currentYear");
 
   if (currentYear) {
-    currentYear.textContent =
-      new Date().getFullYear();
+    currentYear.textContent = new Date().getFullYear();
   }
 
-
-  // =========================================
-  // MESSAGE SYSTEM
-  // =========================================
-
-  const messageBox =
-    document.getElementById("authMessage");
+  const messageBox = document.getElementById("authMessage");
 
   function showMessage(message, type = "error") {
-
     if (!messageBox) {
-      alert(message);
+      if (message) {
+        alert(message);
+      }
       return;
     }
 
     messageBox.textContent = message;
-
     messageBox.className = "auth-message";
 
     if (message) {
@@ -39,45 +30,105 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-
-  // =========================================
+  // -----------------------------------------
   // CHECK SUPABASE
-  // =========================================
+  // -----------------------------------------
 
   if (typeof window.supabase === "undefined") {
-
-    console.error(
-      "Supabase JavaScript library is missing."
-    );
-
+    console.error("Supabase library is missing.");
     showMessage(
       "Authentication service could not load. Please refresh the page."
     );
-
     return;
   }
 
-
   if (typeof supabaseClient === "undefined") {
-
-    console.error(
-      "supabaseClient is missing."
-    );
-
+    console.error("supabaseClient is missing.");
     showMessage(
       "Supabase connection could not be initialized."
     );
-
     return;
   }
 
+  // -----------------------------------------
+  // ROLE ROUTING
+  // -----------------------------------------
 
-  console.log("Supabase client ready.");
+  async function routeUser() {
+    try {
+      const {
+        data: { user },
+        error: sessionError
+      } = await supabaseClient.auth.getUser();
 
+      if (sessionError) {
+        throw sessionError;
+      }
 
-  // =========================================
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      const {
+        data: profile,
+        error: profileError
+      } = await supabaseClient
+        .from("profiles")
+        .select(
+          "id, full_name, email, role, is_active, avatar_url"
+        )
+        .eq("id", user.id)
+        .single();
+
+      if (profileError) {
+        throw profileError;
+      }
+
+      if (!profile.is_active) {
+        await supabaseClient.auth.signOut();
+
+        showMessage(
+          "Your account has been deactivated. Please contact SMH Collection support."
+        );
+
+        return;
+      }
+
+      console.log("Authenticated profile:", profile);
+
+      if (profile.role === "admin") {
+        window.location.href = "admin-dashboard.html";
+        return;
+      }
+
+      if (profile.role === "seller") {
+        window.location.href = "seller-dashboard.html";
+        return;
+      }
+
+      if (profile.role === "buyer") {
+        window.location.href = "buyer-dashboard.html";
+        return;
+      }
+
+      throw new Error(
+        "Your account has an invalid account role."
+      );
+
+    } catch (error) {
+      console.error("Role routing error:", error);
+
+      showMessage(
+        error.message ||
+        "Unable to load your account."
+      );
+    }
+  }
+
+  // -----------------------------------------
   // SIGN UP
-  // =========================================
+  // -----------------------------------------
 
   const signupForm =
     document.getElementById("signupForm");
@@ -85,11 +136,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const signupButton =
     document.getElementById("signupButton");
 
-
   if (signupForm) {
-
-    console.log("Signup form found.");
-
 
     signupForm.addEventListener(
       "submit",
@@ -97,17 +144,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
         event.preventDefault();
 
-        console.log("Signup form submitted.");
-
         showMessage("");
-
 
         const fullName =
           document
             .getElementById("fullName")
             .value
             .trim();
-
 
         const email =
           document
@@ -116,148 +159,84 @@ document.addEventListener("DOMContentLoaded", () => {
             .trim()
             .toLowerCase();
 
-
         const password =
           document
             .getElementById("signupPassword")
             .value;
-
 
         const confirmPassword =
           document
             .getElementById("confirmPassword")
             .value;
 
-
-        // =====================================
-        // VALIDATION
-        // =====================================
-
         if (!fullName) {
-
           showMessage(
             "Please enter your full name."
           );
-
           return;
         }
 
-
         if (!email) {
-
           showMessage(
             "Please enter your email address."
           );
-
           return;
         }
 
-
         if (password.length < 8) {
-
           showMessage(
             "Your password must contain at least 8 characters."
           );
-
           return;
         }
 
-
         if (password !== confirmPassword) {
-
           showMessage(
             "Passwords do not match."
           );
-
           return;
         }
 
-
-        // =====================================
-        // START SIGNUP
-        // =====================================
-
         signupButton.disabled = true;
-
         signupButton.textContent =
           "Creating account...";
 
-
         try {
-
-          console.log(
-            "Sending signup request to Supabase..."
-          );
-
 
           const {
             data,
             error
           } =
             await supabaseClient.auth.signUp({
-
-              email: email,
-
-              password: password,
-
+              email,
+              password,
               options: {
-
                 data: {
                   full_name: fullName
                 }
-
               }
-
             });
-
-
-          console.log(
-            "Supabase signup response:",
-            data,
-            error
-          );
-
 
           if (error) {
             throw error;
           }
 
-
           if (!data.user) {
-
             throw new Error(
-              "Supabase did not return a user."
+              "Account creation failed."
             );
-
           }
 
-
           showMessage(
-            "Account created successfully.",
+            "Account created successfully. Redirecting to login...",
             "success"
           );
 
-
           signupForm.reset();
 
-
-          console.log(
-            "User created:",
-            data.user.id
-          );
-
-
-          // ===================================
-          // REDIRECT TEMPORARILY
-          // ===================================
-
           setTimeout(() => {
-
-            window.location.href =
-              "login.html";
-
+            window.location.href = "login.html";
           }, 1200);
-
 
         } catch (error) {
 
@@ -266,78 +245,161 @@ document.addEventListener("DOMContentLoaded", () => {
             error
           );
 
-
           showMessage(
             error.message ||
             "Unable to create your account."
           );
 
-
         } finally {
 
           signupButton.disabled = false;
-
           signupButton.textContent =
             "Create Account";
-
         }
-
       }
     );
-
-  } else {
-
-    console.error(
-      "Signup form was not found."
-    );
-
   }
 
+  // -----------------------------------------
+  // LOGIN
+  // -----------------------------------------
 
-  // =========================================
-  // GOOGLE SIGN UP
-  // =========================================
+  const loginForm =
+    document.getElementById("loginForm");
 
-  const googleSignUp =
-    document.getElementById("googleSignUp");
+  const loginButton =
+    document.getElementById("loginButton");
 
+  if (loginForm) {
 
-  if (googleSignUp) {
+    loginForm.addEventListener(
+      "submit",
+      async (event) => {
 
-    googleSignUp.addEventListener(
+        event.preventDefault();
+
+        showMessage("");
+
+        const email =
+          document
+            .getElementById("loginEmail")
+            .value
+            .trim()
+            .toLowerCase();
+
+        const password =
+          document
+            .getElementById("loginPassword")
+            .value;
+
+        if (!email) {
+          showMessage(
+            "Please enter your email address."
+          );
+          return;
+        }
+
+        if (!password) {
+          showMessage(
+            "Please enter your password."
+          );
+          return;
+        }
+
+        loginButton.disabled = true;
+        loginButton.textContent =
+          "Signing in...";
+
+        try {
+
+          const {
+            data,
+            error
+          } =
+            await supabaseClient.auth.signInWithPassword({
+              email,
+              password
+            });
+
+          if (error) {
+            throw error;
+          }
+
+          if (!data.user) {
+            throw new Error(
+              "Login failed."
+            );
+          }
+
+          showMessage(
+            "Login successful. Loading your account...",
+            "success"
+          );
+
+          await routeUser();
+
+        } catch (error) {
+
+          console.error(
+            "Login error:",
+            error
+          );
+
+          showMessage(
+            error.message ||
+            "Unable to sign in."
+          );
+
+        } finally {
+
+          loginButton.disabled = false;
+          loginButton.textContent =
+            "Sign In";
+        }
+      }
+    );
+  }
+
+  // -----------------------------------------
+  // GOOGLE AUTHENTICATION
+  // -----------------------------------------
+
+  const googleButtons =
+    document.querySelectorAll(
+      "#googleSignUp, #googleLogin"
+    );
+
+  googleButtons.forEach((button) => {
+
+    button.addEventListener(
       "click",
       async () => {
 
         try {
 
-          googleSignUp.disabled = true;
+          button.disabled = true;
 
-          googleSignUp.innerHTML =
+          const originalHTML =
+            button.innerHTML;
+
+          button.innerHTML =
             "<span>Connecting...</span>";
-
 
           const {
             error
           } =
             await supabaseClient.auth
               .signInWithOAuth({
-
                 provider: "google",
-
                 options: {
-
                   redirectTo:
                     `${window.location.origin}/login.html`
-
                 }
-
               });
-
 
           if (error) {
             throw error;
           }
-
 
         } catch (error) {
 
@@ -346,33 +408,51 @@ document.addEventListener("DOMContentLoaded", () => {
             error
           );
 
-
           showMessage(
             error.message ||
             "Google authentication failed."
           );
 
+          button.disabled = false;
 
-          googleSignUp.disabled = false;
-
-          googleSignUp.innerHTML = `
-            <span
-              class="google-icon"
-              aria-hidden="true"
-            >
-              G
-            </span>
-
-            <span>
-              Continue with Google
-            </span>
-          `;
-
+          button.innerHTML =
+            "<span>Continue with Google</span>";
         }
-
       }
     );
+  });
 
-  }
+  // -----------------------------------------
+  // AUTH SESSION CALLBACK
+  // -----------------------------------------
+
+  supabaseClient.auth.onAuthStateChange(
+    async (event, session) => {
+
+      console.log(
+        "Auth event:",
+        event
+      );
+
+      if (
+        event === "SIGNED_IN" &&
+        session
+      ) {
+
+        const currentPage =
+          window.location.pathname
+            .split("/")
+            .pop();
+
+        if (
+          currentPage === "login.html" ||
+          currentPage === "signup.html" ||
+          currentPage === ""
+        ) {
+          await routeUser();
+        }
+      }
+    }
+  );
 
 });
