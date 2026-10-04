@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <meta
+    name="description"
+    content="View your SMH Collection orders."
+  >
+
+  <title>My Orders | SMH Collection</title>
+
+  <link
+    rel="stylesheet"
+    href="assets/css/orders.css"
+  >
+
+</head>
+
+<body>
+
+  <!-- =================================
+       TOP MARQUEE
+  ================================== -->
+
+  <div class="top-marquee">
+
+    <div class="marquee-track">
+
+      <span>SMH COLLECTION</span>
+      <span>SHOP EVERYTHING</span>
+      <span>FREE DELIVERY</span>
+      <span>CASH ON DELIVERY</span>
+      <span>SMH COLLECTION</span>
+      <span>SHOP EVERYTHING</span>
+      <span>FREE DELIVERY</span>
+      <span>CASH ON DELIVERY</span>
+
+    </div>
+
+  </div>
+
+
+  <!-- =================================
+       HEADER
+  ================================== -->
+
+  <header class="orders-header">
+
+    <a
+      href="buyer-dashboard.html"
+      class="brand"
+      aria-label="SMH Collection"
+    >
+
+      <span class="brand-main">
+        SMH
+      </span>
+
+      <span class="brand-sub">
+        COLLECTION
+      </span>
+
+    </a>
+
+
+    <div class="header-actions">
+
+      <button
+        type="button"
+        class="back-button"
+        id="backToShop"
+      >
+        ← Shop
+      </button>
+
+      <button
+        type="button"
+        class="profile-button"
+        id="profileButton"
+      >
+
+        <span
+          class="profile-avatar"
+          id="profileAvatar"
+        >
+          U
+        </span>
+
+        <span
+          class="profile-name"
+          id="profileName"
+        >
+          Account
+        </span>
+
+        <span class="profile-arrow">
+          ▾
+        </span>
+
+      </button>
+
+    </div>
+
+  </header>
+
+
+  <!-- =================================
+       PROFILE MENU
+  ================================== -->
+
+  <div
+    class="profile-menu"
+    id="profileMenu"
+  >
+
+    <div class="profile-menu-header">
+
+      <div
+        class="menu-avatar"
+        id="menuAvatar"
+      >
+        U
+      </div>
+
+      <div>
+
+        <strong id="menuName">
+          Account
+        </strong>
+
+        <small id="menuEmail">
+          Loading...
+        </small>
+
+      </div>
+
+    </div>
+
+
+    <button
+      type="button"
+      class="menu-item active"
+      id="myOrdersButton"
+    >
+      <span>📦</span>
+      My Orders
+    </button>
+
+
+    <button
+      type="button"
+      class="menu-item"
+      id="wishlistButton"
+    >
+      <span>♡</span>
+      Wishlist
+    </button>
+
+
+    <button
+      type="button"
+      class="menu-item"
+      id="settingsButton"
+    >
+      <span>⚙</span>
+      Account Settings
+    </button>
+
+
+    <button
+      type="button"
+      class="menu-item logout-item"
+      id="logoutButton"
+    >
+      <span>↪</span>
+      Sign Out
+    </button>
+
+  </div>
+
+
+  <!-- =================================
+       MAIN
+  ================================== -->
+
+  <main class="orders-main">
+
+    <section class="orders-intro">
+
+      <p class="eyebrow">
+        YOUR SHOPPING ACTIVITY
+      </p>
+
+      <h1>
+        My Orders
+      </h1>
+
+      <p>
+        View and track all your SMH Collection orders
+        in one place.
+      </p>
+
+    </section>
+
+
+    <!-- =================================
+         ORDER FILTER
+    ================================== -->
+
+    <section class="orders-toolbar">
+
+      <div class="toolbar-title">
+
+        <span class="toolbar-icon">
+          📦
+        </span>
+
+        <div>
+
+          <strong>
+            Order History
+          </strong>
+
+          <small id="orderCount">
+            Loading orders...
+          </small>
+
+        </div>
+
+      </div>
+
+
+      <label
+        class="status-filter"
+        for="statusFilter"
+      >
+
+        <span>
+          Filter
+        </span>
+
+        <select id="statusFilter">
+
+          <option value="all">
+            All Orders
+          </option>
+
+          <option value="pending">
+            Pending
+          </option>
+
+          <option value="confirmed">
+            Confirmed
+          </option>
+
+          <option value="processing">
+            Processing
+          </option>
+
+          <option value="shipped">
+            Shipped
+          </option>
+
+          <option value="delivered">
+            Delivered
+          </option>
+
+          <option value="cancelled">
+            Cancelled
+          </option>
+
+        </select>
+
+      </label>
+
+    </section>
+
+
+    <!-- =================================
+         ORDERS
+    ================================== -->
+
+    <section
+      class="orders-list"
+      id="ordersList"
+    >
+
+      <div class="loading-state">
+
+        <div class="loading-spinner"></div>
+
+        <p>
+          Loading your orders...
+        </p>
+
+      </div>
+
+    </section>
+
+
+    <!-- =================================
+         EMPTY STATE
+    ================================== -->
+
+    <section
+      class="empty-state"
+      id="emptyState"
+      hidden
+    >
+
+      <div class="empty-icon">
+        📦
+      </div>
+
+      <h2>
+        No orders yet
+      </h2>
+
+      <p>
+        You haven't placed any orders yet.
+        Start shopping and your orders will appear here.
+      </p>
+
+      <button
+        type="button"
+        class="primary-button"
+        id="startShoppingButton"
+      >
+        Start Shopping
+      </button>
+
+    </section>
+
+
+    <!-- =================================
+         ERROR STATE
+    ================================== -->
+
+    <section
+      class="error-state"
+      id="errorState"
+      hidden
+    >
+
+      <div class="error-icon">
+        !
+      </div>
+
+      <h2>
+        Unable to load orders
+      </h2>
+
+      <p id="errorMessage">
+        Something went wrong while loading your orders.
+      </p>
+
+      <button
+        type="button"
+        class="primary-button"
+        id="retryButton"
+      >
+        Try Again
+      </button>
+
+    </section>
+
+  </main>
+
+
+  <!-- =================================
+       FOOTER
+  ================================== -->
+
+  <footer class="orders-footer">
+
+    <div class="footer-brand">
+
+      <strong>
+        SMH COLLECTION
+      </strong>
+
+      <span>
+        Everything in one place.
+      </span>
+
+    </div>
+
+    <p>
+
+      ©
+      <span id="currentYear"></span>
+      SMH Collection.
+      All rights reserved.
+
+    </p>
+
+  </footer>
+
+
+  <!-- =================================
+       SCRIPTS
+  ================================== -->
+
+  <script
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+  ></script>
+
+  <script src="assets/js/supabase.js"></script>
+
+  <script src="assets/js/orders.js"></script>
+
+</body>
+</html>
