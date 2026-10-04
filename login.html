@@ -17,14 +17,21 @@
 <body>
 
   <!-- =========================
-       AUTH HEADER
+       HEADER
   ========================== -->
 
   <header class="auth-header">
 
     <a href="index.html" class="auth-logo">
-      <span class="auth-logo-main">SMH</span>
-      <span class="auth-logo-sub">COLLECTION</span>
+
+      <span class="auth-logo-main">
+        SMH
+      </span>
+
+      <span class="auth-logo-sub">
+        COLLECTION
+      </span>
+
     </a>
 
     <a href="index.html" class="back-home">
@@ -35,12 +42,14 @@
 
 
   <!-- =========================
-       LOGIN
+       MAIN
   ========================== -->
 
   <main class="auth-page">
 
     <section class="auth-card">
+
+      <!-- Heading -->
 
       <div class="auth-heading">
 
@@ -53,8 +62,7 @@
         </h1>
 
         <p>
-          Access your SMH Collection account and continue
-          your shopping experience.
+          Sign in to continue to your SMH Collection account.
         </p>
 
       </div>
@@ -111,16 +119,33 @@
               id="rememberMe"
             >
 
-            <span>Remember me</span>
+            <span>
+              Remember me
+            </span>
 
           </label>
 
-          <a href="#" id="forgotPassword">
+          <button
+            type="button"
+            class="forgot-password"
+            id="forgotPassword"
+          >
             Forgot password?
-          </a>
+          </button>
 
         </div>
 
+
+        <!-- Error / Success message -->
+
+        <div
+          id="authMessage"
+          class="auth-message"
+          aria-live="polite"
+        ></div>
+
+
+        <!-- Login button -->
 
         <button
           type="submit"
@@ -143,7 +168,7 @@
 
 
       <!-- =========================
-           GOOGLE SIGN IN
+           GOOGLE
       ========================== -->
 
       <button
@@ -164,7 +189,7 @@
 
 
       <!-- =========================
-           CREATE ACCOUNT
+           SIGN UP
       ========================== -->
 
       <p class="auth-switch">
@@ -196,7 +221,15 @@
   </footer>
 
 
+  <!-- =========================
+       SUPABASE
+  ========================== -->
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script src="assets/js/supabase.js"></script>
+
   <script src="assets/js/auth.js"></script>
 
 </body>
-  </html>
+</html>
