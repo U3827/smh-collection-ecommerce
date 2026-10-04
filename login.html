@@ -1,8 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
   <title>Sign In | SMH Collection</title>
 
@@ -11,18 +16,26 @@
     content="Sign in to your SMH Collection account."
   >
 
-  <link rel="stylesheet" href="assets/css/auth.css">
+  <link
+    rel="stylesheet"
+    href="assets/css/auth.css"
+  >
+
 </head>
 
 <body>
 
-  <!-- =========================
-       HEADER
-  ========================== -->
+  <!-- ================================
+       AUTH HEADER
+  ================================= -->
 
   <header class="auth-header">
 
-    <a href="index.html" class="auth-logo">
+    <a
+      href="index.html"
+      class="auth-logo"
+      aria-label="SMH Collection Home"
+    >
 
       <span class="auth-logo-main">
         SMH
@@ -34,22 +47,26 @@
 
     </a>
 
-    <a href="index.html" class="back-home">
+    <a
+      href="index.html"
+      class="back-home"
+    >
       ← Home
     </a>
 
   </header>
 
 
-  <!-- =========================
-       MAIN
-  ========================== -->
+  <!-- ================================
+       LOGIN
+  ================================= -->
 
   <main class="auth-page">
 
-    <section class="auth-card">
-
-      <!-- Heading -->
+    <section
+      class="auth-card"
+      aria-labelledby="loginTitle"
+    >
 
       <div class="auth-heading">
 
@@ -57,22 +74,27 @@
           WELCOME BACK
         </p>
 
-        <h1>
+        <h1 id="loginTitle">
           Sign in to your account
         </h1>
 
         <p>
-          Sign in to continue to your SMH Collection account.
+          Sign in to continue to your
+          SMH Collection account.
         </p>
 
       </div>
 
 
-      <!-- =========================
+      <!-- ==============================
            LOGIN FORM
-      ========================== -->
+      =============================== -->
 
-      <form id="loginForm" class="auth-form">
+      <form
+        id="loginForm"
+        class="auth-form"
+        novalidate
+      >
 
         <div class="form-group">
 
@@ -86,6 +108,7 @@
             name="email"
             placeholder="Enter your email"
             autocomplete="email"
+            maxlength="254"
             required
           >
 
@@ -110,6 +133,8 @@
         </div>
 
 
+        <!-- OPTIONS -->
+
         <div class="form-options">
 
           <label class="remember-me">
@@ -117,6 +142,7 @@
             <input
               type="checkbox"
               id="rememberMe"
+              name="rememberMe"
             >
 
             <span>
@@ -124,6 +150,7 @@
             </span>
 
           </label>
+
 
           <button
             type="button"
@@ -136,16 +163,17 @@
         </div>
 
 
-        <!-- Error / Success message -->
+        <!-- MESSAGE -->
 
         <div
           id="authMessage"
           class="auth-message"
           aria-live="polite"
+          role="status"
         ></div>
 
 
-        <!-- Login button -->
+        <!-- SUBMIT -->
 
         <button
           type="submit"
@@ -158,18 +186,14 @@
       </form>
 
 
-      <!-- =========================
-           DIVIDER
-      ========================== -->
+      <!-- ==============================
+           GOOGLE
+      =============================== -->
 
       <div class="auth-divider">
         <span>OR</span>
       </div>
 
-
-      <!-- =========================
-           GOOGLE
-      ========================== -->
 
       <button
         type="button"
@@ -177,7 +201,10 @@
         id="googleSignIn"
       >
 
-        <span class="google-icon">
+        <span
+          class="google-icon"
+          aria-hidden="true"
+        >
           G
         </span>
 
@@ -188,9 +215,9 @@
       </button>
 
 
-      <!-- =========================
-           SIGN UP
-      ========================== -->
+      <!-- ==============================
+           SIGN UP LINK
+      =============================== -->
 
       <p class="auth-switch">
 
@@ -207,9 +234,9 @@
   </main>
 
 
-  <!-- =========================
+  <!-- ================================
        FOOTER
-  ========================== -->
+  ================================= -->
 
   <footer class="auth-footer">
 
@@ -221,11 +248,13 @@
   </footer>
 
 
-  <!-- =========================
-       SUPABASE
-  ========================== -->
+  <!-- ================================
+       SCRIPTS
+  ================================= -->
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+  ></script>
 
   <script src="assets/js/supabase.js"></script>
 
