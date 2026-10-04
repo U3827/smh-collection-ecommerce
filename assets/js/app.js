@@ -1,3 +1,4 @@
+
 // =========================================
 // SMH COLLECTION
 // Main Website JavaScript
@@ -5,58 +6,44 @@
 
 document.addEventListener("DOMContentLoaded", () => {
 
-
-  /* =========================================
-     CURRENT YEAR
-  ========================================== */
-
-  const currentYear =
-    document.getElementById("currentYear");
+  // Current year
+  const currentYear = document.getElementById("currentYear");
 
   if (currentYear) {
-    currentYear.textContent =
-      new Date().getFullYear();
+    currentYear.textContent = new Date().getFullYear();
   }
 
 
-
-  /* =========================================
-     EXPANDABLE SECTIONS
-  ========================================== */
-
-  const expandableButtons =
-    document.querySelectorAll(
-      ".expandable-button"
-    );
-
+  // Expandable sections
+  const expandableButtons = document.querySelectorAll(
+    ".expandable-button"
+  );
 
   expandableButtons.forEach((button) => {
 
     button.addEventListener("click", () => {
 
-      const targetId =
-        button.getAttribute("data-target");
+      const block = button.closest(".expandable-block");
 
-      const target =
-        document.getElementById(targetId);
-
-      const block =
-        button.closest(".expandable-block");
-
-
-      if (!target || !block) {
+      if (!block) {
         return;
       }
 
+      const content = block.querySelector(
+        ".expandable-content"
+      );
 
-      const isOpen =
+      if (!content) {
+        return;
+      }
+
+      const currentlyOpen =
         block.classList.contains("open");
 
 
-      /* Close all other sections */
-
+      // Close every other section
       document
-        .querySelectorAll(".expandable-block.open")
+        .querySelectorAll(".expandable-block")
         .forEach((otherBlock) => {
 
           if (otherBlock !== block) {
@@ -80,9 +67,8 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
 
-      /* Toggle current section */
-
-      if (isOpen) {
+      // Toggle clicked section
+      if (currentlyOpen) {
 
         block.classList.remove("open");
 
