@@ -4,13 +4,16 @@
 // REAL SUPABASE MARKETPLACE
 // =========================================
 
-document.addEventListener("DOMContentLoaded", async () => {
+document.addEventListener("DOMContentLoaded", () => {
 
-  console.log("SMH Buyer Dashboard loaded.");
+  console.log("SMH Collection Buyer Dashboard loaded.");
 
   // =========================================
   // ELEMENTS
   // =========================================
+
+  const currentYear =
+    document.getElementById("currentYear");
 
   const profileButton =
     document.getElementById("profileButton");
@@ -18,17 +21,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   const profileMenu =
     document.getElementById("profileMenu");
 
-  const logoutButton =
-    document.getElementById("logoutButton");
+  const profileAvatar =
+    document.getElementById("profileAvatar");
 
   const profileName =
     document.getElementById("profileName");
-
-  const welcomeName =
-    document.getElementById("welcomeName");
-
-  const profileAvatar =
-    document.getElementById("profileAvatar");
 
   const menuAvatar =
     document.getElementById("menuAvatar");
@@ -38,6 +35,27 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const menuEmail =
     document.getElementById("menuEmail");
+
+  const logoutButton =
+    document.getElementById("logoutButton");
+
+  const myOrdersButton =
+    document.getElementById("myOrdersButton");
+
+  const wishlistButton =
+    document.getElementById("wishlistButton");
+
+  const settingsButton =
+    document.getElementById("settingsButton");
+
+  const cartButton =
+    document.getElementById("cartButton");
+
+  const cartCount =
+    document.getElementById("cartCount");
+
+  const welcomeName =
+    document.getElementById("welcomeName");
 
   const categoryGrid =
     document.getElementById("categoryGrid");
@@ -54,14 +72,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   const searchButton =
     document.getElementById("searchButton");
 
-  const cartCount =
-    document.getElementById("cartCount");
+  const viewCategoriesButton =
+    document.getElementById(
+      "viewCategoriesButton"
+    );
 
-  const cartButton =
-    document.getElementById("cartButton");
-
-  const currentYear =
-    document.getElementById("currentYear");
+  const viewProductsButton =
+    document.getElementById(
+      "viewProductsButton"
+    );
 
 
   // =========================================
@@ -75,15 +94,16 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
   // =========================================
-  // SUPABASE CHECK
+  // CHECK SUPABASE
   // =========================================
 
   if (
+    typeof window.supabase === "undefined" ||
     typeof supabaseClient === "undefined"
   ) {
 
     console.error(
-      "Supabase client is unavailable."
+      "Supabase is not available."
     );
 
     return;
@@ -95,41 +115,24 @@ document.addEventListener("DOMContentLoaded", async () => {
   // =========================================
 
   let currentUser = null;
+
   let currentProfile = null;
+
   let allProducts = [];
-  let categories = [];
-  let currentSearch = "";
+
+  let allCategories = [];
 
 
   // =========================================
   // HELPERS
   // =========================================
 
-  function getInitials(name) {
-
-    if (!name) {
-      return "U";
-    }
-
-    const parts =
-      name.trim().split(/\s+/);
-
-    if (parts.length === 1) {
-      return parts[0]
-        .substring(0, 2)
-        .toUpperCase();
-    }
-
-    return (
-      parts[0][0] +
-      parts[parts.length - 1][0]
-    ).toUpperCase();
-  }
-
-
   function escapeHTML(value) {
 
-    if (value === null || value === undefined) {
+    if (
+      value === null ||
+      value === undefined
+    ) {
       return "";
     }
 
@@ -148,55 +151,83 @@ document.addEventListener("DOMContentLoaded", async () => {
       "en-US",
       {
         style: "currency",
-        currency: "USD"
+        currency: "USD",
+        minimumFractionDigits: 2
       }
-    ).format(Number(value) || 0);
+    ).format(
+      Number(value) || 0
+    );
   }
 
 
-  function showEmptyState(show) {
+  function getInitials(name) {
 
-    if (emptyState) {
-      emptyState.hidden = !show;
+    if (!name) {
+      return "U";
     }
+
+    const parts =
+      name
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean);
+
+    if (parts.length === 1) {
+
+      return parts[0]
+        .substring(0, 2)
+        .toUpperCase();
+    }
+
+    return (
+      parts[0][0] +
+      parts[parts.length - 1][0]
+    ).toUpperCase();
   }
 
 
   // =========================================
-  // AUTHENTICATED USER
+  // LOAD CURRENT USER
   // =========================================
 
   async function loadCurrentUser() {
 
     const {
-      data,
+      data: {
+        user
+      },
       error
     } =
-      await supabaseClient.auth.getUser();
+      await supabaseClient.auth
+        .getUser();
 
     if (error) {
       throw error;
     }
 
-    if (!data.user) {
-      window.location.href = "login.html";
+    if (!user) {
+
+      window.location.href =
+        "login.html";
+
       return false;
     }
 
-    currentUser = data.user;
+    currentUser =
+      user;
 
     return true;
   }
 
 
   // =========================================
-  // PROFILE
+  // LOAD PROFILE
   // =========================================
 
   async function loadProfile() {
 
     const {
-      data,
+      data: profile,
       error
     } =
       await supabaseClient
@@ -204,79 +235,128 @@ document.addEventListener("DOMContentLoaded", async () => {
         .select(
           "id, full_name, email, role, is_active, avatar_url"
         )
-        .eq("id", currentUser.id)
+        .eq(
+          "id",
+          currentUser.id
+        )
         .single();
 
     if (error) {
       throw error;
     }
 
-    if (!data.is_active) {
+    if (!profile) {
 
-      await supabaseClient.auth.signOut();
-
-      window.location.href = "login.html";
-
-      return;
+      throw new Error(
+        "Your account profile could not be found."
+      );
     }
 
-    if (data.role !== "buyer") {
+    if (!profile.is_active) {
 
-      if (data.role === "admin") {
-        window.location.href =
-          "admin-dashboard.html";
-        return;
-      }
+      await supabaseClient.auth
+        .signOut();
 
-      if (data.role === "seller") {
-        window.location.href =
-          "seller-dashboard.html";
-        return;
-      }
+      window.location.href =
+        "login.html";
 
-      await supabaseClient.auth.signOut();
-
-      window.location.href = "login.html";
-
-      return;
+      return false;
     }
 
-    currentProfile = data;
+
+    currentProfile =
+      profile;
+
+
+    // =======================================
+    // ROLE ROUTING
+    // =======================================
+
+    if (profile.role === "admin") {
+
+      window.location.href =
+        "admin-dashboard.html";
+
+      return false;
+    }
+
+
+    if (profile.role === "seller") {
+
+      window.location.href =
+        "seller-dashboard.html";
+
+      return false;
+    }
+
+
+    if (profile.role !== "buyer") {
+
+      throw new Error(
+        "Your account has an invalid role."
+      );
+    }
+
+
+    // =======================================
+    // PROFILE DISPLAY
+    // =======================================
 
     const name =
-      data.full_name ||
+      profile.full_name ||
+      currentUser.email ||
       "Shopper";
 
     const initials =
       getInitials(name);
 
+
     if (profileName) {
-      profileName.textContent = name;
+      profileName.textContent =
+        name;
     }
 
-    if (welcomeName) {
-      welcomeName.textContent =
-        name.split(" ")[0];
-    }
-
-    if (menuName) {
-      menuName.textContent = name;
-    }
-
-    if (menuEmail) {
-      menuEmail.textContent =
-        data.email || currentUser.email;
-    }
 
     if (profileAvatar) {
       profileAvatar.textContent =
         initials;
     }
 
+
+    if (menuName) {
+      menuName.textContent =
+        name;
+    }
+
+
+    if (menuEmail) {
+      menuEmail.textContent =
+        profile.email ||
+        currentUser.email ||
+        "";
+    }
+
+
     if (menuAvatar) {
       menuAvatar.textContent =
         initials;
     }
+
+
+    if (welcomeName) {
+
+      const firstName =
+        name
+          .trim()
+          .split(/\s+/)[0];
+
+      welcomeName.textContent =
+        firstName ||
+        "Shopper";
+    }
+
+
+    return true;
   }
 
 
@@ -296,8 +376,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       </div>
     `;
 
+
     const {
-      data,
+      data: categories,
       error
     } =
       await supabaseClient
@@ -305,84 +386,30 @@ document.addEventListener("DOMContentLoaded", async () => {
         .select(
           "id, name, slug, description, image_url"
         )
-        .eq("is_active", true)
-        .order("name");
+        .eq(
+          "is_active",
+          true
+        )
+        .order(
+          "name",
+          {
+            ascending: true
+          }
+        );
+
 
     if (error) {
       throw error;
     }
 
-    categories = data || [];
 
-    renderCategories();
-  }
+    allCategories =
+      categories || [];
 
 
-  // =========================================
-  // CATEGORY ICON
-  // =========================================
-
-  function getCategoryIcon(name) {
-
-    const value =
-      String(name || "").toLowerCase();
-
-    if (
-      value.includes("phone") ||
-      value.includes("elect")
-    ) {
-      return "▣";
-    }
-
-    if (
-      value.includes("fashion") ||
-      value.includes("cloth")
-    ) {
-      return "◇";
-    }
-
-    if (
-      value.includes("food") ||
-      value.includes("grocery")
-    ) {
-      return "◉";
-    }
-
-    if (
-      value.includes("home") ||
-      value.includes("furniture")
-    ) {
-      return "⌂";
-    }
-
-    if (
-      value.includes("beauty") ||
-      value.includes("health")
-    ) {
-      return "✦";
-    }
-
-    if (
-      value.includes("sport")
-    ) {
-      return "○";
-    }
-
-    if (
-      value.includes("book") ||
-      value.includes("education")
-    ) {
-      return "▤";
-    }
-
-    if (
-      value.includes("car") ||
-      value.includes("vehicle")
-    ) {
-      return "◇";
-    }
-
-    return "✧";
+    renderCategories(
+      allCategories
+    );
   }
 
 
@@ -390,92 +417,90 @@ document.addEventListener("DOMContentLoaded", async () => {
   // RENDER CATEGORIES
   // =========================================
 
-  function renderCategories() {
+  function renderCategories(
+    categories
+  ) {
 
     if (!categoryGrid) {
       return;
     }
 
-    if (!categories.length) {
+
+    if (
+      !categories ||
+      categories.length === 0
+    ) {
 
       categoryGrid.innerHTML = `
         <div class="loading-card">
-          Categories will appear here soon.
+          No categories available yet.
         </div>
       `;
 
       return;
     }
 
+
     categoryGrid.innerHTML =
       categories
-        .map((category) => {
+        .map(
+          (category) => {
 
-          return `
-            <button
-              type="button"
-              class="category-card"
-              data-category-id="${escapeHTML(category.id)}"
-            >
+            const image =
+              category.image_url;
 
-              <span class="category-icon">
-                ${getCategoryIcon(category.name)}
-              </span>
-
-              <h3>
-                ${escapeHTML(category.name)}
-              </h3>
-
-            </button>
-          `;
-
-        })
-        .join("");
-
-    categoryGrid
-      .querySelectorAll(".category-card")
-      .forEach((button) => {
-
-        button.addEventListener(
-          "click",
-          () => {
-
-            const categoryId =
-              button.dataset.categoryId;
-
-            const category =
-              categories.find(
-                (item) =>
-                  item.id === categoryId
-              );
-
-            if (!category) {
-              return;
-            }
-
-            productSearch.value = "";
-
-            currentSearch = "";
-
-            const filtered =
-              allProducts.filter(
-                (product) =>
-                  product.category_id ===
+            return `
+              <button
+                type="button"
+                class="category-card"
+                data-category-id="${escapeHTML(
                   category.id
-              );
+                )}"
+              >
 
-            renderProducts(filtered);
+                <div class="category-image">
 
-            document
-              .querySelector(".product-grid")
-              ?.scrollIntoView({
-                behavior: "smooth",
-                block: "start"
-              });
+                  ${
+                    image
+                      ? `
+                        <img
+                          src="${escapeHTML(
+                            image
+                          )}"
+                          alt="${escapeHTML(
+                            category.name
+                          )}"
+                          loading="lazy"
+                        >
+                      `
+                      : `
+                        <span>
+                          ◇
+                        </span>
+                      `
+                  }
+
+                </div>
+
+                <div class="category-info">
+
+                  <strong>
+                    ${escapeHTML(
+                      category.name
+                    )}
+                  </strong>
+
+                  <small>
+                    Explore products
+                  </small>
+
+                </div>
+
+              </button>
+            `;
           }
-        );
-
-      });
+        )
+        .join("");
   }
 
 
@@ -495,14 +520,16 @@ document.addEventListener("DOMContentLoaded", async () => {
       </div>
     `;
 
+
     const {
-      data,
+      data: products,
       error
     } =
       await supabaseClient
         .from("products")
         .select(`
           id,
+          seller_id,
           category_id,
           name,
           slug,
@@ -517,19 +544,34 @@ document.addEventListener("DOMContentLoaded", async () => {
             slug
           )
         `)
-        .eq("is_active", true)
-        .gt("stock", 0)
-        .order("created_at", {
-          ascending: false
-        });
+        .eq(
+          "is_active",
+          true
+        )
+        .gt(
+          "stock",
+          0
+        )
+        .order(
+          "created_at",
+          {
+            ascending: false
+          }
+        );
+
 
     if (error) {
       throw error;
     }
 
-    allProducts = data || [];
 
-    renderProducts(allProducts);
+    allProducts =
+      products || [];
+
+
+    renderProducts(
+      allProducts
+    );
   }
 
 
@@ -537,209 +579,225 @@ document.addEventListener("DOMContentLoaded", async () => {
   // RENDER PRODUCTS
   // =========================================
 
-  function renderProducts(products) {
+  function renderProducts(
+    products
+  ) {
 
     if (!productGrid) {
       return;
     }
 
-    showEmptyState(
-      !products.length
-    );
 
-    if (!products.length) {
+    if (
+      !products ||
+      products.length === 0
+    ) {
 
-      productGrid.innerHTML = "";
+      productGrid.innerHTML = `
+        <div class="loading-card">
+          No products available yet.
+        </div>
+      `;
+
+      if (emptyState) {
+        emptyState.hidden = false;
+      }
 
       return;
     }
 
+
+    if (emptyState) {
+      emptyState.hidden = true;
+    }
+
+
     productGrid.innerHTML =
       products
-        .map((product) => {
+        .map(
+          (product) => {
 
-          const categoryName =
-            product.categories?.name ||
-            "General";
+            const image =
+              product.image_url;
 
-          const image =
-            product.image_url;
-
-          const productName =
-            escapeHTML(product.name);
-
-          return `
-            <article
-              class="product-card"
-              data-product-id="${escapeHTML(product.id)}"
-            >
-
-              <div class="product-image">
-
-                ${
-                  image
-                    ? `
-                      <img
-                        src="${escapeHTML(image)}"
-                        alt="${productName}"
-                        loading="lazy"
-                      >
-                    `
-                    : `
-                      <div class="product-placeholder">
-                        ◇
-                      </div>
-                    `
-                }
-
-              </div>
+            const category =
+              product.categories?.name ||
+              "General";
 
 
-              <div class="product-info">
+            return `
+              <article
+                class="product-card"
+                data-product-id="${escapeHTML(
+                  product.id
+                )}"
+              >
 
-                <div class="product-category">
-                  ${escapeHTML(categoryName)}
+                <button
+                  type="button"
+                  class="product-image-button"
+                  data-product-id="${escapeHTML(
+                    product.id
+                  )}"
+                  aria-label="View ${
+                    escapeHTML(
+                      product.name
+                    )
+                  }"
+                >
+
+                  <div class="product-image">
+
+                    ${
+                      image
+                        ? `
+                          <img
+                            src="${escapeHTML(
+                              image
+                            )}"
+                            alt="${escapeHTML(
+                              product.name
+                            )}"
+                            loading="lazy"
+                          >
+                        `
+                        : `
+                          <span>
+                            ◇
+                          </span>
+                        `
+                    }
+
+                  </div>
+
+                </button>
+
+
+                <div class="product-info">
+
+                  <span class="product-category">
+                    ${escapeHTML(
+                      category
+                    )}
+                  </span>
+
+
+                  <h3>
+                    ${escapeHTML(
+                      product.name
+                    )}
+                  </h3>
+
+
+                  <p class="product-description">
+
+                    ${escapeHTML(
+                      product.description ||
+                      "Quality product available on SMH Collection."
+                    )}
+
+                  </p>
+
+
+                  <div class="product-bottom">
+
+                    <strong class="product-price">
+
+                      ${formatPrice(
+                        product.price
+                      )}
+
+                    </strong>
+
+
+                    <button
+                      type="button"
+                      class="add-cart-button"
+                      data-product-id="${escapeHTML(
+                        product.id
+                      )}"
+                    >
+                      Add to Cart
+                    </button>
+
+                  </div>
+
                 </div>
 
-                <h3 class="product-name">
-                  ${productName}
-                </h3>
-
-                <div class="product-price">
-                  ${formatPrice(product.price)}
-                </div>
-
-                <div class="product-stock">
-                  ${Number(product.stock)}
-                  available
-                </div>
-
-
-                <div class="product-actions">
-
-                  <button
-                    type="button"
-                    class="product-buy-button"
-                    data-buy-id="${escapeHTML(product.id)}"
-                  >
-                    Buy Now
-                  </button>
-
-                  <button
-                    type="button"
-                    class="product-cart-button"
-                    data-cart-id="${escapeHTML(product.id)}"
-                    aria-label="Add to cart"
-                  >
-                    🛒
-                  </button>
-
-                </div>
-
-              </div>
-
-            </article>
-          `;
-
-        })
+              </article>
+            `;
+          }
+        )
         .join("");
-
-    attachProductEvents();
   }
 
 
   // =========================================
-  // PRODUCT EVENTS
-  // =========================================
-
-  function attachProductEvents() {
-
-    document
-      .querySelectorAll("[data-buy-id]")
-      .forEach((button) => {
-
-        button.addEventListener(
-          "click",
-          () => {
-
-            const productId =
-              button.dataset.buyId;
-
-            window.location.href =
-              `product.html?id=${encodeURIComponent(productId)}`;
-          }
-        );
-
-      });
-
-
-    document
-      .querySelectorAll("[data-cart-id]")
-      .forEach((button) => {
-
-        button.addEventListener(
-          "click",
-          async () => {
-
-            const productId =
-              button.dataset.cartId;
-
-            await addToCart(productId);
-
-          }
-        );
-
-      });
-  }
-
-
-  // =========================================
-  // CART
+  // GET OR CREATE CART
   // =========================================
 
   async function getOrCreateCart() {
 
-    let {
-      data: cart,
-      error
+    const {
+      data: existingCart,
+      error: selectError
     } =
       await supabaseClient
         .from("carts")
         .select("id")
-        .eq("buyer_id", currentUser.id)
+        .eq(
+          "buyer_id",
+          currentUser.id
+        )
         .maybeSingle();
 
-    if (error) {
-      throw error;
+
+    if (selectError) {
+      throw selectError;
     }
 
-    if (cart) {
-      return cart;
+
+    if (existingCart) {
+      return existingCart.id;
     }
 
-    const result =
+
+    const {
+      data: newCart,
+      error: insertError
+    } =
       await supabaseClient
         .from("carts")
         .insert({
-          buyer_id: currentUser.id
+          buyer_id:
+            currentUser.id
         })
         .select("id")
         .single();
 
-    if (result.error) {
-      throw result.error;
+
+    if (insertError) {
+      throw insertError;
     }
 
-    return result.data;
+
+    return newCart.id;
   }
 
 
-  async function addToCart(productId) {
+  // =========================================
+  // ADD TO CART
+  // =========================================
+
+  async function addToCart(
+    productId
+  ) {
 
     try {
 
-      const cart =
+      const cartId =
         await getOrCreateCart();
+
 
       const {
         data: existingItem,
@@ -750,13 +808,21 @@ document.addEventListener("DOMContentLoaded", async () => {
           .select(
             "id, quantity"
           )
-          .eq("cart_id", cart.id)
-          .eq("product_id", productId)
+          .eq(
+            "cart_id",
+            cartId
+          )
+          .eq(
+            "product_id",
+            productId
+          )
           .maybeSingle();
+
 
       if (existingError) {
         throw existingError;
       }
+
 
       if (existingItem) {
 
@@ -769,7 +835,11 @@ document.addEventListener("DOMContentLoaded", async () => {
               quantity:
                 existingItem.quantity + 1
             })
-            .eq("id", existingItem.id);
+            .eq(
+              "id",
+              existingItem.id
+            );
+
 
         if (error) {
           throw error;
@@ -783,19 +853,27 @@ document.addEventListener("DOMContentLoaded", async () => {
           await supabaseClient
             .from("cart_items")
             .insert({
-              cart_id: cart.id,
-              product_id: productId,
-              quantity: 1
+              cart_id:
+                cartId,
+              product_id:
+                productId,
+              quantity:
+                1
             });
+
 
         if (error) {
           throw error;
         }
       }
 
-      await loadCartCount();
 
-      alert("Product added to your cart.");
+      await updateCartCount();
+
+
+      alert(
+        "Product added to your cart."
+      );
 
     } catch (error) {
 
@@ -812,132 +890,99 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
 
-  async function loadCartCount() {
+  // =========================================
+  // UPDATE CART COUNT
+  // =========================================
+
+  async function updateCartCount() {
 
     if (!cartCount) {
       return;
     }
 
-    const {
-      data: cart,
-      error: cartError
-    } =
-      await supabaseClient
-        .from("carts")
-        .select("id")
-        .eq("buyer_id", currentUser.id)
-        .maybeSingle();
 
-    if (cartError) {
-      console.error(cartError);
-      return;
-    }
+    try {
 
-    if (!cart) {
-
-      cartCount.textContent = "0";
-
-      return;
-    }
-
-    const {
-      data: items,
-      error
-    } =
-      await supabaseClient
-        .from("cart_items")
-        .select("quantity")
-        .eq("cart_id", cart.id);
-
-    if (error) {
-      console.error(error);
-      return;
-    }
-
-    const total =
-      (items || [])
-        .reduce(
-          (sum, item) =>
-            sum + Number(item.quantity || 0),
-          0
-        );
-
-    cartCount.textContent =
-      total > 99
-        ? "99+"
-        : String(total);
-  }
+      const {
+        data: cart,
+        error: cartError
+      } =
+        await supabaseClient
+          .from("carts")
+          .select("id")
+          .eq(
+            "buyer_id",
+            currentUser.id
+          )
+          .maybeSingle();
 
 
-  // =========================================
-  // SEARCH
-  // =========================================
+      if (cartError) {
+        throw cartError;
+      }
 
-  function performSearch() {
 
-    currentSearch =
-      productSearch.value
-        .trim()
-        .toLowerCase();
+      if (!cart) {
 
-    if (!currentSearch) {
+        cartCount.textContent =
+          "0";
 
-      renderProducts(allProducts);
+        return;
+      }
 
-      return;
-    }
 
-    const results =
-      allProducts.filter(
-        (product) => {
-
-          const name =
-            String(
-              product.name || ""
-            ).toLowerCase();
-
-          const description =
-            String(
-              product.description || ""
-            ).toLowerCase();
-
-          const category =
-            String(
-              product.categories?.name || ""
-            ).toLowerCase();
-
-          return (
-            name.includes(currentSearch) ||
-            description.includes(currentSearch) ||
-            category.includes(currentSearch)
+      const {
+        data: items,
+        error: itemsError
+      } =
+        await supabaseClient
+          .from("cart_items")
+          .select(
+            "quantity"
+          )
+          .eq(
+            "cart_id",
+            cart.id
           );
-        }
+
+
+      if (itemsError) {
+        throw itemsError;
+      }
+
+
+      const totalQuantity =
+        (items || [])
+          .reduce(
+            (
+              total,
+              item
+            ) =>
+              total +
+              Number(
+                item.quantity
+              ),
+            0
+          );
+
+
+      cartCount.textContent =
+        totalQuantity > 99
+          ? "99+"
+          : String(
+              totalQuantity
+            );
+
+    } catch (error) {
+
+      console.error(
+        "Cart count error:",
+        error
       );
 
-    renderProducts(results);
-  }
-
-
-  if (searchButton) {
-    searchButton.addEventListener(
-      "click",
-      performSearch
-    );
-  }
-
-
-  if (productSearch) {
-
-    productSearch.addEventListener(
-      "keydown",
-      (event) => {
-
-        if (event.key === "Enter") {
-          performSearch();
-        }
-
-      }
-    );
+      cartCount.textContent =
+        "0";
+    }
   }
 
 
@@ -953,9 +998,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         event.stopPropagation();
 
-        profileMenu?.classList.toggle(
-          "open"
-        );
+        if (profileMenu) {
+
+          profileMenu.classList.toggle(
+            "open"
+          );
+        }
       }
     );
   }
@@ -967,17 +1015,88 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       if (
         profileMenu &&
-        !profileMenu.contains(event.target) &&
-        !profileButton?.contains(event.target)
+        !profileMenu.contains(
+          event.target
+        ) &&
+        !profileButton?.contains(
+          event.target
+        )
       ) {
 
         profileMenu.classList.remove(
           "open"
         );
       }
-
     }
   );
+
+
+  // =========================================
+  // MY ORDERS
+  // =========================================
+
+  if (myOrdersButton) {
+
+    myOrdersButton.addEventListener(
+      "click",
+      () => {
+
+        window.location.href =
+          "orders.html";
+      }
+    );
+  }
+
+
+  // =========================================
+  // WISHLIST
+  // =========================================
+
+  if (wishlistButton) {
+
+    wishlistButton.addEventListener(
+      "click",
+      () => {
+
+        window.location.href =
+          "wishlist.html";
+      }
+    );
+  }
+
+
+  // =========================================
+  // ACCOUNT SETTINGS
+  // =========================================
+
+  if (settingsButton) {
+
+    settingsButton.addEventListener(
+      "click",
+      () => {
+
+        window.location.href =
+          "account-settings.html";
+      }
+    );
+  }
+
+
+  // =========================================
+  // CART
+  // =========================================
+
+  if (cartButton) {
+
+    cartButton.addEventListener(
+      "click",
+      () => {
+
+        window.location.href =
+          "cart.html";
+      }
+    );
+  }
 
 
   // =========================================
@@ -990,18 +1109,26 @@ document.addEventListener("DOMContentLoaded", async () => {
       "click",
       async () => {
 
-        logoutButton.disabled = true;
+        logoutButton.disabled =
+          true;
+
+        logoutButton.innerHTML =
+          "<span>↪</span> Signing out...";
+
 
         try {
 
           const {
             error
           } =
-            await supabaseClient.auth.signOut();
+            await supabaseClient.auth
+              .signOut();
+
 
           if (error) {
             throw error;
           }
+
 
           window.location.href =
             "login.html";
@@ -1013,79 +1140,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             error
           );
 
-          logoutButton.disabled = false;
 
-          alert(
-            error.message ||
-            "Unable to sign out."
-          );
-        }
-      }
-    );
-  }
-
-
-  // =========================================
-  // CART BUTTON
-  // =========================================
-
-  if (cartButton) {
-
-    cartButton.addEventListener(
-      "click",
-      () => {
-
-        window.location.href =
-          "cart.html";
-
-      }
-    );
-  }
-
-
-  // =========================================
-  // INITIALIZE
-  // =========================================
-
-  try {
-
-    const authenticated =
-      await loadCurrentUser();
-
-    if (!authenticated) {
-      return;
-    }
-
-    await loadProfile();
-
-    await Promise.all([
-      loadCategories(),
-      loadProducts(),
-      loadCartCount()
-    ]);
-
-    console.log(
-      "Buyer dashboard initialized successfully."
-    );
-
-  } catch (error) {
-
-    console.error(
-      "Buyer dashboard initialization error:",
-      error
-    );
-
-    if (productGrid) {
-
-      productGrid.innerHTML = `
-        <div class="loading-card">
-          Unable to load marketplace data.
-          Please refresh the page.
-        </div>
-      `;
-
-    }
-
-  }
-
-});
+          logoutButton.disabled =
+            false;
