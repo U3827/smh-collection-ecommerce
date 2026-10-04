@@ -1,138 +1,81 @@
 // =========================================
 // SMH COLLECTION
 // BUYER DASHBOARD
-// REAL SUPABASE MARKETPLACE
+// REAL SUPABASE DATA + PROFILE + CART
 // =========================================
 
 document.addEventListener("DOMContentLoaded", () => {
-
   console.log("SMH Collection Buyer Dashboard loaded.");
 
   // =========================================
   // ELEMENTS
   // =========================================
 
-  const currentYear =
-    document.getElementById("currentYear");
+  const currentYear = document.getElementById("currentYear");
 
-  const profileButton =
-    document.getElementById("profileButton");
+  const profileButton = document.getElementById("profileButton");
+  const profileMenu = document.getElementById("profileMenu");
+  const profileAvatar = document.getElementById("profileAvatar");
 
-  const profileMenu =
-    document.getElementById("profileMenu");
+  const profileName = document.getElementById("profileName");
+  const menuAvatar = document.getElementById("menuAvatar");
+  const menuName = document.getElementById("menuName");
+  const menuEmail = document.getElementById("menuEmail");
 
-  const profileAvatar =
-    document.getElementById("profileAvatar");
+  const logoutButton = document.getElementById("logoutButton");
+  const myOrdersButton = document.getElementById("myOrdersButton");
+  const wishlistButton = document.getElementById("wishlistButton");
+  const settingsButton = document.getElementById("settingsButton");
+  const cartButton = document.getElementById("cartButton");
+  const cartCount = document.getElementById("cartCount");
 
-  const profileName =
-    document.getElementById("profileName");
+  const welcomeName = document.getElementById("welcomeName");
 
-  const menuAvatar =
-    document.getElementById("menuAvatar");
+  const productSearch = document.getElementById("productSearch");
+  const searchButton = document.getElementById("searchButton");
 
-  const menuName =
-    document.getElementById("menuName");
-
-  const menuEmail =
-    document.getElementById("menuEmail");
-
-  const logoutButton =
-    document.getElementById("logoutButton");
-
-  const myOrdersButton =
-    document.getElementById("myOrdersButton");
-
-  const wishlistButton =
-    document.getElementById("wishlistButton");
-
-  const settingsButton =
-    document.getElementById("settingsButton");
-
-  const cartButton =
-    document.getElementById("cartButton");
-
-  const cartCount =
-    document.getElementById("cartCount");
-
-  const welcomeName =
-    document.getElementById("welcomeName");
-
-  const categoryGrid =
-    document.getElementById("categoryGrid");
-
-  const productGrid =
-    document.getElementById("productGrid");
-
-  const emptyState =
-    document.getElementById("emptyState");
-
-  const productSearch =
-    document.getElementById("productSearch");
-
-  const searchButton =
-    document.getElementById("searchButton");
-
-  const viewCategoriesButton =
-    document.getElementById(
-      "viewCategoriesButton"
-    );
+  const productGrid = document.getElementById("productGrid");
+  const emptyState = document.getElementById("emptyState");
 
   const viewProductsButton =
-    document.getElementById(
-      "viewProductsButton"
-    );
-
+    document.getElementById("viewProductsButton");
 
   // =========================================
   // YEAR
   // =========================================
 
   if (currentYear) {
-    currentYear.textContent =
-      new Date().getFullYear();
+    currentYear.textContent = new Date().getFullYear();
   }
 
-
   // =========================================
-  // CHECK SUPABASE
+  // SUPABASE CHECK
   // =========================================
 
-  if (
-    typeof window.supabase === "undefined" ||
-    typeof supabaseClient === "undefined"
-  ) {
-
-    console.error(
-      "Supabase is not available."
-    );
-
+  if (typeof window.supabase === "undefined") {
+    console.error("Supabase library is missing.");
     return;
   }
 
+  if (typeof supabaseClient === "undefined") {
+    console.error("supabaseClient is missing.");
+    return;
+  }
 
   // =========================================
   // STATE
   // =========================================
 
   let currentUser = null;
-
   let currentProfile = null;
-
   let allProducts = [];
-
-  let allCategories = [];
-
 
   // =========================================
   // HELPERS
   // =========================================
 
   function escapeHTML(value) {
-
-    if (
-      value === null ||
-      value === undefined
-    ) {
+    if (value === null || value === undefined) {
       return "";
     }
 
@@ -144,739 +87,432 @@ document.addEventListener("DOMContentLoaded", () => {
       .replace(/'/g, "&#039;");
   }
 
-
   function formatPrice(value) {
+    const amount = Number(value || 0);
 
-    return new Intl.NumberFormat(
-      "en-US",
-      {
-        style: "currency",
-        currency: "USD",
-        minimumFractionDigits: 2
-      }
-    ).format(
-      Number(value) || 0
-    );
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD"
+    }).format(amount);
   }
 
-
   function getInitials(name) {
-
     if (!name) {
-      return "U";
+      return "SM";
     }
 
-    const parts =
-      name
-        .trim()
-        .split(/\s+/)
-        .filter(Boolean);
+    const parts = name
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean);
 
     if (parts.length === 1) {
-
-      return parts[0]
-        .substring(0, 2)
-        .toUpperCase();
+      return parts[0].substring(0, 2).toUpperCase();
     }
 
     return (
-      parts[0][0] +
-      parts[parts.length - 1][0]
+      parts[0].charAt(0) +
+      parts[parts.length - 1].charAt(0)
     ).toUpperCase();
   }
 
+  function showEmptyState(show) {
+    if (emptyState) {
+      emptyState.style.display = show ? "block" : "none";
+    }
+  }
 
   // =========================================
   // LOAD CURRENT USER
   // =========================================
 
   async function loadCurrentUser() {
-
     const {
-      data: {
-        user
-      },
+      data: { user },
       error
-    } =
-      await supabaseClient.auth
-        .getUser();
+    } = await supabaseClient.auth.getUser();
 
     if (error) {
       throw error;
     }
 
     if (!user) {
-
-      window.location.href =
-        "login.html";
-
+      window.location.href = "login.html";
       return false;
     }
 
-    currentUser =
-      user;
-
+    currentUser = user;
     return true;
   }
-
 
   // =========================================
   // LOAD PROFILE
   // =========================================
 
   async function loadProfile() {
+    if (!currentUser) {
+      return;
+    }
 
     const {
       data: profile,
       error
-    } =
-      await supabaseClient
-        .from("profiles")
-        .select(
-          "id, full_name, email, role, is_active, avatar_url"
-        )
-        .eq(
-          "id",
-          currentUser.id
-        )
-        .single();
+    } = await supabaseClient
+      .from("profiles")
+      .select(
+        "id, full_name, email, role, is_active, avatar_url"
+      )
+      .eq("id", currentUser.id)
+      .single();
 
     if (error) {
       throw error;
     }
 
     if (!profile) {
-
-      throw new Error(
-        "Your account profile could not be found."
-      );
+      throw new Error("Your profile could not be found.");
     }
 
     if (!profile.is_active) {
+      await supabaseClient.auth.signOut();
 
-      await supabaseClient.auth
-        .signOut();
-
-      window.location.href =
-        "login.html";
-
-      return false;
+      window.location.href = "login.html";
+      return;
     }
 
-
-    currentProfile =
-      profile;
-
-
-    // =======================================
-    // ROLE ROUTING
-    // =======================================
+    // =========================================
+    // ROLE PROTECTION
+    // =========================================
 
     if (profile.role === "admin") {
-
-      window.location.href =
-        "admin-dashboard.html";
-
-      return false;
+      window.location.href = "admin-dashboard.html";
+      return;
     }
-
 
     if (profile.role === "seller") {
-
-      window.location.href =
-        "seller-dashboard.html";
-
-      return false;
+      window.location.href = "seller-dashboard.html";
+      return;
     }
 
-
     if (profile.role !== "buyer") {
-
       throw new Error(
-        "Your account has an invalid role."
+        "Your account has an invalid account role."
       );
     }
 
+    currentProfile = profile;
 
-    // =======================================
+    // =========================================
     // PROFILE DISPLAY
-    // =======================================
+    // =========================================
 
     const name =
       profile.full_name ||
+      currentUser.user_metadata?.full_name ||
+      "SMH Customer";
+
+    const email =
+      profile.email ||
       currentUser.email ||
-      "Shopper";
+      "";
 
-    const initials =
-      getInitials(name);
-
+    const initials = getInitials(name);
 
     if (profileName) {
-      profileName.textContent =
-        name;
+      profileName.textContent = name;
     }
-
-
-    if (profileAvatar) {
-      profileAvatar.textContent =
-        initials;
-    }
-
 
     if (menuName) {
-      menuName.textContent =
-        name;
+      menuName.textContent = name;
     }
-
 
     if (menuEmail) {
-      menuEmail.textContent =
-        profile.email ||
-        currentUser.email ||
-        "";
+      menuEmail.textContent = email;
     }
-
-
-    if (menuAvatar) {
-      menuAvatar.textContent =
-        initials;
-    }
-
 
     if (welcomeName) {
-
-      const firstName =
-        name
-          .trim()
-          .split(/\s+/)[0];
-
-      welcomeName.textContent =
-        firstName ||
-        "Shopper";
+      welcomeName.textContent = name;
     }
 
+    if (profileAvatar) {
+      if (profile.avatar_url) {
+        profileAvatar.src = profile.avatar_url;
+        profileAvatar.alt = name;
+      } else {
+        profileAvatar.textContent = initials;
+      }
+    }
 
-    return true;
+    if (menuAvatar) {
+      if (profile.avatar_url) {
+        menuAvatar.src = profile.avatar_url;
+        menuAvatar.alt = name;
+      } else {
+        menuAvatar.textContent = initials;
+      }
+    }
   }
 
-
   // =========================================
-  // LOAD CATEGORIES
+  // PROFILE MENU
   // =========================================
 
-  async function loadCategories() {
-
-    if (!categoryGrid) {
+  function closeProfileMenu() {
+    if (!profileMenu) {
       return;
     }
 
-    categoryGrid.innerHTML = `
-      <div class="loading-card">
-        Loading categories...
-      </div>
-    `;
+    profileMenu.classList.remove("open");
 
-
-    const {
-      data: categories,
-      error
-    } =
-      await supabaseClient
-        .from("categories")
-        .select(
-          "id, name, slug, description, image_url"
-        )
-        .eq(
-          "is_active",
-          true
-        )
-        .order(
-          "name",
-          {
-            ascending: true
-          }
-        );
-
-
-    if (error) {
-      throw error;
+    if (profileButton) {
+      profileButton.setAttribute(
+        "aria-expanded",
+        "false"
+      );
     }
 
-
-    allCategories =
-      categories || [];
-
-
-    renderCategories(
-      allCategories
+    profileMenu.setAttribute(
+      "aria-hidden",
+      "true"
     );
   }
 
-
-  // =========================================
-  // RENDER CATEGORIES
-  // =========================================
-
-  function renderCategories(
-    categories
-  ) {
-
-    if (!categoryGrid) {
+  function openProfileMenu() {
+    if (!profileMenu) {
       return;
     }
 
+    profileMenu.classList.add("open");
 
-    if (
-      !categories ||
-      categories.length === 0
-    ) {
-
-      categoryGrid.innerHTML = `
-        <div class="loading-card">
-          No categories available yet.
-        </div>
-      `;
-
-      return;
+    if (profileButton) {
+      profileButton.setAttribute(
+        "aria-expanded",
+        "true"
+      );
     }
 
+    profileMenu.setAttribute(
+      "aria-hidden",
+      "false"
+    );
 
-    categoryGrid.innerHTML =
-      categories
-        .map(
-          (category) => {
-
-            const image =
-              category.image_url;
-
-            return `
-              <button
-                type="button"
-                class="category-card"
-                data-category-id="${escapeHTML(
-                  category.id
-                )}"
-              >
-
-                <div class="category-image">
-
-                  ${
-                    image
-                      ? `
-                        <img
-                          src="${escapeHTML(
-                            image
-                          )}"
-                          alt="${escapeHTML(
-                            category.name
-                          )}"
-                          loading="lazy"
-                        >
-                      `
-                      : `
-                        <span>
-                          ◇
-                        </span>
-                      `
-                  }
-
-                </div>
-
-                <div class="category-info">
-
-                  <strong>
-                    ${escapeHTML(
-                      category.name
-                    )}
-                  </strong>
-
-                  <small>
-                    Explore products
-                  </small>
-
-                </div>
-
-              </button>
-            `;
-          }
-        )
-        .join("");
+    console.log("SMH: Profile menu opened.");
   }
 
+  function toggleProfileMenu(event) {
+    event.preventDefault();
+    event.stopPropagation();
 
-  // =========================================
-  // LOAD PRODUCTS
-  // =========================================
-
-  async function loadProducts() {
-
-    if (!productGrid) {
+    if (!profileMenu) {
+      console.error(
+        "SMH ERROR: profileMenu element was not found."
+      );
       return;
     }
 
-    productGrid.innerHTML = `
-      <div class="loading-card">
-        Loading products...
-      </div>
-    `;
+    const isOpen =
+      profileMenu.classList.contains("open");
 
-
-    const {
-      data: products,
-      error
-    } =
-      await supabaseClient
-        .from("products")
-        .select(`
-          id,
-          seller_id,
-          category_id,
-          name,
-          slug,
-          description,
-          price,
-          stock,
-          image_url,
-          created_at,
-          categories (
-            id,
-            name,
-            slug
-          )
-        `)
-        .eq(
-          "is_active",
-          true
-        )
-        .gt(
-          "stock",
-          0
-        )
-        .order(
-          "created_at",
-          {
-            ascending: false
-          }
-        );
-
-
-    if (error) {
-      throw error;
+    if (isOpen) {
+      closeProfileMenu();
+    } else {
+      openProfileMenu();
     }
+  }
 
+  if (profileButton && profileMenu) {
+    profileButton.addEventListener(
+      "click",
+      toggleProfileMenu
+    );
 
-    allProducts =
-      products || [];
+    profileMenu.addEventListener(
+      "click",
+      (event) => {
+        event.stopPropagation();
+      }
+    );
 
-
-    renderProducts(
-      allProducts
+    console.log(
+      "SMH: Profile button and menu connected successfully."
+    );
+  } else {
+    console.error(
+      "SMH ERROR: Profile button or profile menu was not found.",
+      {
+        profileButton,
+        profileMenu
+      }
     );
   }
 
-
   // =========================================
-  // RENDER PRODUCTS
+  // CLOSE PROFILE MENU OUTSIDE
   // =========================================
 
-  function renderProducts(
-    products
-  ) {
-
-    if (!productGrid) {
-      return;
-    }
-
-
-    if (
-      !products ||
-      products.length === 0
-    ) {
-
-      productGrid.innerHTML = `
-        <div class="loading-card">
-          No products available yet.
-        </div>
-      `;
-
-      if (emptyState) {
-        emptyState.hidden = false;
+  document.addEventListener(
+    "click",
+    (event) => {
+      if (!profileMenu || !profileButton) {
+        return;
       }
 
-      return;
+      if (
+        !profileMenu.contains(event.target) &&
+        !profileButton.contains(event.target)
+      ) {
+        closeProfileMenu();
+      }
     }
-
-
-    if (emptyState) {
-      emptyState.hidden = true;
-    }
-
-
-    productGrid.innerHTML =
-      products
-        .map(
-          (product) => {
-
-            const image =
-              product.image_url;
-
-            const category =
-              product.categories?.name ||
-              "General";
-
-
-            return `
-              <article
-                class="product-card"
-                data-product-id="${escapeHTML(
-                  product.id
-                )}"
-              >
-
-                <button
-                  type="button"
-                  class="product-image-button"
-                  data-product-id="${escapeHTML(
-                    product.id
-                  )}"
-                  aria-label="View ${
-                    escapeHTML(
-                      product.name
-                    )
-                  }"
-                >
-
-                  <div class="product-image">
-
-                    ${
-                      image
-                        ? `
-                          <img
-                            src="${escapeHTML(
-                              image
-                            )}"
-                            alt="${escapeHTML(
-                              product.name
-                            )}"
-                            loading="lazy"
-                          >
-                        `
-                        : `
-                          <span>
-                            ◇
-                          </span>
-                        `
-                    }
-
-                  </div>
-
-                </button>
-
-
-                <div class="product-info">
-
-                  <span class="product-category">
-                    ${escapeHTML(
-                      category
-                    )}
-                  </span>
-
-
-                  <h3>
-                    ${escapeHTML(
-                      product.name
-                    )}
-                  </h3>
-
-
-                  <p class="product-description">
-
-                    ${escapeHTML(
-                      product.description ||
-                      "Quality product available on SMH Collection."
-                    )}
-
-                  </p>
-
-
-                  <div class="product-bottom">
-
-                    <strong class="product-price">
-
-                      ${formatPrice(
-                        product.price
-                      )}
-
-                    </strong>
-
-
-                    <button
-                      type="button"
-                      class="add-cart-button"
-                      data-product-id="${escapeHTML(
-                        product.id
-                      )}"
-                    >
-                      Add to Cart
-                    </button>
-
-                  </div>
-
-                </div>
-
-              </article>
-            `;
-          }
-        )
-        .join("");
-  }
-
+  );
 
   // =========================================
-  // GET OR CREATE CART
+  // GET / CREATE CART
   // =========================================
 
   async function getOrCreateCart() {
-
-    const {
-      data: existingCart,
-      error: selectError
-    } =
-      await supabaseClient
-        .from("carts")
-        .select("id")
-        .eq(
-          "buyer_id",
-          currentUser.id
-        )
-        .maybeSingle();
-
-
-    if (selectError) {
-      throw selectError;
+    if (!currentUser) {
+      return null;
     }
 
+    let {
+      data: cart,
+      error
+    } = await supabaseClient
+      .from("carts")
+      .select("id, buyer_id")
+      .eq("buyer_id", currentUser.id)
+      .maybeSingle();
 
-    if (existingCart) {
-      return existingCart.id;
+    if (error) {
+      throw error;
     }
 
-
-    const {
-      data: newCart,
-      error: insertError
-    } =
-      await supabaseClient
-        .from("carts")
-        .insert({
-          buyer_id:
-            currentUser.id
-        })
-        .select("id")
-        .single();
-
-
-    if (insertError) {
-      throw insertError;
+    if (cart) {
+      return cart;
     }
 
+    const result = await supabaseClient
+      .from("carts")
+      .insert({
+        buyer_id: currentUser.id
+      })
+      .select("id, buyer_id")
+      .single();
 
-    return newCart.id;
+    if (result.error) {
+      throw result.error;
+    }
+
+    return result.data;
   }
 
+  // =========================================
+  // UPDATE CART COUNT
+  // =========================================
+
+  async function updateCartCount() {
+    if (!cartCount || !currentUser) {
+      return;
+    }
+
+    try {
+      const cart = await getOrCreateCart();
+
+      if (!cart) {
+        cartCount.textContent = "0";
+        return;
+      }
+
+      const {
+        data: items,
+        error
+      } = await supabaseClient
+        .from("cart_items")
+        .select("quantity")
+        .eq("cart_id", cart.id);
+
+      if (error) {
+        throw error;
+      }
+
+      const totalQuantity = (items || []).reduce(
+        (total, item) =>
+          total + Number(item.quantity || 0),
+        0
+      );
+
+      cartCount.textContent = totalQuantity;
+    } catch (error) {
+      console.error(
+        "Unable to update cart count:",
+        error
+      );
+
+      cartCount.textContent = "0";
+    }
+  }
 
   // =========================================
   // ADD TO CART
   // =========================================
 
-  async function addToCart(
-    productId
-  ) {
-
+  async function addToCart(productId) {
     try {
+      const cart = await getOrCreateCart();
 
-      const cartId =
-        await getOrCreateCart();
-
+      if (!cart) {
+        throw new Error("Your cart could not be created.");
+      }
 
       const {
         data: existingItem,
         error: existingError
-      } =
-        await supabaseClient
-          .from("cart_items")
-          .select(
-            "id, quantity"
-          )
-          .eq(
-            "cart_id",
-            cartId
-          )
-          .eq(
-            "product_id",
-            productId
-          )
-          .maybeSingle();
-
+      } = await supabaseClient
+        .from("cart_items")
+        .select("id, quantity")
+        .eq("cart_id", cart.id)
+        .eq("product_id", productId)
+        .maybeSingle();
 
       if (existingError) {
         throw existingError;
       }
 
-
       if (existingItem) {
-
         const {
-          error
-        } =
-          await supabaseClient
-            .from("cart_items")
-            .update({
-              quantity:
-                existingItem.quantity + 1
-            })
-            .eq(
-              "id",
-              existingItem.id
-            );
+          error: updateError
+        } = await supabaseClient
+          .from("cart_items")
+          .update({
+            quantity: Number(existingItem.quantity) + 1,
+            updated_at: new Date().toISOString()
+          })
+          .eq("id", existingItem.id);
 
-
-        if (error) {
-          throw error;
+        if (updateError) {
+          throw updateError;
         }
-
       } else {
-
         const {
-          error
-        } =
-          await supabaseClient
-            .from("cart_items")
-            .insert({
-              cart_id:
-                cartId,
-              product_id:
-                productId,
-              quantity:
-                1
-            });
+          error: insertError
+        } = await supabaseClient
+          .from("cart_items")
+          .insert({
+            cart_id: cart.id,
+            product_id: productId,
+            quantity: 1
+          });
 
-
-        if (error) {
-          throw error;
+        if (insertError) {
+          throw insertError;
         }
       }
 
-
       await updateCartCount();
 
-
-      alert(
-        "Product added to your cart."
-      );
-
+      alert("Product added to your cart.");
     } catch (error) {
-
       console.error(
         "Add to cart error:",
         error
@@ -889,249 +525,359 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-
   // =========================================
-  // UPDATE CART COUNT
+  // LOAD PRODUCTS
   // =========================================
 
-  async function updateCartCount() {
-
-    if (!cartCount) {
+  async function loadProducts() {
+    if (!productGrid) {
       return;
     }
 
+    productGrid.innerHTML = `
+      <div class="loading-state">
+        Loading products...
+      </div>
+    `;
 
-    try {
+    const {
+      data: products,
+      error
+    } = await supabaseClient
+      .from("products")
+      .select(`
+        id,
+        seller_id,
+        category_id,
+        name,
+        slug,
+        description,
+        price,
+        stock,
+        image_url,
+        is_active,
+        created_at
+      `)
+      .eq("is_active", true)
+      .order("created_at", {
+        ascending: false
+      });
 
-      const {
-        data: cart,
-        error: cartError
-      } =
-        await supabaseClient
-          .from("carts")
-          .select("id")
-          .eq(
-            "buyer_id",
-            currentUser.id
-          )
-          .maybeSingle();
-
-
-      if (cartError) {
-        throw cartError;
-      }
-
-
-      if (!cart) {
-
-        cartCount.textContent =
-          "0";
-
-        return;
-      }
-
-
-      const {
-        data: items,
-        error: itemsError
-      } =
-        await supabaseClient
-          .from("cart_items")
-          .select(
-            "quantity"
-          )
-          .eq(
-            "cart_id",
-            cart.id
-          );
-
-
-      if (itemsError) {
-        throw itemsError;
-      }
-
-
-      const totalQuantity =
-        (items || [])
-          .reduce(
-            (
-              total,
-              item
-            ) =>
-              total +
-              Number(
-                item.quantity
-              ),
-            0
-          );
-
-
-      cartCount.textContent =
-        totalQuantity > 99
-          ? "99+"
-          : String(
-              totalQuantity
-            );
-
-    } catch (error) {
-
-      console.error(
-        "Cart count error:",
-        error
-      );
-
-      cartCount.textContent =
-        "0";
+    if (error) {
+      throw error;
     }
+
+    allProducts = products || [];
+
+    renderProducts(allProducts);
   }
 
+  // =========================================
+  // RENDER PRODUCTS
+  // =========================================
+
+  function renderProducts(products) {
+    if (!productGrid) {
+      return;
+    }
+
+    if (!products || products.length === 0) {
+      productGrid.innerHTML = "";
+      showEmptyState(true);
+      return;
+    }
+
+    showEmptyState(false);
+
+    productGrid.innerHTML = products
+      .map((product) => {
+
+        const image = product.image_url
+          ? `
+            <img
+              src="${escapeHTML(product.image_url)}"
+              alt="${escapeHTML(product.name)}"
+              loading="lazy"
+            >
+          `
+          : `
+            <div class="product-image-placeholder">
+              SMH
+            </div>
+          `;
+
+        const stockText =
+          Number(product.stock) > 0
+            ? `${product.stock} available`
+            : "Out of stock";
+
+        const disabled =
+          Number(product.stock) <= 0
+            ? "disabled"
+            : "";
+
+        return `
+          <article
+            class="product-card"
+            data-product-id="${escapeHTML(product.id)}"
+          >
+
+            <a
+              href="product.html?id=${encodeURIComponent(product.id)}"
+              class="product-image"
+              aria-label="View ${escapeHTML(product.name)}"
+            >
+              ${image}
+            </a>
+
+            <div class="product-content">
+
+              <h3 class="product-name">
+                ${escapeHTML(product.name)}
+              </h3>
+
+              <p class="product-description">
+                ${escapeHTML(
+                  product.description ||
+                  "Quality product from SMH Collection."
+                )}
+              </p>
+
+              <div class="product-meta">
+
+                <strong class="product-price">
+                  ${formatPrice(product.price)}
+                </strong>
+
+                <span class="product-stock">
+                  ${escapeHTML(stockText)}
+                </span>
+
+              </div>
+
+              <button
+                type="button"
+                class="add-to-cart-button"
+                data-add-cart="${escapeHTML(product.id)}"
+                ${disabled}
+              >
+                ${
+                  Number(product.stock) > 0
+                    ? "Add to Cart"
+                    : "Out of Stock"
+                }
+              </button>
+
+            </div>
+
+          </article>
+        `;
+      })
+      .join("");
+
+    // Add-to-cart buttons
+    productGrid
+      .querySelectorAll("[data-add-cart]")
+      .forEach((button) => {
+
+        button.addEventListener(
+          "click",
+          async (event) => {
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            const productId =
+              button.getAttribute("data-add-cart");
+
+            if (!productId) {
+              return;
+            }
+
+            button.disabled = true;
+            button.textContent = "Adding...";
+
+            try {
+              await addToCart(productId);
+
+              button.textContent = "Added ✓";
+
+              setTimeout(() => {
+                if (Number(
+                  allProducts.find(
+                    (product) =>
+                      product.id === productId
+                  )?.stock || 0
+                ) > 0) {
+                  button.disabled = false;
+                  button.textContent = "Add to Cart";
+                }
+              }, 1200);
+
+            } catch (error) {
+              button.disabled = false;
+              button.textContent = "Add to Cart";
+            }
+          }
+        );
+      });
+  }
 
   // =========================================
-  // PROFILE MENU
+  // PRODUCT SEARCH
   // =========================================
 
-  if (profileButton) {
+  function performProductSearch() {
+    if (!productSearch) {
+      return;
+    }
 
-    profileButton.addEventListener(
+    const searchTerm =
+      productSearch.value
+        .trim()
+        .toLowerCase();
+
+    if (!searchTerm) {
+      renderProducts(allProducts);
+      return;
+    }
+
+    const filteredProducts =
+      allProducts.filter((product) => {
+
+        const name =
+          String(product.name || "")
+            .toLowerCase();
+
+        const description =
+          String(product.description || "")
+            .toLowerCase();
+
+        const slug =
+          String(product.slug || "")
+            .toLowerCase();
+
+        return (
+          name.includes(searchTerm) ||
+          description.includes(searchTerm) ||
+          slug.includes(searchTerm)
+        );
+      });
+
+    renderProducts(filteredProducts);
+  }
+
+  if (searchButton) {
+    searchButton.addEventListener(
       "click",
+      performProductSearch
+    );
+  }
+
+  if (productSearch) {
+    productSearch.addEventListener(
+      "keydown",
       (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          performProductSearch();
+        }
+      }
+    );
 
-        event.stopPropagation();
-
-        if (profileMenu) {
-
-          profileMenu.classList.toggle(
-            "open"
-          );
+    productSearch.addEventListener(
+      "input",
+      () => {
+        if (
+          productSearch.value.trim() === ""
+        ) {
+          renderProducts(allProducts);
         }
       }
     );
   }
 
-
-  document.addEventListener(
-    "click",
-    (event) => {
-
-      if (
-        profileMenu &&
-        !profileMenu.contains(
-          event.target
-        ) &&
-        !profileButton?.contains(
-          event.target
-        )
-      ) {
-
-        profileMenu.classList.remove(
-          "open"
-        );
-      }
-    }
-  );
-
-
   // =========================================
-  // MY ORDERS
+  // NAVIGATION
   // =========================================
 
   if (myOrdersButton) {
-
     myOrdersButton.addEventListener(
       "click",
       () => {
-
-        window.location.href =
-          "orders.html";
+        window.location.href = "orders.html";
       }
     );
   }
 
-
-  // =========================================
-  // WISHLIST
-  // =========================================
-
   if (wishlistButton) {
-
     wishlistButton.addEventListener(
       "click",
       () => {
-
-        window.location.href =
-          "wishlist.html";
+        window.location.href = "wishlist.html";
       }
     );
   }
 
-
-  // =========================================
-  // ACCOUNT SETTINGS
-  // =========================================
-
   if (settingsButton) {
-
     settingsButton.addEventListener(
       "click",
       () => {
-
         window.location.href =
           "account-settings.html";
       }
     );
   }
 
-
-  // =========================================
-  // CART
-  // =========================================
-
   if (cartButton) {
-
     cartButton.addEventListener(
       "click",
       () => {
-
-        window.location.href =
-          "cart.html";
+        window.location.href = "cart.html";
       }
     );
   }
 
+  if (viewProductsButton) {
+    viewProductsButton.addEventListener(
+      "click",
+      () => {
+
+        const productsSection =
+          document.getElementById("productsSection");
+
+        if (productsSection) {
+          productsSection.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+          });
+        }
+      }
+    );
+  }
 
   // =========================================
   // LOGOUT
   // =========================================
 
   if (logoutButton) {
-
     logoutButton.addEventListener(
       "click",
       async () => {
 
-        logoutButton.disabled =
-          true;
-
-        logoutButton.innerHTML =
-          "<span>↪</span> Signing out...";
-
+        logoutButton.disabled = true;
+        logoutButton.textContent = "Signing out...";
 
         try {
-
           const {
             error
-          } =
-            await supabaseClient.auth
-              .signOut();
-
+          } = await supabaseClient.auth.signOut();
 
           if (error) {
             throw error;
           }
 
-
-          window.location.href =
-            "login.html";
+          window.location.href = "login.html";
 
         } catch (error) {
 
@@ -1140,6 +886,56 @@ document.addEventListener("DOMContentLoaded", () => {
             error
           );
 
+          logoutButton.disabled = false;
+          logoutButton.textContent = "Sign Out";
 
-          logoutButton.disabled =
-            false;
+          alert(
+            error.message ||
+            "Unable to sign out."
+          );
+        }
+      }
+    );
+  }
+
+  // =========================================
+  // INITIALIZE DASHBOARD
+  // =========================================
+
+  async function initializeDashboard() {
+
+    try {
+
+      console.log(
+        "SMH: Starting buyer dashboard..."
+      );
+
+      const authenticated =
+        await loadCurrentUser();
+
+      if (!authenticated) {
+        return;
+      }
+
+      await loadProfile();
+
+      if (!currentProfile) {
+        return;
+      }
+
+      await loadProducts();
+
+      await updateCartCount();
+
+      console.log(
+        "SMH: Buyer dashboard initialized successfully."
+      );
+
+    } catch (error) {
+
+      console.error(
+        "SMH Buyer Dashboard Error:",
+        error
+      );
+
+      if (productGrid) {
