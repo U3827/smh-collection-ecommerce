@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <meta
+    name="description"
+    content="View your SMH Collection order details."
+  >
+
+  <title>Order Details | SMH Collection</title>
+
+  <link
+    rel="stylesheet"
+    href="assets/css/order-details.css"
+  >
+
+</head>
+
+<body>
+
+  <!-- =================================
+       TOP MARQUEE
+  ================================== -->
+
+  <div class="top-marquee">
+
+    <div class="marquee-track">
+
+      <span>SMH COLLECTION</span>
+      <span>SHOP EVERYTHING</span>
+      <span>FREE DELIVERY</span>
+      <span>CASH ON DELIVERY</span>
+      <span>SMH COLLECTION</span>
+      <span>SHOP EVERYTHING</span>
+      <span>FREE DELIVERY</span>
+      <span>CASH ON DELIVERY</span>
+
+    </div>
+
+  </div>
+
+
+  <!-- =================================
+       HEADER
+  ================================== -->
+
+  <header class="order-details-header">
+
+    <a
+      href="buyer-dashboard.html"
+      class="brand"
+      aria-label="Go to SMH Collection home"
+    >
+
+      <span class="brand-main">
+        SMH
+      </span>
+
+      <span class="brand-sub">
+        COLLECTION
+      </span>
+
+    </a>
+
+
+    <div class="header-actions">
+
+      <a
+        href="orders.html"
+        class="back-button"
+      >
+        ← My Orders
+      </a>
+
+
+      <button
+        type="button"
+        class="profile-button"
+        id="profileButton"
+        aria-expanded="false"
+        aria-controls="profileMenu"
+        aria-label="Open account menu"
+      >
+
+        <span
+          class="profile-avatar"
+          id="profileAvatar"
+        >
+          U
+        </span>
+
+        <span
+          class="profile-name"
+          id="profileName"
+        >
+          Account
+        </span>
+
+        <span class="profile-arrow">
+          ▾
+        </span>
+
+      </button>
+
+    </div>
+
+  </header>
+
+
+  <!-- =================================
+       PROFILE MENU
+  ================================== -->
+
+  <div
+    class="profile-menu"
+    id="profileMenu"
+    aria-hidden="true"
+  >
+
+    <div class="profile-menu-header">
+
+      <div
+        class="menu-avatar"
+        id="menuAvatar"
+      >
+        U
+      </div>
+
+      <div>
+
+        <strong id="menuName">
+          Account
+        </strong>
+
+        <small id="menuEmail">
+          Loading...
+        </small>
+
+      </div>
+
+    </div>
+
+
+    <button
+      type="button"
+      class="menu-item"
+      id="myOrdersButton"
+    >
+      <span>📦</span>
+      My Orders
+    </button>
+
+
+    <button
+      type="button"
+      class="menu-item"
+      id="wishlistButton"
+    >
+      <span>♡</span>
+      Wishlist
+    </button>
+
+
+    <button
+      type="button"
+      class="menu-item"
+      id="settingsButton"
+    >
+      <span>⚙</span>
+      Account Settings
+    </button>
+
+
+    <button
+      type="button"
+      class="menu-item logout-item"
+      id="logoutButton"
+    >
+      <span>↪</span>
+      Sign Out
+    </button>
+
+  </div>
+
+
+  <!-- =================================
+       MAIN
+  ================================== -->
+
+  <main class="order-details-main">
+
+
+    <!-- =================================
+         INTRO
+    ================================== -->
+
+    <section class="order-details-intro">
+
+      <p class="eyebrow">
+        ORDER INFORMATION
+      </p>
+
+      <h1>
+        Order Details
+      </h1>
+
+      <p>
+        Review your order, delivery information,
+        payment method and current order status.
+      </p>
+
+    </section>
+
+
+    <!-- =================================
+         LOADING STATE
+    ================================== -->
+
+    <section
+      class="loading-state"
+      id="loadingState"
+    >
+
+      <div class="loading-spinner"></div>
+
+      <p>
+        Loading order details...
+      </p>
+
+    </section>
+
+
+    <!-- =================================
+         ERROR STATE
+    ================================== -->
+
+    <section
+      class="error-state"
+      id="errorState"
+      hidden
+    >
+
+      <div class="error-icon">
+        !
+      </div>
+
+      <h2>
+        Unable to load order
+      </h2>
+
+      <p id="errorMessage">
+        We could not load this order.
+      </p>
+
+      <div class="order-actions">
+
+        <a
+          href="orders.html"
+          class="secondary-button"
+        >
+          ← My Orders
+        </a>
+
+        <a
+          href="buyer-dashboard.html"
+          class="primary-button"
+        >
+          Continue Shopping
+        </a>
+
+      </div>
+
+    </section>
+
+
+    <!-- =================================
+         ORDER CONTENT
+    ================================== -->
+
+    <div
+      id="orderContent"
+      hidden
+    >
+
+
+      <!-- =================================
+           ORDER SUMMARY
+      ================================== -->
+
+      <section class="order-summary-card">
+
+        <div class="order-summary-top">
+
+          <div>
+
+            <p class="order-number-label">
+              Order Number
+            </p>
+
+            <h2
+              class="order-number"
+              id="orderNumber"
+            >
+              —
+            </h2>
+
+            <p
+              class="order-date"
+              id="orderDate"
+            >
+              —
+            </p>
+
+          </div>
+
+
+          <span
+            class="status-badge"
+            id="orderStatus"
+          >
+            Pending
+          </span>
+
+        </div>
+
+
+        <!-- =================================
+             ORDER STATUS TIMELINE
+        ================================== -->
+
+        <div
+          class="order-timeline"
+          id="orderTimeline"
+        >
+
+          <div
+            class="timeline-step"
+            data-status="pending"
+          >
+
+            <div class="timeline-dot">
+              1
+            </div>
+
+            <div class="timeline-label">
+              Pending
+            </div>
+
+          </div>
+
+
+          <div
+            class="timeline-step"
+            data-status="confirmed"
+          >
+
+            <div class="timeline-dot">
+              2
+            </div>
+
+            <div class="timeline-label">
+              Confirmed
+            </div>
+
+          </div>
+
+
+          <div
+            class="timeline-step"
+            data-status="processing"
+          >
+
+            <div class="timeline-dot">
+              3
+            </div>
+
+            <div class="timeline-label">
+              Processing
+            </div>
+
+          </div>
+
+
+          <div
+            class="timeline-step"
+            data-status="shipped"
+          >
+
+            <div class="timeline-dot">
+              4
+            </div>
+
+            <div class="timeline-label">
+              Shipped
+            </div>
+
+          </div>
+
+
+          <div
+            class="timeline-step"
+            data-status="delivered"
+          >
+
+            <div class="timeline-dot">
+              5
+            </div>
+
+            <div class="timeline-label">
+              Delivered
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =================================
+           CONTENT GRID
+      ================================== -->
+
+      <div class="order-content-grid">
+
+
+        <!-- =================================
+             LEFT COLUMN
+        ================================== -->
+
+        <div>
+
+
+          <!-- ORDER ITEMS -->
+
+          <section class="details-card">
+
+            <div class="card-heading">
+
+              <h2>
+                Items in This Order
+              </h2>
+
+              <span id="itemCount">
+                0 items
+              </span>
+
+            </div>
+
+
+            <div
+              class="order-items"
+              id="orderItems"
+            >
+              <!-- Real order items inserted by JavaScript -->
+            </div>
+
+          </section>
+
+
+          <!-- DELIVERY INFORMATION -->
+
+          <section class="details-card">
+
+            <div class="card-heading">
+
+              <h2>
+                Delivery Information
+              </h2>
+
+            </div>
+
+
+            <div class="delivery-details">
+
+              <div class="delivery-row">
+
+                <span class="delivery-label">
+                  Full Name
+                </span>
+
+                <span
+                  class="delivery-value"
+                  id="shippingName"
+                >
+                  —
+                </span>
+
+              </div>
+
+
+              <div class="delivery-row">
+
+                <span class="delivery-label">
+                  Phone
+                </span>
+
+                <span
+                  class="delivery-value"
+                  id="shippingPhone"
+                >
+                  —
+                </span>
+
+              </div>
+
+
+              <div class="delivery-row">
+
+                <span class="delivery-label">
+                  Address
+                </span>
+
+                <span
+                  class="delivery-value"
+                  id="shippingAddress"
+                >
+                  —
+                </span>
+
+              </div>
+
+
+              <div class="delivery-row">
+
+                <span class="delivery-label">
+                  City
+                </span>
+
+                <span
+                  class="delivery-value"
+                  id="shippingCity"
+                >
+                  —
+                </span>
+
+              </div>
+
+
+              <div class="delivery-row">
+
+                <span class="delivery-label">
+                  State
+                </span>
+
+                <span
+                  class="delivery-value"
+                  id="shippingState"
+                >
+                  —
+                </span>
+
+              </div>
+
+
+              <div class="delivery-row">
+
+                <span class="delivery-label">
+                  Country
+                </span>
+
+                <span
+                  class="delivery-value"
+                  id="shippingCountry"
+                >
+                  Nigeria
+                </span>
+
+              </div>
+
+            </div>
+
+          </section>
+
+
+          <!-- ORDER NOTES -->
+
+          <section
+            class="details-card"
+            id="notesCard"
+            hidden
+          >
+
+            <div class="card-heading">
+
+              <h2>
+                Order Notes
+              </h2>
+
+            </div>
+
+            <div
+              class="order-notes"
+              id="orderNotes"
+            >
+            </div>
+
+          </section>
+
+        </div>
+
+
+        <!-- =================================
+             RIGHT COLUMN
+        ================================== -->
+
+        <div>
+
+
+          <!-- ORDER TOTALS -->
+
+          <section class="details-card">
+
+            <div class="card-heading">
+
+              <h2>
+                Order Summary
+              </h2>
+
+            </div>
+
+
+            <div class="order-totals">
+
+              <div class="total-row">
+
+                <span>
+                  Subtotal
+                </span>
+
+                <strong id="orderSubtotal">
+                  $0.00
+                </strong>
+
+              </div>
+
+
+              <div class="total-row delivery">
+
+                <span>
+                  Delivery
+                </span>
+
+                <strong id="orderDelivery">
+                  FREE
+                </strong>
+
+              </div>
+
+
+              <div class="total-row grand-total">
+
+                <span>
+                  Total
+                </span>
+
+                <strong id="orderTotal">
+                  $0.00
+                </strong>
+
+              </div>
+
+            </div>
+
+          </section>
+
+
+          <!-- PAYMENT -->
+
+          <section class="details-card">
+
+            <div class="card-heading">
+
+              <h2>
+                Payment
+              </h2>
+
+            </div>
+
+
+            <div class="payment-method">
+
+              <div class="payment-icon">
+                $
+              </div>
+
+              <div>
+
+                <strong>
+                  Cash on Delivery
+                </strong>
+
+                <small id="paymentStatus">
+                  Payment due when your order is delivered.
+                </small>
+
+              </div>
+
+            </div>
+
+          </section>
+
+
+          <!-- ACTIONS -->
+
+          <section class="details-card">
+
+            <div class="card-heading">
+
+              <h2>
+                Continue Shopping
+              </h2>
+
+            </div>
+
+
+            <div class="order-actions">
+
+              <a
+                href="buyer-dashboard.html"
+                class="primary-button"
+              >
+                Continue Shopping
+              </a>
+
+              <a
+                href="orders.html"
+                class="secondary-button"
+              >
+                ← My Orders
+              </a>
+
+            </div>
+
+          </section>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+  </main>
+
+
+  <!-- =================================
+       FOOTER
+  ================================== -->
+
+  <footer class="order-details-footer">
+
+    <div class="footer-brand">
+
+      <strong>
+        SMH COLLECTION
+      </strong>
+
+      <span>
+        Everything in one place.
+      </span>
+
+    </div>
+
+    <p>
+      ©
+      <span id="currentYear"></span>
+      SMH Collection.
+      All rights reserved.
+    </p>
+
+  </footer>
+
+
+  <!-- =================================
+       SUPABASE
+  ================================== -->
+
+  <script
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+  ></script>
+
+  <script src="assets/js/supabase.js"></script>
+
+  <script src="assets/js/order-details.js"></script>
+
+</body>
+</html>
