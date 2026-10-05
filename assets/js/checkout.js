@@ -1114,9 +1114,66 @@ async function createOrder() {
       null
   };
 
-  // -----------------------------------------
-  // CREATE ORDER
-  // -----------------------------------------
+// -----------------------------------------
+// CREATE ORDER
+// -----------------------------------------
+
+async function createOrder() {
+  if (!currentUser) {
+    throw new Error(
+      "Your session has expired. Please sign in again."
+    );
+  }
+
+  // Refresh cart immediately before ordering.
+  const freshItems =
+    await refreshCartProducts();
+
+  const stockValidation =
+    validateCartStock(freshItems);
+
+  if (!stockValidation.valid) {
+    throw new Error(
+      stockValidation.message
+    );
+  }
+
+  const subtotal =
+    calculateSubtotal(freshItems);
+
+  if (subtotal <= 0) {
+    throw new Error(
+      "Your order total must be greater than zero."
+    );
+  }
+
+  const orderNumber =
+    generateOrderNumber();
+
+  // IMPORTANT:
+  // These column names match public.orders.
+  const orderData = {
+    buyer_id: currentUser.id,
+    order_number: orderNumber,
+    status: "pending",
+    payment_method: "cash_on_delivery",
+    payment_status: "unpaid",
+    subtotal: subtotal,
+    delivery_fee: 0,
+    total_amount: subtotal,
+    shipping_name: shippingName.value.trim(),
+    shipping_phone: shippingPhone.value.trim(),
+    shipping_address: shippingAddress.value.trim(),
+    shipping_city: shippingCity.value.trim(),
+    shipping_state: shippingState.value.trim(),
+    shipping_country: shippingCountry.value.trim(),
+    notes: orderNotes?.value.trim() || null
+  };
+
+  console.log(
+    "Submitting order:",
+    orderData
+  );
 
   const {
     data: order,
@@ -1150,14 +1207,18 @@ async function createOrder() {
       orderError
     );
 
-    throw orderError;
+    throw new Error(
+      orderError.message ||
+      "Unable to create your order."
+    );
   }
 
   if (!order) {
     throw new Error(
-      "The order was not created."
+      "The order could not be created."
     );
   }
+
   // -----------------------------------------
   // CREATE ORDER ITEMS
   // -----------------------------------------
@@ -1174,34 +1235,15 @@ async function createOrder() {
         Number(item.quantity) || 0;
 
       return {
-        order_id:
-          order.id,
-
-        product_id:
-          product.id,
-
-        seller_id:
-          product.seller_id,
-
-        product_name:
-          product.name,
-
-        product_price:
-          price,
-
-        quantity:
-          quantity,
-
-        item_total:
-          price * quantity
+        order_id: order.id,
+        product_id: product.id,
+        seller_id: product.seller_id,
+        product_name: product.name,
+        product_price: price,
+        quantity: quantity,
+        item_total: price * quantity
       };
     });
-
-  if (orderItems.length === 0) {
-    throw new Error(
-      "No products were found for this order."
-    );
-  }
 
   const {
     error: orderItemsError
@@ -1215,14 +1257,16 @@ async function createOrder() {
       orderItemsError
     );
 
-    // Remove the order if its items
-    // could not be created.
+    // Try to remove the incomplete order.
     await supabaseClient
       .from("orders")
       .delete()
       .eq("id", order.id);
 
-    throw orderItemsError;
+    throw new Error(
+      orderItemsError.message ||
+      "Unable to save your order items."
+    );
   }
 
   // -----------------------------------------
@@ -1234,141 +1278,34 @@ async function createOrder() {
   } = await supabaseClient
     .from("cart_items")
     .delete()
-    .eq(
-      "cart_id",
-      currentCart.id
-    );
+    .eq("cart_id", currentCart.id);
 
   if (clearCartError) {
     console.error(
       "Clear cart error:",
       clearCartError
     );
-
-    // The order already exists, so we
-    // don't cancel it here.
-    console.warn(
-      "Order was created, but the cart could not be cleared."
-    );
   }
 
-  return order;
-}
+  // -----------------------------------------
+  // SUCCESS
+  // -----------------------------------------
 
-// -----------------------------------------
-// PLACE ORDER
-// -----------------------------------------
+  showMessage(
+    "Your order has been placed successfully.",
+    "success"
+  );
 
-async function handlePlaceOrder() {
-  showMessage("");
-
-  const validationError =
-    validateShippingForm();
-
-  if (validationError) {
-    showMessage(
-      validationError,
-      "error"
-    );
-
-    return;
+  if (placeOrderButton) {
+    placeOrderButton.disabled = true;
+    placeOrderButton.textContent =
+      "Order Placed";
   }
 
-  setButtonLoading(true);
-
-  try {
-    const order =
-      await createOrder();
-
-    showMessage(
-      `Order ${order.order_number} placed successfully.`,
-      "success"
-    );
-
-    if (placeOrderButton) {
-      placeOrderButton.disabled =
-        true;
-
-      placeOrderButton.textContent =
-        "Order Placed";
-    }
-
-    // Give the success message a moment
-    // before moving to the orders page.
-    setTimeout(() => {
-      window.location.href =
-        `orders.html?order=${encodeURIComponent(
-          order.id
-        )}`;
-    }, 1200);
-
-  } catch (error) {
-    console.error(
-      "Place order error:",
-      error
-    );
-
-    showMessage(
-      error?.message ||
-        "Unable to place your order. Please try again.",
-      "error"
-    );
-
-    setButtonLoading(false);
-  }
-}
-
-// -----------------------------------------
-// PROFILE MENU ACTIONS
-// -----------------------------------------
-
-if (myOrdersButton) {
-  myOrdersButton.addEventListener(
-    "click",
-    () => {
-      window.location.href =
-        "orders.html";
-    }
-  );
-}
-
-if (wishlistButton) {
-  wishlistButton.addEventListener(
-    "click",
-    () => {
-      window.location.href =
-        "wishlist.html";
-    }
-  );
-}
-
-if (settingsButton) {
-  settingsButton.addEventListener(
-    "click",
-    () => {
-      window.location.href =
-        "account-settings.html";
-    }
-  );
-}
-
-if (logoutButton) {
-  logoutButton.addEventListener(
-    "click",
-    async () => {
-      try {
-        await supabaseClient.auth.signOut();
-      } catch (error) {
-        console.error(
-          "Logout error:",
-          error
-        );
-      }
-
-      window.location.href =
-        "login.html";
-    }
-  );
+  window.location.href =
+    `orders.html?order=${encodeURIComponent(
+      order.order_number
+    )}`;
 }
 
 // -----------------------------------------
@@ -1381,37 +1318,51 @@ if (checkoutForm) {
     async (event) => {
       event.preventDefault();
 
-      await handlePlaceOrder();
-    }
-  );
-}
+      showMessage("");
 
-if (placeOrderButton) {
-  placeOrderButton.addEventListener(
-    "click",
-    async (event) => {
-      if (
-        checkoutForm &&
-        event.target ===
-          placeOrderButton
-      ) {
+      const validationError =
+        validateShippingForm();
+
+      if (validationError) {
+        showMessage(
+          validationError,
+          "error"
+        );
         return;
       }
 
-      await handlePlaceOrder();
+      try {
+        setButtonLoading(true);
+
+        await createOrder();
+
+      } catch (error) {
+        console.error(
+          "Checkout submission error:",
+          error
+        );
+
+        showMessage(
+          error.message ||
+          "Unable to place your order. Please try again.",
+          "error"
+        );
+
+        setButtonLoading(false);
+      }
     }
   );
 }
 
 // -----------------------------------------
-// RETRY
+// RETRY BUTTON
 // -----------------------------------------
 
 if (retryButton) {
   retryButton.addEventListener(
     "click",
-    () => {
-      window.location.reload();
+    async () => {
+      await initializeCheckout();
     }
   );
 }
@@ -1423,11 +1374,12 @@ if (retryButton) {
 async function initializeCheckout() {
   try {
     showLoading();
+    showMessage("");
 
-    const authenticated =
+    const profileLoaded =
       await loadProfile();
 
-    if (!authenticated) {
+    if (!profileLoaded) {
       return;
     }
 
@@ -1442,14 +1394,18 @@ async function initializeCheckout() {
       return;
     }
 
-    renderCheckoutItems(
-      items
-    );
+    const stockValidation =
+      validateCartStock(items);
 
-    renderTotals(
-      items
-    );
+    if (!stockValidation.valid) {
+      showMessage(
+        stockValidation.message,
+        "error"
+      );
+    }
 
+    renderCheckoutItems(items);
+    renderTotals(items);
     prefillShippingInformation();
 
     showCheckout();
@@ -1461,27 +1417,11 @@ async function initializeCheckout() {
     );
 
     showError(
-      error?.message ||
-        "Unable to load checkout."
+      error.message ||
+      "Unable to load checkout."
     );
   }
 }
-
-// -----------------------------------------
-// AUTH STATE
-// -----------------------------------------
-
-supabaseClient.auth.onAuthStateChange(
-  (event, session) => {
-    if (
-      event === "SIGNED_OUT" ||
-      !session
-    ) {
-      window.location.href =
-        "login.html";
-    }
-  }
-);
 
 // -----------------------------------------
 // START CHECKOUT
