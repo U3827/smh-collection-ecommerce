@@ -10,12 +10,13 @@ document.addEventListener("DOMContentLoaded", () => {
   // BASIC INITIALIZATION
   // =========================================
 
-  const currentYear = document.getElementById("currentYear");
+  const currentYear =
+    document.getElementById("currentYear");
 
   if (currentYear) {
-    currentYear.textContent = new Date().getFullYear();
+    currentYear.textContent =
+      new Date().getFullYear();
   }
-
 
   // =========================================
   // DOM ELEMENTS
@@ -67,7 +68,9 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("emptyState");
 
   const startShoppingButton =
-    document.getElementById("startShoppingButton");
+    document.getElementById(
+      "startShoppingButton"
+    );
 
   const errorState =
     document.getElementById("errorState");
@@ -77,7 +80,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const retryButton =
     document.getElementById("retryButton");
-
 
   // =========================================
   // PAGE STATE
@@ -89,13 +91,14 @@ document.addEventListener("DOMContentLoaded", () => {
   let allOrders = [];
   let filteredOrders = [];
 
-
   // =========================================
   // SUPABASE CHECK
   // =========================================
 
-  if (typeof window.supabase === "undefined") {
-
+  if (
+    typeof window.supabase ===
+    "undefined"
+  ) {
     console.error(
       "Supabase library is missing."
     );
@@ -107,11 +110,10 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-
   if (
-    typeof supabaseClient === "undefined"
+    typeof supabaseClient ===
+    "undefined"
   ) {
-
     console.error(
       "supabaseClient is missing."
     );
@@ -123,21 +125,12 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-
   // =========================================
-  // HELPER FUNCTIONS
+  // HELPERS
   // =========================================
 
   function escapeHTML(value) {
-
-    if (
-      value === null ||
-      value === undefined
-    ) {
-      return "";
-    }
-
-    return String(value)
+    return String(value ?? "")
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;")
@@ -145,24 +138,19 @@ document.addEventListener("DOMContentLoaded", () => {
       .replace(/'/g, "&#039;");
   }
 
-
   function formatCurrency(amount) {
-
-    const number =
-      Number(amount) || 0;
-
     return new Intl.NumberFormat(
       "en-US",
       {
         style: "currency",
         currency: "USD"
       }
-    ).format(number);
+    ).format(
+      Number(amount) || 0
+    );
   }
 
-
   function formatDate(dateValue) {
-
     if (!dateValue) {
       return "Date unavailable";
     }
@@ -188,9 +176,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ).format(date);
   }
 
-
   function formatDateTime(dateValue) {
-
     if (!dateValue) {
       return "Date unavailable";
     }
@@ -218,9 +204,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ).format(date);
   }
 
-
   function formatStatus(status) {
-
     if (!status) {
       return "Pending";
     }
@@ -229,13 +213,12 @@ document.addEventListener("DOMContentLoaded", () => {
       .replace(/_/g, " ")
       .replace(
         /\b\w/g,
-        letter => letter.toUpperCase()
+        letter =>
+          letter.toUpperCase()
       );
   }
 
-
   function getStatusClass(status) {
-
     const validStatuses = [
       "pending",
       "confirmed",
@@ -254,26 +237,21 @@ document.addEventListener("DOMContentLoaded", () => {
     return "pending";
   }
 
-
   // =========================================
   // UI STATES
   // =========================================
 
   function showLoading() {
-
     if (ordersList) {
-
       ordersList.hidden = false;
 
       ordersList.innerHTML = `
         <div class="loading-state">
-
           <div class="loading-spinner"></div>
 
           <p>
             Loading your orders...
           </p>
-
         </div>
       `;
     }
@@ -287,9 +265,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-
   function showEmpty() {
-
     if (ordersList) {
       ordersList.hidden = true;
     }
@@ -303,9 +279,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-
   function showOrders() {
-
     if (ordersList) {
       ordersList.hidden = false;
     }
@@ -319,9 +293,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-
   function showError(message) {
-
     if (ordersList) {
       ordersList.hidden = true;
     }
@@ -335,7 +307,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (errorMessage) {
-
       errorMessage.textContent =
         message ||
         "Something went wrong while loading your orders.";
@@ -347,13 +318,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-
   // =========================================
   // PROFILE MENU
   // =========================================
 
   function openProfileMenu() {
-
     if (
       !profileMenu ||
       !profileButton
@@ -374,9 +343,7 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   }
 
-
   function closeProfileMenu() {
-
     if (
       !profileMenu ||
       !profileButton
@@ -384,7 +351,9 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    profileMenu.classList.remove("open");
+    profileMenu.classList.remove(
+      "open"
+    );
 
     profileMenu.setAttribute(
       "aria-hidden",
@@ -397,15 +366,15 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   }
 
-
   function toggleProfileMenu() {
-
     if (!profileMenu) {
       return;
     }
 
     const isOpen =
-      profileMenu.classList.contains("open");
+      profileMenu.classList.contains(
+        "open"
+      );
 
     if (isOpen) {
       closeProfileMenu();
@@ -414,25 +383,19 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-
   if (profileButton) {
-
     profileButton.addEventListener(
       "click",
       (event) => {
-
         event.stopPropagation();
-
         toggleProfileMenu();
       }
     );
   }
 
-
   document.addEventListener(
     "click",
     (event) => {
-
       if (
         !profileMenu ||
         !profileButton
@@ -441,22 +404,23 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       if (
-        !profileMenu.contains(event.target) &&
-        !profileButton.contains(event.target)
+        !profileMenu.contains(
+          event.target
+        ) &&
+        !profileButton.contains(
+          event.target
+        )
       ) {
-
         closeProfileMenu();
       }
     }
   );
-
 
   // =========================================
   // LOAD BUYER PROFILE
   // =========================================
 
   async function loadProfile(user) {
-
     const {
       data: profile,
       error
@@ -470,25 +434,23 @@ document.addEventListener("DOMContentLoaded", () => {
         is_active,
         avatar_url
       `)
-      .eq("id", user.id)
+      .eq(
+        "id",
+        user.id
+      )
       .single();
-
 
     if (error) {
       throw error;
     }
 
-
     if (!profile) {
-
       throw new Error(
         "Your account profile could not be found."
       );
     }
 
-
     if (!profile.is_active) {
-
       await supabaseClient.auth.signOut();
 
       throw new Error(
@@ -496,39 +458,31 @@ document.addEventListener("DOMContentLoaded", () => {
       );
     }
 
-
     // =========================================
     // ROLE PROTECTION
     // =========================================
 
     if (profile.role !== "buyer") {
-
       if (profile.role === "admin") {
-
         window.location.href =
           "admin-dashboard.html";
 
         return null;
       }
 
-
       if (profile.role === "seller") {
-
         window.location.href =
           "seller-dashboard.html";
 
         return null;
       }
 
-
       throw new Error(
         "Only buyer accounts can access the order history."
       );
     }
 
-
     currentProfile = profile;
-
 
     // =========================================
     // PROFILE DISPLAY
@@ -548,9 +502,9 @@ document.addEventListener("DOMContentLoaded", () => {
       name.trim().charAt(0).toUpperCase() ||
       "U";
 
-
     if (profileName) {
-      profileName.textContent = name;
+      profileName.textContent =
+        name;
     }
 
     if (profileAvatar) {
@@ -559,18 +513,19 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (menuName) {
-      menuName.textContent = name;
+      menuName.textContent =
+        name;
     }
 
     if (menuEmail) {
-      menuEmail.textContent = email;
+      menuEmail.textContent =
+        email;
     }
 
     if (menuAvatar) {
       menuAvatar.textContent =
         firstLetter;
     }
-
 
     return profile;
   }
@@ -591,6 +546,10 @@ document.addEventListener("DOMContentLoaded", () => {
         );
       }
 
+      console.log(
+        "Loading orders for buyer:",
+        currentUser.id
+      );
 
       // =========================================
       // FETCH BUYER ORDERS
@@ -603,6 +562,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .from("orders")
         .select(`
           id,
+          buyer_id,
           order_number,
           status,
           payment_method,
@@ -622,11 +582,12 @@ document.addEventListener("DOMContentLoaded", () => {
           order_items (
             id,
             product_id,
+            seller_id,
             product_name,
             product_price,
             quantity,
             item_total,
-            seller_id
+            created_at
           )
         `)
         .eq(
@@ -640,17 +601,24 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         );
 
-
       if (error) {
+        console.error(
+          "Supabase orders query error:",
+          error
+        );
+
         throw error;
       }
 
+      console.log(
+        "Orders returned from Supabase:",
+        orders
+      );
 
       allOrders =
         Array.isArray(orders)
           ? orders
           : [];
-
 
       // =========================================
       // UPDATE ORDER COUNT
@@ -658,13 +626,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
       updateOrderCount();
 
-
       // =========================================
-      // APPLY FILTER
+      // APPLY CURRENT FILTER
       // =========================================
 
       applyOrderFilter();
-
 
     } catch (error) {
 
@@ -691,10 +657,8 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-
     const count =
       allOrders.length;
-
 
     if (count === 0) {
 
@@ -703,7 +667,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
       return;
     }
-
 
     orderCount.textContent =
       `${count} ${
@@ -725,7 +688,6 @@ document.addEventListener("DOMContentLoaded", () => {
         ? statusFilter.value
         : "all";
 
-
     if (
       selectedStatus === "all" ||
       !selectedStatus
@@ -739,10 +701,10 @@ document.addEventListener("DOMContentLoaded", () => {
       filteredOrders =
         allOrders.filter(
           (order) =>
-            order.status === selectedStatus
+            order.status ===
+            selectedStatus
         );
     }
-
 
     renderOrders();
   }
@@ -757,17 +719,24 @@ document.addEventListener("DOMContentLoaded", () => {
     statusFilter.addEventListener(
       "change",
       () => {
-
         applyOrderFilter();
-
       }
     );
   }
 
 
   // =========================================
-  // RENDER ORDERS
+  // UPDATE ORDER COUNT AFTER FILTER
   // =========================================
+
+  function getFilteredOrderCount() {
+
+    return filteredOrders.length;
+  }
+// =========================================
+// RENDER ORDERS
+// PART 3 OF 3
+// =========================================
 
   function renderOrders() {
 
@@ -775,18 +744,14 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-
     // =========================================
     // NO ORDERS
     // =========================================
 
     if (allOrders.length === 0) {
-
       showEmpty();
-
       return;
     }
-
 
     // =========================================
     // FILTER HAS NO RESULTS
@@ -817,7 +782,6 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-
     // =========================================
     // DISPLAY ORDERS
     // =========================================
@@ -826,9 +790,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     ordersList.innerHTML =
       filteredOrders
-        .map(
-          (order) =>
-            createOrderCard(order)
+        .map((order) =>
+          createOrderCard(order)
         )
         .join("");
   }
@@ -845,36 +808,22 @@ document.addEventListener("DOMContentLoaded", () => {
         ? order.order_items
         : [];
 
-
     const itemCount =
       items.reduce(
-        (total, item) => {
-
-          return (
-            total +
-            (
-              Number(item.quantity) ||
-              0
-            )
-          );
-
-        },
+        (total, item) =>
+          total +
+          (Number(item.quantity) || 0),
         0
       );
 
-
     const status =
-      order.status ||
-      "pending";
-
+      order.status || "pending";
 
     const statusLabel =
       formatStatus(status);
 
-
     const statusClass =
       getStatusClass(status);
-
 
     const paymentMethod =
       order.payment_method ===
@@ -884,35 +833,21 @@ document.addEventListener("DOMContentLoaded", () => {
             order.payment_method
           );
 
-
     const paymentStatus =
       order.payment_status ||
       "unpaid";
 
-
     const paymentLabel =
-      formatStatus(
-        paymentStatus
-      );
-
+      formatStatus(paymentStatus);
 
     const total =
-      Number(
-        order.total_amount
-      ) || 0;
-
+      Number(order.total_amount) || 0;
 
     const subtotal =
-      Number(
-        order.subtotal
-      ) || 0;
-
+      Number(order.subtotal) || 0;
 
     const deliveryFee =
-      Number(
-        order.delivery_fee
-      ) || 0;
-
+      Number(order.delivery_fee) || 0;
 
     const orderNumber =
       order.order_number ||
@@ -920,24 +855,18 @@ document.addEventListener("DOMContentLoaded", () => {
         .slice(0, 8)
         .toUpperCase()}`;
 
-
     const createdDate =
-      formatDate(
-        order.created_at
-      );
-
+      formatDate(order.created_at);
 
     const createdDateTime =
       formatDateTime(
         order.created_at
       );
 
-
     const firstItem =
       items.length > 0
         ? items[0]
         : null;
-
 
     const remainingItems =
       Math.max(
@@ -945,23 +874,19 @@ document.addEventListener("DOMContentLoaded", () => {
         0
       );
 
-
     const firstProductName =
       firstItem?.product_name ||
       "Product";
-
 
     const firstProductQuantity =
       Number(
         firstItem?.quantity
       ) || 1;
 
-
     const firstProductPrice =
       Number(
         firstItem?.product_price
       ) || 0;
-
 
     const productInitial =
       firstProductName
@@ -970,16 +895,11 @@ document.addEventListener("DOMContentLoaded", () => {
         .toUpperCase() ||
       "P";
 
-
     return `
       <article
         class="order-card"
         data-order-id="${escapeHTML(order.id)}"
       >
-
-        <!-- =================================
-             ORDER HEADER
-        ================================== -->
 
         <div class="order-card-header">
 
@@ -1002,7 +922,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
           </div>
 
-
           <span
             class="status-badge status-${escapeHTML(statusClass)}"
           >
@@ -1011,22 +930,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
         </div>
 
-
-        <!-- =================================
-             ORDER BODY
-        ================================== -->
-
         <div class="order-card-body">
-
-
-          <!-- PRODUCT -->
 
           <div class="order-product-summary">
 
             <div class="product-placeholder">
               ${escapeHTML(productInitial)}
             </div>
-
 
             <div class="product-summary-content">
 
@@ -1037,23 +947,17 @@ document.addEventListener("DOMContentLoaded", () => {
               </strong>
 
               <span>
-
                 ${firstProductQuantity}
-
                 ${
                   firstProductQuantity === 1
                     ? "item"
                     : "items"
                 }
-
                 ×
-
                 ${formatCurrency(
                   firstProductPrice
                 )}
-
               </span>
-
 
               ${
                 remainingItems > 0
@@ -1074,9 +978,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
           </div>
 
-
-          <!-- ORDER INFORMATION -->
-
           <div class="order-information">
 
             <div class="order-info-item">
@@ -1090,7 +991,6 @@ document.addEventListener("DOMContentLoaded", () => {
               </strong>
 
             </div>
-
 
             <div class="order-info-item">
 
@@ -1106,7 +1006,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
             </div>
 
-
             <div class="order-info-item">
 
               <span>
@@ -1114,7 +1013,9 @@ document.addEventListener("DOMContentLoaded", () => {
               </span>
 
               <strong
-                class="payment-status payment-${escapeHTML(paymentStatus)}"
+                class="payment-status payment-${escapeHTML(
+                  paymentStatus
+                )}"
               >
                 ${escapeHTML(
                   paymentLabel
@@ -1122,7 +1023,6 @@ document.addEventListener("DOMContentLoaded", () => {
               </strong>
 
             </div>
-
 
             <div class="order-info-item total-item">
 
@@ -1140,11 +1040,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         </div>
 
-
-        <!-- =================================
-             ORDER FOOTER
-        ================================== -->
-
         <div class="order-card-footer">
 
           <div class="order-total-breakdown">
@@ -1154,36 +1049,43 @@ document.addEventListener("DOMContentLoaded", () => {
               ${formatCurrency(subtotal)}
             </span>
 
-
             <span>
               Delivery:
-
-              ${
-                deliveryFee > 0
-                  ? formatCurrency(
-                      deliveryFee
-                    )
-                  : "FREE"
-              }
-
+              ${formatCurrency(deliveryFee)}
             </span>
+
+            <strong>
+              Total:
+              ${formatCurrency(total)}
+            </strong>
 
           </div>
 
+          <div class="order-shipping-summary">
 
-          <button
-            type="button"
-            class="view-order-button"
-            data-order-id="${escapeHTML(order.id)}"
-          >
-
-            View Order
-
-            <span aria-hidden="true">
-              →
+            <span>
+              Deliver to:
             </span>
 
-          </button>
+            <strong>
+              ${escapeHTML(
+                order.shipping_name ||
+                ""
+              )}
+            </strong>
+
+            <span>
+              ${escapeHTML(
+                order.shipping_city ||
+                ""
+              )},
+              ${escapeHTML(
+                order.shipping_state ||
+                ""
+              )}
+            </span>
+
+          </div>
 
         </div>
 
@@ -1193,66 +1095,46 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   // =========================================
-  // VIEW ORDER
+  // NAVIGATION
   // =========================================
 
-  if (ordersList) {
+  if (myOrdersButton) {
 
-    ordersList.addEventListener(
+    myOrdersButton.addEventListener(
       "click",
-      (event) => {
-
-        const viewButton =
-          event.target.closest(
-            ".view-order-button"
-          );
-
-
-        if (!viewButton) {
-          return;
-        }
-
-
-        const orderId =
-          viewButton.dataset.orderId;
-
-
-        if (!orderId) {
-
-          console.error(
-            "Order ID is missing."
-          );
-
-          return;
-        }
-
-
-        window.location.href =
-          `order-details.html?id=${encodeURIComponent(
-            orderId
-          )}`;
-
+      () => {
+        closeProfileMenu();
       }
     );
   }
-// =========================================
-// ACCOUNT NAVIGATION + INITIALIZATION
-// PART 3 OF 3
-// =========================================
 
+  if (wishlistButton) {
 
-  // =========================================
-  // START SHOPPING
-  // =========================================
+    wishlistButton.addEventListener(
+      "click",
+      () => {
+        window.location.href =
+          "wishlist.html";
+      }
+    );
+  }
+
+  if (settingsButton) {
+
+    settingsButton.addEventListener(
+      "click",
+      () => {
+        window.location.href =
+          "settings.html";
+      }
+    );
+  }
 
   if (startShoppingButton) {
 
     startShoppingButton.addEventListener(
       "click",
-      (event) => {
-
-        event.preventDefault();
-
+      () => {
         window.location.href =
           "buyer-dashboard.html";
       }
@@ -1261,66 +1143,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   // =========================================
-  // MY ORDERS
-  // =========================================
-
-  if (myOrdersButton) {
-
-    myOrdersButton.addEventListener(
-      "click",
-      () => {
-
-        closeProfileMenu();
-
-        window.scrollTo({
-          top: 0,
-          behavior: "smooth"
-        });
-      }
-    );
-  }
-
-
-  // =========================================
-  // WISHLIST
-  // =========================================
-
-  if (wishlistButton) {
-
-    wishlistButton.addEventListener(
-      "click",
-      () => {
-
-        closeProfileMenu();
-
-        window.location.href =
-          "wishlist.html";
-      }
-    );
-  }
-
-
-  // =========================================
-  // ACCOUNT SETTINGS
-  // =========================================
-
-  if (settingsButton) {
-
-    settingsButton.addEventListener(
-      "click",
-      () => {
-
-        closeProfileMenu();
-
-        window.location.href =
-          "account-settings.html";
-      }
-    );
-  }
-
-
-  // =========================================
-  // SIGN OUT
+  // LOGOUT
   // =========================================
 
   if (logoutButton) {
@@ -1329,34 +1152,23 @@ document.addEventListener("DOMContentLoaded", () => {
       "click",
       async () => {
 
-        closeProfileMenu();
-
-        const originalContent =
-          logoutButton.innerHTML;
-
-
-        logoutButton.disabled = true;
-
-        logoutButton.innerHTML =
-          "<span>↪</span> Signing Out...";
-
-
         try {
+
+          logoutButton.disabled = true;
 
           const {
             error
           } =
-            await supabaseClient.auth.signOut();
-
+            await supabaseClient
+              .auth
+              .signOut();
 
           if (error) {
             throw error;
           }
 
-
           window.location.href =
             "login.html";
-
 
         } catch (error) {
 
@@ -1365,15 +1177,12 @@ document.addEventListener("DOMContentLoaded", () => {
             error
           );
 
-
-          logoutButton.disabled = false;
-
-          logoutButton.innerHTML =
-            originalContent;
-
+          logoutButton.disabled =
+            false;
 
           alert(
-            "Unable to sign out. Please try again."
+            error.message ||
+            "Unable to log out. Please try again."
           );
         }
       }
@@ -1391,7 +1200,7 @@ document.addEventListener("DOMContentLoaded", () => {
       "click",
       async () => {
 
-        await loadOrders();
+        await initializeOrders();
 
       }
     );
@@ -1408,28 +1217,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
       showLoading();
 
-
-      // =========================================
-      // GET CURRENT USER
-      // =========================================
-
       const {
         data: {
           user
         },
-        error: sessionError
+        error
       } =
-        await supabaseClient.auth.getUser();
+        await supabaseClient
+          .auth
+          .getUser();
 
-
-      if (sessionError) {
-        throw sessionError;
+      if (error) {
+        throw error;
       }
-
-
-      // =========================================
-      // USER NOT SIGNED IN
-      // =========================================
 
       if (!user) {
 
@@ -1439,84 +1239,36 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-
       currentUser = user;
 
+      const profileLoaded =
+        await loadProfile(
+          currentUser
+        );
 
-      // =========================================
-      // LOAD PROFILE
-      // =========================================
-
-      const profile =
-        await loadProfile(user);
-
-
-      if (!profile) {
+      if (!profileLoaded) {
         return;
       }
 
-
-      // =========================================
-      // LOAD REAL ORDERS
-      // =========================================
-
       await loadOrders();
-
 
     } catch (error) {
 
       console.error(
-        "Orders initialization error:",
+        "Orders page initialization error:",
         error
       );
 
-
       showError(
         error.message ||
-        "Unable to load your order history."
+        "Unable to load your orders. Please try again."
       );
     }
   }
 
 
   // =========================================
-  // AUTH STATE LISTENER
-  // =========================================
-
-  supabaseClient.auth.onAuthStateChange(
-    async (event, session) => {
-
-      console.log(
-        "Orders auth event:",
-        event
-      );
-
-
-      if (event === "SIGNED_OUT") {
-
-        window.location.href =
-          "login.html";
-
-        return;
-      }
-
-
-      if (
-        !session &&
-        event !== "INITIAL_SESSION"
-      ) {
-
-        window.location.href =
-          "login.html";
-
-        return;
-      }
-    }
-  );
-
-
-  // =========================================
-  // START ORDERS PAGE
+  // START
   // =========================================
 
   initializeOrders();
