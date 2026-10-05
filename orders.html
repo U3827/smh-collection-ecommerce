@@ -11,7 +11,7 @@
 
   <meta
     name="description"
-    content="View your SMH Collection orders."
+    content="View and manage your SMH Collection orders."
   >
 
   <title>My Orders | SMH Collection</title>
@@ -53,10 +53,12 @@
 
   <header class="orders-header">
 
+    <!-- BRAND / HOME -->
+
     <a
       href="buyer-dashboard.html"
       class="brand"
-      aria-label="SMH Collection"
+      aria-label="Go to SMH Collection home"
     >
 
       <span class="brand-main">
@@ -70,20 +72,31 @@
     </a>
 
 
+    <!-- HEADER ACTIONS -->
+
     <div class="header-actions">
 
-      <button
-        type="button"
+      <!-- DIRECT SHOP LINK
+           Navigation does not depend on JavaScript -->
+
+      <a
+        href="buyer-dashboard.html"
         class="back-button"
-        id="backToShop"
+        aria-label="Back to shop"
       >
         ← Shop
-      </button>
+      </a>
+
+
+      <!-- PROFILE -->
 
       <button
         type="button"
         class="profile-button"
         id="profileButton"
+        aria-expanded="false"
+        aria-controls="profileMenu"
+        aria-label="Open account menu"
       >
 
         <span
@@ -118,7 +131,10 @@
   <div
     class="profile-menu"
     id="profileMenu"
+    aria-hidden="true"
   >
+
+    <!-- PROFILE INFORMATION -->
 
     <div class="profile-menu-header">
 
@@ -144,43 +160,63 @@
     </div>
 
 
+    <!-- MY ORDERS -->
+
     <button
       type="button"
       class="menu-item active"
       id="myOrdersButton"
     >
+
       <span>📦</span>
+
       My Orders
+
     </button>
 
+
+    <!-- WISHLIST -->
 
     <button
       type="button"
       class="menu-item"
       id="wishlistButton"
     >
+
       <span>♡</span>
+
       Wishlist
+
     </button>
 
+
+    <!-- ACCOUNT SETTINGS -->
 
     <button
       type="button"
       class="menu-item"
       id="settingsButton"
     >
+
       <span>⚙</span>
+
       Account Settings
+
     </button>
 
+
+    <!-- SIGN OUT -->
 
     <button
       type="button"
       class="menu-item logout-item"
       id="logoutButton"
     >
+
       <span>↪</span>
+
       Sign Out
+
     </button>
 
   </div>
@@ -191,6 +227,11 @@
   ================================== -->
 
   <main class="orders-main">
+
+
+    <!-- =================================
+         INTRO
+    ================================== -->
 
     <section class="orders-intro">
 
@@ -211,7 +252,7 @@
 
 
     <!-- =================================
-         ORDER FILTER
+         ORDER TOOLBAR
     ================================== -->
 
     <section class="orders-toolbar">
@@ -236,6 +277,8 @@
 
       </div>
 
+
+      <!-- STATUS FILTER -->
 
       <label
         class="status-filter"
@@ -284,12 +327,13 @@
 
 
     <!-- =================================
-         ORDERS
+         ORDERS LIST
     ================================== -->
 
     <section
       class="orders-list"
       id="ordersList"
+      aria-live="polite"
     >
 
       <div class="loading-state">
@@ -328,13 +372,14 @@
         Start shopping and your orders will appear here.
       </p>
 
-      <button
-        type="button"
+      <!-- DIRECT LINK -->
+      <a
+        href="buyer-dashboard.html"
         class="primary-button"
         id="startShoppingButton"
       >
         Start Shopping
-      </button>
+      </a>
 
     </section>
 
