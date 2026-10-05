@@ -1,465 +1,1357 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+// =========================================
+// SMH COLLECTION
+// REAL BUYER ORDER HISTORY
+// PART 1 OF 3
+// =========================================
 
-  <meta charset="UTF-8">
+document.addEventListener("DOMContentLoaded", () => {
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
+  // =========================================
+  // BASIC INITIALIZATION
+  // =========================================
 
-  <meta
-    name="description"
-    content="View and manage your SMH Collection orders."
-  >
+  const currentYear = document.getElementById("currentYear");
 
-  <title>My Orders | SMH Collection</title>
-
-  <link
-    rel="stylesheet"
-    href="assets/css/orders.css"
-  >
-
-</head>
-
-<body>
-
-  <!-- =================================
-       TOP MARQUEE
-  ================================== -->
-
-  <div class="top-marquee">
-
-    <div class="marquee-track">
-
-      <span>SMH COLLECTION</span>
-      <span>SHOP EVERYTHING</span>
-      <span>FREE DELIVERY</span>
-      <span>CASH ON DELIVERY</span>
-      <span>SMH COLLECTION</span>
-      <span>SHOP EVERYTHING</span>
-      <span>FREE DELIVERY</span>
-      <span>CASH ON DELIVERY</span>
-
-    </div>
-
-  </div>
+  if (currentYear) {
+    currentYear.textContent = new Date().getFullYear();
+  }
 
 
-  <!-- =================================
-       HEADER
-  ================================== -->
+  // =========================================
+  // DOM ELEMENTS
+  // =========================================
 
-  <header class="orders-header">
+  const profileButton = document.getElementById("profileButton");
+  const profileMenu = document.getElementById("profileMenu");
 
-    <!-- BRAND / HOME -->
+  const profileAvatar = document.getElementById("profileAvatar");
+  const profileName = document.getElementById("profileName");
 
-    <a
-      href="buyer-dashboard.html"
-      class="brand"
-      aria-label="Go to SMH Collection home"
-    >
+  const menuAvatar = document.getElementById("menuAvatar");
+  const menuName = document.getElementById("menuName");
+  const menuEmail = document.getElementById("menuEmail");
 
-      <span class="brand-main">
-        SMH
-      </span>
+  const myOrdersButton = document.getElementById("myOrdersButton");
+  const wishlistButton = document.getElementById("wishlistButton");
+  const settingsButton = document.getElementById("settingsButton");
+  const logoutButton = document.getElementById("logoutButton");
 
-      <span class="brand-sub">
-        COLLECTION
-      </span>
+  const orderCount = document.getElementById("orderCount");
+  const statusFilter = document.getElementById("statusFilter");
 
-    </a>
+  const ordersList = document.getElementById("ordersList");
+
+  const emptyState = document.getElementById("emptyState");
+  const startShoppingButton =
+    document.getElementById("startShoppingButton");
+
+  const errorState = document.getElementById("errorState");
+  const errorMessage = document.getElementById("errorMessage");
+  const retryButton = document.getElementById("retryButton");
 
 
-    <!-- HEADER ACTIONS -->
+  // =========================================
+  // STATE
+  // =========================================
 
-    <div class="header-actions">
+  let currentUser = null;
+  let currentProfile = null;
 
-      <!-- DIRECT SHOP LINK
-           Navigation does not depend on JavaScript -->
+  let allOrders = [];
+  let filteredOrders = [];
 
-      <a
-        href="buyer-dashboard.html"
-        class="back-button"
-        aria-label="Back to shop"
+
+  // =========================================
+  // SUPABASE CHECK
+  // =========================================
+
+  if (typeof window.supabase === "undefined") {
+
+    console.error("Supabase library is missing.");
+
+    showError(
+      "Authentication service could not load. Please refresh the page."
+    );
+
+    return;
+  }
+
+
+  if (typeof supabaseClient === "undefined") {
+
+    console.error("supabaseClient is missing.");
+
+    showError(
+      "Supabase connection could not be initialized."
+    );
+
+    return;
+  }
+
+
+  // =========================================
+  // HELPER FUNCTIONS
+  // =========================================
+
+  function escapeHTML(value) {
+
+    if (value === null || value === undefined) {
+      return "";
+    }
+
+    return String(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+
+  function formatCurrency(amount) {
+
+    const number = Number(amount) || 0;
+
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD"
+    }).format(number);
+  }
+
+
+  function formatDate(dateValue) {
+
+    if (!dateValue) {
+      return "Date unavailable";
+    }
+
+    const date = new Date(dateValue);
+
+    if (Number.isNaN(date.getTime())) {
+      return "Date unavailable";
+    }
+
+    return new Intl.DateTimeFormat("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric"
+    }).format(date);
+  }
+
+
+  function formatDateTime(dateValue) {
+
+    if (!dateValue) {
+      return "Date unavailable";
+    }
+
+    const date = new Date(dateValue);
+
+    if (Number.isNaN(date.getTime())) {
+      return "Date unavailable";
+    }
+
+    return new Intl.DateTimeFormat("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit"
+    }).format(date);
+  }
+
+
+  function formatStatus(status) {
+
+    if (!status) {
+      return "Pending";
+    }
+
+    return status
+      .replace(/_/g, " ")
+      .replace(/\b\w/g, letter => letter.toUpperCase());
+  }
+
+
+  function getStatusClass(status) {
+
+    const validStatuses = [
+      "pending",
+      "confirmed",
+      "processing",
+      "shipped",
+      "delivered",
+      "cancelled"
+    ];
+
+    if (validStatuses.includes(status)) {
+      return status;
+    }
+
+    return "pending";
+  }
+
+
+  // =========================================
+  // UI STATES
+  // =========================================
+
+  function showLoading() {
+
+    if (ordersList) {
+
+      ordersList.hidden = false;
+
+      ordersList.innerHTML = `
+        <div class="loading-state">
+          <div class="loading-spinner"></div>
+
+          <p>
+            Loading your orders...
+          </p>
+        </div>
+      `;
+    }
+
+    if (emptyState) {
+      emptyState.hidden = true;
+    }
+
+    if (errorState) {
+      errorState.hidden = true;
+    }
+  }
+
+
+  function showEmpty() {
+
+    if (ordersList) {
+      ordersList.hidden = true;
+    }
+
+    if (emptyState) {
+      emptyState.hidden = false;
+    }
+
+    if (errorState) {
+      errorState.hidden = true;
+    }
+  }
+
+
+  function showOrders() {
+
+    if (ordersList) {
+      ordersList.hidden = false;
+    }
+
+    if (emptyState) {
+      emptyState.hidden = true;
+    }
+
+    if (errorState) {
+      errorState.hidden = true;
+    }
+  }
+
+
+  function showError(message) {
+
+    if (ordersList) {
+      ordersList.hidden = true;
+    }
+
+    if (emptyState) {
+      emptyState.hidden = true;
+    }
+
+    if (errorState) {
+      errorState.hidden = false;
+    }
+
+    if (errorMessage) {
+      errorMessage.textContent =
+        message ||
+        "Something went wrong while loading your orders.";
+    }
+
+    if (orderCount) {
+      orderCount.textContent = "Unable to load orders";
+    }
+  }
+
+
+  // =========================================
+  // PROFILE MENU
+  // =========================================
+
+  function openProfileMenu() {
+
+    if (!profileMenu || !profileButton) {
+      return;
+    }
+
+    profileMenu.classList.add("open");
+
+    profileMenu.setAttribute("aria-hidden", "false");
+
+    profileButton.setAttribute("aria-expanded", "true");
+  }
+
+
+  function closeProfileMenu() {
+
+    if (!profileMenu || !profileButton) {
+      return;
+    }
+
+    profileMenu.classList.remove("open");
+
+    profileMenu.setAttribute("aria-hidden", "true");
+
+    profileButton.setAttribute("aria-expanded", "false");
+  }
+
+
+  function toggleProfileMenu() {
+
+    if (!profileMenu) {
+      return;
+    }
+
+    const isOpen =
+      profileMenu.classList.contains("open");
+
+    if (isOpen) {
+      closeProfileMenu();
+    } else {
+      openProfileMenu();
+    }
+  }
+
+
+  if (profileButton) {
+
+    profileButton.addEventListener("click", (event) => {
+
+      event.stopPropagation();
+
+      toggleProfileMenu();
+
+    });
+  }
+
+
+  document.addEventListener("click", (event) => {
+
+    if (!profileMenu || !profileButton) {
+      return;
+    }
+
+    if (
+      !profileMenu.contains(event.target) &&
+      !profileButton.contains(event.target)
+    ) {
+
+      closeProfileMenu();
+    }
+
+  });
+
+
+  // =========================================
+  // LOAD BUYER PROFILE
+  // =========================================
+
+  async function loadProfile(user) {
+
+    const { data: profile, error } = await supabaseClient
+      .from("profiles")
+      .select(`
+        id,
+        full_name,
+        email,
+        role,
+        is_active,
+        avatar_url
+      `)
+      .eq("id", user.id)
+      .single();
+
+
+    if (error) {
+      throw error;
+    }
+
+
+    if (!profile) {
+      throw new Error(
+        "Your account profile could not be found."
+      );
+    }
+
+
+    if (!profile.is_active) {
+
+      await supabaseClient.auth.signOut();
+
+      throw new Error(
+        "Your account has been deactivated. Please contact SMH Collection support."
+      );
+    }
+
+
+    // =========================================
+    // ORDERS PAGE IS FOR BUYERS
+    // =========================================
+
+    if (profile.role !== "buyer") {
+
+      if (profile.role === "admin") {
+
+        window.location.href =
+          "admin-dashboard.html";
+
+        return null;
+      }
+
+
+      if (profile.role === "seller") {
+
+        window.location.href =
+          "seller-dashboard.html";
+
+        return null;
+      }
+
+
+      throw new Error(
+        "Only buyer accounts can access the order history."
+      );
+    }
+
+
+    currentProfile = profile;
+
+
+    // =========================================
+    // PROFILE DISPLAY
+    // =========================================
+
+    const name =
+      profile.full_name ||
+      user.email?.split("@")[0] ||
+      "Account";
+
+
+    const email =
+      profile.email ||
+      user.email ||
+      "";
+
+
+    const firstLetter =
+      name.trim().charAt(0).toUpperCase() ||
+      "U";
+
+
+    if (profileName) {
+      profileName.textContent = name;
+    }
+
+
+    if (profileAvatar) {
+      profileAvatar.textContent = firstLetter;
+    }
+
+
+    if (menuName) {
+      menuName.textContent = name;
+    }
+// =========================================
+// LOAD ORDERS FROM SUPABASE
+// PART 2 OF 3
+// =========================================
+
+  async function loadOrders() {
+
+    showLoading();
+
+    try {
+
+      if (!currentUser) {
+        throw new Error("You are not signed in.");
+      }
+
+
+      // =========================================
+      // FETCH BUYER ORDERS
+      // =========================================
+
+      const { data: orders, error } = await supabaseClient
+        .from("orders")
+        .select(`
+          id,
+          order_number,
+          status,
+          payment_method,
+          payment_status,
+          subtotal,
+          delivery_fee,
+          total_amount,
+          shipping_name,
+          shipping_phone,
+          shipping_address,
+          shipping_city,
+          shipping_state,
+          shipping_country,
+          notes,
+          created_at,
+          updated_at,
+          order_items (
+            id,
+            product_id,
+            product_name,
+            product_price,
+            quantity,
+            item_total,
+            seller_id
+          )
+        `)
+        .eq("buyer_id", currentUser.id)
+        .order("created_at", {
+          ascending: false
+        });
+
+
+      if (error) {
+        throw error;
+      }
+
+
+      allOrders = Array.isArray(orders)
+        ? orders
+        : [];
+
+
+      // =========================================
+      // ORDER COUNT
+      // =========================================
+
+      updateOrderCount();
+
+
+      // =========================================
+      // APPLY CURRENT FILTER
+      // =========================================
+
+      applyOrderFilter();
+
+    } catch (error) {
+
+      console.error(
+        "Load orders error:",
+        error
+      );
+
+      showError(
+        error.message ||
+        "Unable to load your orders. Please try again."
+      );
+    }
+  }
+
+
+  // =========================================
+  // UPDATE ORDER COUNT
+  // =========================================
+
+  function updateOrderCount() {
+
+    if (!orderCount) {
+      return;
+    }
+
+
+    const count = allOrders.length;
+
+
+    if (count === 0) {
+
+      orderCount.textContent =
+        "No orders yet";
+
+      return;
+    }
+
+
+    orderCount.textContent =
+      `${count} ${count === 1 ? "order" : "orders"}`;
+  }
+
+
+  // =========================================
+  // APPLY STATUS FILTER
+  // =========================================
+
+  function applyOrderFilter() {
+
+    const selectedStatus =
+      statusFilter
+        ? statusFilter.value
+        : "all";
+
+
+    if (
+      selectedStatus === "all" ||
+      !selectedStatus
+    ) {
+
+      filteredOrders = [...allOrders];
+
+    } else {
+
+      filteredOrders =
+        allOrders.filter((order) => {
+
+          return order.status === selectedStatus;
+
+        });
+    }
+
+
+    renderOrders();
+  }
+
+
+  // =========================================
+  // STATUS FILTER EVENT
+  // =========================================
+
+  if (statusFilter) {
+
+    statusFilter.addEventListener(
+      "change",
+      () => {
+
+        applyOrderFilter();
+
+      }
+    );
+  }
+
+
+  // =========================================
+  // RENDER ORDERS
+  // =========================================
+
+  function renderOrders() {
+
+    if (!ordersList) {
+      return;
+    }
+
+
+    // =========================================
+    // NO ORDERS AT ALL
+    // =========================================
+
+    if (allOrders.length === 0) {
+
+      showEmpty();
+
+      return;
+    }
+
+
+    // =========================================
+    // FILTER HAS NO RESULTS
+    // =========================================
+
+    if (filteredOrders.length === 0) {
+
+      showOrders();
+
+
+      ordersList.innerHTML = `
+        <div class="empty-filter-state">
+
+          <div class="empty-icon">
+            🔎
+          </div>
+
+          <h2>
+            No matching orders
+          </h2>
+
+          <p>
+            There are no orders with the selected status.
+          </p>
+
+        </div>
+      `;
+
+      return;
+    }
+
+
+    // =========================================
+    // RENDER ORDER CARDS
+    // =========================================
+
+    showOrders();
+
+
+    ordersList.innerHTML =
+      filteredOrders
+        .map(order => createOrderCard(order))
+        .join("");
+  }
+
+
+  // =========================================
+  // CREATE ORDER CARD
+  // =========================================
+
+  function createOrderCard(order) {
+
+    const items =
+      Array.isArray(order.order_items)
+        ? order.order_items
+        : [];
+
+
+    const itemCount =
+      items.reduce(
+        (total, item) => {
+          return total + (Number(item.quantity) || 0);
+        },
+        0
+      );
+
+
+    const status =
+      order.status || "pending";
+
+
+    const statusLabel =
+      formatStatus(status);
+
+
+    const statusClass =
+      getStatusClass(status);
+
+
+    const paymentMethod =
+      order.payment_method === "cash_on_delivery"
+        ? "Cash on Delivery"
+        : formatStatus(order.payment_method);
+
+
+    const paymentStatus =
+      order.payment_status || "unpaid";
+
+
+    const paymentLabel =
+      formatStatus(paymentStatus);
+
+
+    const total =
+      Number(order.total_amount) || 0;
+
+
+    const subtotal =
+      Number(order.subtotal) || 0;
+
+
+    const deliveryFee =
+      Number(order.delivery_fee) || 0;
+
+
+    const orderNumber =
+      order.order_number ||
+      `SMH-${String(order.id).slice(0, 8).toUpperCase()}`;
+
+
+    const createdDate =
+      formatDate(order.created_at);
+
+
+    const createdDateTime =
+      formatDateTime(order.created_at);
+
+
+    const firstItem =
+      items.length > 0
+        ? items[0]
+        : null;
+
+
+    const remainingItems =
+      Math.max(items.length - 1, 0);
+
+
+    const firstProductName =
+      firstItem?.product_name ||
+      "Product";
+
+
+    const firstProductQuantity =
+      Number(firstItem?.quantity) || 1;
+
+
+    const firstProductPrice =
+      Number(firstItem?.product_price) || 0;
+
+
+    return `
+      <article
+        class="order-card"
+        data-order-id="${escapeHTML(order.id)}"
       >
-        ← Shop
-      </a>
+
+        <!-- =================================
+             ORDER CARD HEADER
+        ================================== -->
+
+        <div class="order-card-header">
+
+          <div class="order-card-heading">
+
+            <span class="order-label">
+              ORDER
+            </span>
+
+            <strong class="order-number">
+              ${escapeHTML(orderNumber)}
+            </strong>
+
+            <span
+              class="order-date"
+              title="${escapeHTML(createdDateTime)}"
+            >
+              ${escapeHTML(createdDate)}
+            </span>
+
+          </div>
 
 
-      <!-- PROFILE -->
-
-      <button
-        type="button"
-        class="profile-button"
-        id="profileButton"
-        aria-expanded="false"
-        aria-controls="profileMenu"
-        aria-label="Open account menu"
-      >
-
-        <span
-          class="profile-avatar"
-          id="profileAvatar"
-        >
-          U
-        </span>
-
-        <span
-          class="profile-name"
-          id="profileName"
-        >
-          Account
-        </span>
-
-        <span class="profile-arrow">
-          ▾
-        </span>
-
-      </button>
-
-    </div>
-
-  </header>
-
-
-  <!-- =================================
-       PROFILE MENU
-  ================================== -->
-
-  <div
-    class="profile-menu"
-    id="profileMenu"
-    aria-hidden="true"
-  >
-
-    <!-- PROFILE INFORMATION -->
-
-    <div class="profile-menu-header">
-
-      <div
-        class="menu-avatar"
-        id="menuAvatar"
-      >
-        U
-      </div>
-
-      <div>
-
-        <strong id="menuName">
-          Account
-        </strong>
-
-        <small id="menuEmail">
-          Loading...
-        </small>
-
-      </div>
-
-    </div>
-
-
-    <!-- MY ORDERS -->
-
-    <button
-      type="button"
-      class="menu-item active"
-      id="myOrdersButton"
-    >
-
-      <span>📦</span>
-
-      My Orders
-
-    </button>
-
-
-    <!-- WISHLIST -->
-
-    <button
-      type="button"
-      class="menu-item"
-      id="wishlistButton"
-    >
-
-      <span>♡</span>
-
-      Wishlist
-
-    </button>
-
-
-    <!-- ACCOUNT SETTINGS -->
-
-    <button
-      type="button"
-      class="menu-item"
-      id="settingsButton"
-    >
-
-      <span>⚙</span>
-
-      Account Settings
-
-    </button>
-
-
-    <!-- SIGN OUT -->
-
-    <button
-      type="button"
-      class="menu-item logout-item"
-      id="logoutButton"
-    >
-
-      <span>↪</span>
-
-      Sign Out
-
-    </button>
-
-  </div>
-
-
-  <!-- =================================
-       MAIN
-  ================================== -->
-
-  <main class="orders-main">
-
-
-    <!-- =================================
-         INTRO
-    ================================== -->
-
-    <section class="orders-intro">
-
-      <p class="eyebrow">
-        YOUR SHOPPING ACTIVITY
-      </p>
-
-      <h1>
-        My Orders
-      </h1>
-
-      <p>
-        View and track all your SMH Collection orders
-        in one place.
-      </p>
-
-    </section>
-
-
-    <!-- =================================
-         ORDER TOOLBAR
-    ================================== -->
-
-    <section class="orders-toolbar">
-
-      <div class="toolbar-title">
-
-        <span class="toolbar-icon">
-          📦
-        </span>
-
-        <div>
-
-          <strong>
-            Order History
-          </strong>
-
-          <small id="orderCount">
-            Loading orders...
-          </small>
+          <span
+            class="status-badge status-${escapeHTML(statusClass)}"
+          >
+            ${escapeHTML(statusLabel)}
+          </span>
 
         </div>
 
-      </div>
+
+        <!-- =================================
+             ORDER CARD BODY
+        ================================== -->
+
+        <div class="order-card-body">
 
 
-      <!-- STATUS FILTER -->
+          <!-- PRODUCT SUMMARY -->
 
-      <label
-        class="status-filter"
-        for="statusFilter"
-      >
+          <div class="order-product-summary">
 
-        <span>
-          Filter
-        </span>
-
-        <select id="statusFilter">
-
-          <option value="all">
-            All Orders
-          </option>
-
-          <option value="pending">
-            Pending
-          </option>
-
-          <option value="confirmed">
-            Confirmed
-          </option>
-
-          <option value="processing">
-            Processing
-          </option>
-
-          <option value="shipped">
-            Shipped
-          </option>
-
-          <option value="delivered">
-            Delivered
-          </option>
-
-          <option value="cancelled">
-            Cancelled
-          </option>
-
-        </select>
-
-      </label>
-
-    </section>
+            <div class="product-placeholder">
+              ${escapeHTML(
+                firstProductName
+                  .trim()
+                  .charAt(0)
+                  .toUpperCase() || "P"
+              )}
+            </div>
 
 
-    <!-- =================================
-         ORDERS LIST
-    ================================== -->
+            <div class="product-summary-content">
 
-    <section
-      class="orders-list"
-      id="ordersList"
-      aria-live="polite"
-    >
+              <strong>
+                ${escapeHTML(firstProductName)}
+              </strong>
 
-      <div class="loading-state">
-
-        <div class="loading-spinner"></div>
-
-        <p>
-          Loading your orders...
-        </p>
-
-      </div>
-
-    </section>
+              <span>
+                ${firstProductQuantity}
+                ${firstProductQuantity === 1 ? "item" : "items"}
+                ×
+                ${formatCurrency(firstProductPrice)}
+              </span>
 
 
-    <!-- =================================
-         EMPTY STATE
-    ================================== -->
+              ${
+                remainingItems > 0
+                  ? `
+                    <small>
+                      + ${remainingItems}
+                      ${
+                        remainingItems === 1
+                          ? "more product"
+                          : "more products"
+                      }
+                    </small>
+                  `
+                  : ""
+              }
 
-    <section
-      class="empty-state"
-      id="emptyState"
-      hidden
-    >
+            </div>
 
-      <div class="empty-icon">
-        📦
-      </div>
-
-      <h2>
-        No orders yet
-      </h2>
-
-      <p>
-        You haven't placed any orders yet.
-        Start shopping and your orders will appear here.
-      </p>
-
-      <!-- DIRECT LINK -->
-      <a
-        href="buyer-dashboard.html"
-        class="primary-button"
-        id="startShoppingButton"
-      >
-        Start Shopping
-      </a>
-
-    </section>
+          </div>
 
 
-    <!-- =================================
-         ERROR STATE
-    ================================== -->
+          <!-- ORDER INFORMATION -->
 
-    <section
-      class="error-state"
-      id="errorState"
-      hidden
-    >
+          <div class="order-information">
 
-      <div class="error-icon">
-        !
-      </div>
+            <div class="order-info-item">
 
-      <h2>
-        Unable to load orders
-      </h2>
+              <span>
+                Items
+              </span>
 
-      <p id="errorMessage">
-        Something went wrong while loading your orders.
-      </p>
+              <strong>
+                ${itemCount}
+              </strong>
 
-      <button
-        type="button"
-        class="primary-button"
-        id="retryButton"
-      >
-        Try Again
-      </button>
-
-    </section>
-
-  </main>
+            </div>
 
 
-  <!-- =================================
-       FOOTER
-  ================================== -->
+            <div class="order-info-item">
 
-  <footer class="orders-footer">
+              <span>
+                Payment
+              </span>
 
-    <div class="footer-brand">
+              <strong>
+                ${escapeHTML(paymentMethod)}
+              </strong>
 
-      <strong>
-        SMH COLLECTION
-      </strong>
-
-      <span>
-        Everything in one place.
-      </span>
-
-    </div>
-
-    <p>
-
-      ©
-      <span id="currentYear"></span>
-      SMH Collection.
-      All rights reserved.
-
-    </p>
-
-  </footer>
+            </div>
 
 
-  <!-- =================================
-       SCRIPTS
-  ================================== -->
+            <div class="order-info-item">
 
-  <script
-    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
-  ></script>
+              <span>
+                Payment Status
+              </span>
 
-  <script src="assets/js/supabase.js"></script>
+              <strong
+                class="payment-status payment-${escapeHTML(paymentStatus)}"
+              >
+                ${escapeHTML(paymentLabel)}
+              </strong>
 
-  <script src="assets/js/orders.js"></script>
+            </div>
 
-</body>
-</html>
+
+            <div class="order-info-item total-item">
+
+              <span>
+                Total
+              </span>
+
+              <strong>
+                ${formatCurrency(total)}
+              </strong>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- =================================
+             ORDER CARD FOOTER
+        ================================== -->
+
+        <div class="order-card-footer">
+
+
+          <div class="order-total-breakdown">
+
+            <span>
+              Subtotal:
+              ${formatCurrency(subtotal)}
+            </span>
+
+
+            <span>
+              Delivery:
+              ${
+                deliveryFee > 0
+                  ? formatCurrency(deliveryFee)
+                  : "FREE"
+              }
+            </span>
+
+          </div>
+
+
+          <button
+            type="button"
+            class="view-order-button"
+            data-order-id="${escapeHTML(order.id)}"
+          >
+            View Order
+            <span aria-hidden="true">
+              →
+            </span>
+          </button>
+
+        </div>
+
+      </article>
+    `;
+  }
+
+
+  // =========================================
+  // VIEW ORDER BUTTONS
+  // =========================================
+
+  if (ordersList) {
+
+    ordersList.addEventListener(
+      "click",
+      (event) => {
+
+        const viewButton =
+          event.target.closest(
+            ".view-order-button"
+          );
+
+
+        if (!viewButton) {
+          return;
+        }
+
+
+        const orderId =
+          viewButton.dataset.orderId;
+
+
+        if (!orderId) {
+
+          console.error(
+            "Order ID is missing."
+          );
+
+          return;
+        }
+
+
+        window.location.href =
+          `order-details.html?id=${encodeURIComponent(orderId)}`;
+
+      }
+    );
+  }
+// =========================================
+// NAVIGATION + ACCOUNT ACTIONS
+// PART 3 OF 3
+// =========================================
+
+
+  // =========================================
+  // START SHOPPING
+  // =========================================
+
+  if (startShoppingButton) {
+
+    startShoppingButton.addEventListener(
+      "click",
+      () => {
+
+        window.location.href =
+          "buyer-dashboard.html";
+
+      }
+    );
+  }
+
+
+  // =========================================
+  // MY ORDERS
+  // =========================================
+
+  if (myOrdersButton) {
+
+    myOrdersButton.addEventListener(
+      "click",
+      () => {
+
+        closeProfileMenu();
+
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth"
+        });
+
+      }
+    );
+  }
+
+
+  // =========================================
+  // WISHLIST
+  // =========================================
+
+  if (wishlistButton) {
+
+    wishlistButton.addEventListener(
+      "click",
+      () => {
+
+        closeProfileMenu();
+
+        window.location.href =
+          "wishlist.html";
+
+      }
+    );
+  }
+
+
+  // =========================================
+  // ACCOUNT SETTINGS
+  // =========================================
+
+  if (settingsButton) {
+
+    settingsButton.addEventListener(
+      "click",
+      () => {
+
+        closeProfileMenu();
+
+        window.location.href =
+          "account-settings.html";
+
+      }
+    );
+  }
+
+
+  // =========================================
+  // SIGN OUT
+  // =========================================
+
+  if (logoutButton) {
+
+    logoutButton.addEventListener(
+      "click",
+      async () => {
+
+        closeProfileMenu();
+
+        logoutButton.disabled = true;
+
+        const originalContent =
+          logoutButton.innerHTML;
+
+        logoutButton.innerHTML =
+          "<span>↪</span> Signing Out...";
+
+
+        try {
+
+          const { error } =
+            await supabaseClient.auth.signOut();
+
+
+          if (error) {
+            throw error;
+          }
+
+
+          window.location.href =
+            "login.html";
+
+
+        } catch (error) {
+
+          console.error(
+            "Logout error:",
+            error
+          );
+
+
+          logoutButton.disabled = false;
+
+          logoutButton.innerHTML =
+            originalContent;
+
+
+          alert(
+            "Unable to sign out. Please try again."
+          );
+        }
+      }
+    );
+  }
+
+
+  // =========================================
+  // RETRY
+  // =========================================
+
+  if (retryButton) {
+
+    retryButton.addEventListener(
+      "click",
+      async () => {
+
+        await loadOrders();
+
+      }
+    );
+  }
+
+
+  // =========================================
+  // AUTHENTICATION + INITIALIZATION
+  // =========================================
+
+  async function initializeOrders() {
+
+    try {
+
+      showLoading();
+
+
+      // =========================================
+      // GET CURRENT USER
+      // =========================================
+
+      const {
+        data: {
+          user
+        },
+        error: sessionError
+      } = await supabaseClient.auth.getUser();
+
+
+      if (sessionError) {
+        throw sessionError;
+      }
+
+
+      // =========================================
+      // NOT LOGGED IN
+      // =========================================
+
+      if (!user) {
+
+        window.location.href =
+          "login.html";
+
+        return;
+      }
+
+
+      currentUser = user;
+
+
+      // =========================================
+      // LOAD PROFILE
+      // =========================================
+
+      const profile =
+        await loadProfile(user);
+
+
+      if (!profile) {
+        return;
+      }
+
+
+      // =========================================
+      // LOAD REAL ORDERS
+      // =========================================
+
+      await loadOrders();
+
+
+    } catch (error) {
+
+      console.error(
+        "Orders initialization error:",
+        error
+      );
+
+
+      showError(
+        error.message ||
+        "Unable to load your order history."
+      );
+    }
+  }
+
+
+  // =========================================
+  // AUTH STATE CHANGES
+  // =========================================
+
+  supabaseClient.auth.onAuthStateChange(
+    async (event, session) => {
+
+      console.log(
+        "Orders auth event:",
+        event
+      );
+
+
+      // =========================================
+      // SIGNED OUT
+      // =========================================
+
+      if (event === "SIGNED_OUT") {
+
+        window.location.href =
+          "login.html";
+
+        return;
+      }
+
+
+      // =========================================
+      // SESSION EXPIRED / MISSING
+      // =========================================
+
+      if (
+        !session &&
+        event !== "INITIAL_SESSION"
+      ) {
+
+        window.location.href =
+          "login.html";
+
+        return;
+      }
+
+    }
+  );
+
+
+  // =========================================
+  // INITIALIZE PAGE
+  // =========================================
+
+  initializeOrders();
+
+});
+
+    if (menuEmail) {
+      menuEmail.textContent = email;
+    }
+
+
+    if (menuAvatar) {
+      menuAvatar.textContent = firstLetter;
+    }
+
+
+    return profile;
+  }
