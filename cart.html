@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <meta
+    name="description"
+    content="SMH Collection shopping cart."
+  >
+
+  <title>Shopping Cart | SMH Collection</title>
+
+  <link
+    rel="stylesheet"
+    href="assets/css/cart.css"
+  >
+</head>
+
+<body>
+
+  <!-- =========================================
+       TOP MARQUEE
+  ========================================== -->
+
+  <div class="top-marquee">
+
+    <div class="marquee-track">
+
+      <span>SMH COLLECTION</span>
+      <span>SHOP EVERYTHING</span>
+      <span>SELL EVERYTHING</span>
+      <span>FREE DELIVERY</span>
+      <span>CASH ON DELIVERY</span>
+      <span>SMH COLLECTION</span>
+      <span>SHOP EVERYTHING</span>
+      <span>SELL EVERYTHING</span>
+
+    </div>
+
+  </div>
+
+
+  <!-- =========================================
+       HEADER
+  ========================================== -->
+
+  <header class="cart-header">
+
+    <a
+      href="buyer-dashboard.html"
+      class="brand"
+      aria-label="SMH Collection home"
+    >
+
+      <span class="brand-main">
+        SMH
+      </span>
+
+      <span class="brand-sub">
+        COLLECTION
+      </span>
+
+    </a>
+
+
+    <div class="header-actions">
+
+      <a
+        href="buyer-dashboard.html"
+        class="back-shop-button"
+      >
+        Continue Shopping
+      </a>
+
+
+      <button
+        type="button"
+        class="profile-button"
+        id="profileButton"
+        aria-expanded="false"
+        aria-controls="profileMenu"
+        aria-label="Open account menu"
+      >
+
+        <span
+          class="profile-avatar"
+          id="profileAvatar"
+        >
+          U
+        </span>
+
+        <span
+          class="profile-name"
+          id="profileName"
+        >
+          Account
+        </span>
+
+        <span class="profile-arrow">
+          ▾
+        </span>
+
+      </button>
+
+    </div>
+
+  </header>
+
+
+  <!-- =========================================
+       PROFILE MENU
+  ========================================== -->
+
+  <div
+    class="profile-menu"
+    id="profileMenu"
+    aria-hidden="true"
+  >
+
+    <div class="profile-menu-header">
+
+      <div
+        class="menu-avatar"
+        id="menuAvatar"
+      >
+        U
+      </div>
+
+      <div>
+
+        <strong id="menuName">
+          Account
+        </strong>
+
+        <small id="menuEmail">
+          Loading...
+        </small>
+
+      </div>
+
+    </div>
+
+
+    <button
+      type="button"
+      class="menu-item"
+      id="myOrdersButton"
+    >
+      <span>📦</span>
+      My Orders
+    </button>
+
+
+    <button
+      type="button"
+      class="menu-item"
+      id="wishlistButton"
+    >
+      <span>♡</span>
+      Wishlist
+    </button>
+
+
+    <button
+      type="button"
+      class="menu-item"
+      id="settingsButton"
+    >
+      <span>⚙</span>
+      Account Settings
+    </button>
+
+
+    <button
+      type="button"
+      class="menu-item logout-item"
+      id="logoutButton"
+    >
+      <span>↪</span>
+      Sign Out
+    </button>
+
+  </div>
+
+
+  <!-- =========================================
+       MAIN
+  ========================================== -->
+
+  <main class="cart-main">
+
+    <section class="cart-intro">
+
+      <p class="eyebrow">
+        SMH MARKETPLACE
+      </p>
+
+      <h1>
+        Your Shopping Cart
+      </h1>
+
+      <p>
+        Review your items before continuing to checkout.
+      </p>
+
+    </section>
+
+
+    <!-- =====================================
+         LOADING
+    ====================================== -->
+
+    <section
+      class="cart-loading"
+      id="cartLoading"
+    >
+
+      <div class="loading-spinner"></div>
+
+      <p>
+        Loading your cart...
+      </p>
+
+    </section>
+
+
+    <!-- =====================================
+         CART CONTENT
+    ====================================== -->
+
+    <section
+      class="cart-layout"
+      id="cartLayout"
+      hidden
+    >
+
+      <!-- ===================================
+           ITEMS
+      ==================================== -->
+
+      <div class="cart-items-section">
+
+        <div class="cart-section-heading">
+
+          <div>
+
+            <p class="section-label">
+              YOUR ITEMS
+            </p>
+
+            <h2>
+              Shopping Cart
+            </h2>
+
+          </div>
+
+          <span
+            class="item-count"
+            id="itemCount"
+          >
+            0 items
+          </span>
+
+        </div>
+
+
+        <div
+          class="cart-items"
+          id="cartItems"
+        >
+        </div>
+
+      </div>
+
+
+      <!-- ===================================
+           SUMMARY
+      ==================================== -->
+
+      <aside class="cart-summary">
+
+        <div class="summary-header">
+
+          <p class="section-label">
+            ORDER SUMMARY
+          </p>
+
+          <h2>
+            Summary
+          </h2>
+
+        </div>
+
+
+        <div class="summary-row">
+
+          <span>
+            Subtotal
+          </span>
+
+          <strong id="subtotal">
+            $0.00
+          </strong>
+
+        </div>
+
+
+        <div class="summary-row">
+
+          <span>
+            Delivery
+          </span>
+
+          <strong class="free-delivery">
+            FREE
+          </strong>
+
+        </div>
+
+
+        <div class="summary-divider"></div>
+
+
+        <div class="summary-total">
+
+          <span>
+            Total
+          </span>
+
+          <strong id="totalAmount">
+            $0.00
+          </strong>
+
+        </div>
+
+
+        <button
+          type="button"
+          class="checkout-button"
+          id="checkoutButton"
+        >
+          Proceed to Checkout
+        </button>
+
+
+        <p class="payment-note">
+          💵 Cash on Delivery
+        </p>
+
+        <p class="delivery-note">
+          🚚 Free delivery
+        </p>
+
+      </aside>
+
+    </section>
+
+
+    <!-- =====================================
+         EMPTY CART
+    ====================================== -->
+
+    <section
+      class="empty-cart"
+      id="emptyCart"
+      hidden
+    >
+
+      <div class="empty-cart-icon">
+        🛒
+      </div>
+
+      <p class="section-label">
+        YOUR CART
+      </p>
+
+      <h2>
+        Your cart is empty
+      </h2>
+
+      <p>
+        You haven't added any products to your cart yet.
+      </p>
+
+      <a
+        href="buyer-dashboard.html"
+        class="shop-now-button"
+      >
+        Start Shopping
+      </a>
+
+    </section>
+
+
+    <!-- =====================================
+         ERROR
+    ====================================== -->
+
+    <section
+      class="cart-error"
+      id="cartError"
+      hidden
+    >
+
+      <div class="error-icon">
+        !
+      </div>
+
+      <h2>
+        Something went wrong
+      </h2>
+
+      <p id="cartErrorMessage">
+        We couldn't load your cart.
+      </p>
+
+      <button
+        type="button"
+        class="retry-button"
+        id="retryButton"
+      >
+        Try Again
+      </button>
+
+    </section>
+
+  </main>
+
+
+  <!-- =========================================
+       FOOTER
+  ========================================== -->
+
+  <footer class="cart-footer">
+
+    <div class="footer-brand">
+
+      <strong>
+        SMH COLLECTION
+      </strong>
+
+      <span>
+        Everything in one place.
+      </span>
+
+    </div>
+
+    <p>
+      ©
+      <span id="currentYear"></span>
+      SMH Collection.
+      All rights reserved.
+    </p>
+
+  </footer>
+
+
+  <!-- =========================================
+       SCRIPTS
+  ========================================== -->
+
+  <script
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+  ></script>
+
+  <script
+    src="assets/js/supabase.js"
+  ></script>
+
+  <script
+    src="assets/js/cart.js"
+  ></script>
+
+</body>
+</html>
