@@ -1326,3 +1326,175 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     );
   }
+  // =========================================
+  // LOGOUT
+  // =========================================
+
+  if (logoutButton) {
+
+    logoutButton.addEventListener(
+      "click",
+      async () => {
+
+        logoutButton.disabled = true;
+
+        try {
+
+          const {
+            error
+          } =
+            await supabaseClient.auth.signOut();
+
+
+          if (error) {
+            throw error;
+          }
+
+
+          window.location.href =
+            "login.html";
+
+        }
+
+        catch (error) {
+
+          console.error(
+            "Logout error:",
+            error
+          );
+
+
+          alert(
+            error.message ||
+            "Unable to log out."
+          );
+
+
+          logoutButton.disabled =
+            false;
+        }
+      }
+    );
+  }
+
+
+  // =========================================
+  // RETRY BUTTON
+  // =========================================
+
+  if (retryButton) {
+
+    retryButton.addEventListener(
+      "click",
+      async () => {
+
+        try {
+
+          await loadCart();
+
+        }
+
+        catch (error) {
+
+          console.error(
+            "Retry cart error:",
+            error
+          );
+
+
+          showError(
+            error.message ||
+            "Unable to reload your cart."
+          );
+        }
+      }
+    );
+  }
+
+
+  // =========================================
+  // INITIALIZE CART
+  // =========================================
+
+  async function initializeCart() {
+
+    try {
+
+      showLoading();
+
+
+      const userLoaded =
+        await loadCurrentUser();
+
+
+      if (!userLoaded) {
+        return;
+      }
+
+
+      const profileLoaded =
+        await loadProfile();
+
+
+      if (!profileLoaded) {
+        return;
+      }
+
+
+      await loadCart();
+
+    }
+
+    catch (error) {
+
+      console.error(
+        "Cart initialization error:",
+        error
+      );
+
+
+      showError(
+        error.message ||
+        "Unable to load your shopping cart."
+      );
+    }
+  }
+
+
+  // =========================================
+  // AUTH STATE LISTENER
+  // =========================================
+
+  supabaseClient.auth.onAuthStateChange(
+    (event, session) => {
+
+      if (
+        event === "SIGNED_OUT"
+      ) {
+
+        window.location.href =
+          "login.html";
+
+        return;
+      }
+
+
+      if (
+        event === "TOKEN_REFRESHED" &&
+        !session
+      ) {
+
+        window.location.href =
+          "login.html";
+      }
+    }
+  );
+
+
+  // =========================================
+  // START CART APPLICATION
+  // =========================================
+
+  initializeCart();
+
+});
