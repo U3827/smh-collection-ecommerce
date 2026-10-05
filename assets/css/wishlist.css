@@ -1,0 +1,1000 @@
+/* =========================================
+   SMH COLLECTION
+   WISHLIST PAGE
+========================================= */
+
+:root {
+  --bg: #070707;
+  --surface: #111111;
+  --surface-2: #171717;
+  --border: rgba(255, 255, 255, 0.10);
+  --text: #f5f5f5;
+  --muted: #9b9b9b;
+  --gold: #d7b56d;
+  --gold-light: #f1d99a;
+  --danger: #ff6b6b;
+  --success: #72e0a5;
+  --shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(
+      circle at 15% 0%,
+      rgba(215, 181, 109, 0.08),
+      transparent 32%
+    ),
+    radial-gradient(
+      circle at 85% 15%,
+      rgba(255, 255, 255, 0.035),
+      transparent 28%
+    ),
+    var(--bg);
+  color: var(--text);
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  line-height: 1.5;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+a,
+input,
+select {
+  font: inherit;
+}
+
+
+/* =========================================
+   MARQUEE
+========================================= */
+
+.top-marquee {
+  width: 100%;
+  overflow: hidden;
+  background: #000;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.marquee-track {
+  width: max-content;
+  display: flex;
+  gap: 45px;
+  padding: 10px 0;
+  animation: marqueeMove 24s linear infinite;
+}
+
+.marquee-track span {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  background: linear-gradient(
+    90deg,
+    #ff4d4d,
+    #ffd84d,
+    #50e3ff,
+    #a56cff,
+    #ff4d9d
+  );
+  background-size: 300% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: colorShift 6s linear infinite;
+}
+
+@keyframes marqueeMove {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes colorShift {
+  from {
+    background-position: 0% center;
+  }
+
+  to {
+    background-position: 300% center;
+  }
+}
+
+
+/* =========================================
+   HEADER
+========================================= */
+
+.wishlist-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+
+  min-height: 74px;
+  padding: 14px 5%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+
+  background: rgba(7, 7, 7, 0.92);
+  border-bottom: 1px solid var(--border);
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-main {
+  font-size: 22px;
+  font-weight: 950;
+  letter-spacing: -1px;
+
+  background: linear-gradient(
+    90deg,
+    #ffffff,
+    var(--gold-light)
+  );
+
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.brand-sub {
+  padding-left: 10px;
+  border-left: 1px solid var(--border);
+
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.shop-button,
+.browse-button {
+  min-height: 42px;
+  padding: 0 17px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid var(--border);
+  border-radius: 12px;
+
+  background: rgba(255, 255, 255, 0.035);
+
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 800;
+
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.shop-button:hover,
+.browse-button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(215, 181, 109, 0.5);
+  background: rgba(215, 181, 109, 0.08);
+}
+
+
+/* =========================================
+   PROFILE BUTTON
+========================================= */
+
+.profile-button {
+  min-height: 44px;
+  padding: 5px 11px 5px 5px;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+
+  border: 1px solid var(--border);
+  border-radius: 14px;
+
+  background: rgba(255, 255, 255, 0.035);
+  color: var(--text);
+
+  cursor: pointer;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.profile-button:hover {
+  border-color: rgba(215, 181, 109, 0.5);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.profile-avatar,
+.menu-avatar {
+  width: 34px;
+  height: 34px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--gold),
+      var(--gold-light)
+    );
+
+  color: #080808;
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.profile-name {
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.profile-arrow {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+
+/* =========================================
+   PROFILE MENU
+========================================= */
+
+.profile-menu {
+  position: fixed;
+  top: 84px;
+  right: 5%;
+  z-index: 9999;
+
+  width: min(330px, calc(100vw - 30px));
+  padding: 10px;
+
+  display: none;
+  visibility: hidden;
+  opacity: 0;
+
+  transform: translateY(-8px);
+
+  background: rgba(17, 17, 17, 0.98);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+
+  box-shadow: var(--shadow);
+
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease,
+    visibility 0.18s ease;
+}
+
+.profile-menu.open {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  transform: translateY(0);
+}
+
+.profile-menu-header {
+  padding: 10px;
+
+  display: flex;
+  align-items: center;
+  gap: 11px;
+
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 7px;
+}
+
+.profile-menu-header .menu-avatar {
+  flex: 0 0 auto;
+}
+
+.profile-menu-header strong {
+  display: block;
+  color: var(--text);
+  font-size: 13px;
+}
+
+.profile-menu-header small {
+  display: block;
+  max-width: 220px;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.menu-item {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  border: 0;
+  border-radius: 11px;
+
+  background: transparent;
+  color: var(--text);
+
+  text-align: left;
+  cursor: pointer;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.menu-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.menu-item.active {
+  background: rgba(215, 181, 109, 0.10);
+  color: var(--gold-light);
+}
+
+.menu-item span {
+  width: 20px;
+  text-align: center;
+}
+
+.logout-item {
+  margin-top: 5px;
+  color: #ff9b9b;
+}
+
+
+/* =========================================
+   MAIN
+========================================= */
+
+.wishlist-main {
+  width: min(1180px, 90%);
+  margin: 0 auto;
+  padding: 65px 0 90px;
+}
+
+
+/* =========================================
+   INTRO
+========================================= */
+
+.wishlist-intro {
+  max-width: 720px;
+  margin-bottom: 42px;
+}
+
+.eyebrow {
+  margin-bottom: 10px;
+
+  color: var(--gold);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 2.5px;
+}
+
+.wishlist-intro h1 {
+  margin-bottom: 12px;
+
+  font-size: clamp(38px, 6vw, 68px);
+  line-height: 0.98;
+  letter-spacing: -2.5px;
+}
+
+.wishlist-intro > p:last-child {
+  max-width: 610px;
+  color: var(--muted);
+  font-size: 15px;
+}
+
+
+/* =========================================
+   TOOLBAR
+========================================= */
+
+.wishlist-toolbar {
+  margin-bottom: 25px;
+  padding: 16px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+
+  border: 1px solid var(--border);
+  border-radius: 18px;
+
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.toolbar-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.toolbar-icon {
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 13px;
+
+  background: rgba(215, 181, 109, 0.10);
+
+  color: var(--gold-light);
+  font-size: 21px;
+}
+
+.toolbar-title strong {
+  display: block;
+  font-size: 14px;
+}
+
+.toolbar-title small {
+  display: block;
+  margin-top: 2px;
+
+  color: var(--muted);
+  font-size: 11px;
+}
+
+
+/* =========================================
+   WISHLIST GRID
+========================================= */
+
+.wishlist-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+
+
+/* =========================================
+   WISHLIST CARD
+========================================= */
+
+.wishlist-card {
+  position: relative;
+
+  overflow: hidden;
+
+  border: 1px solid var(--border);
+  border-radius: 18px;
+
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.045),
+    rgba(255, 255, 255, 0.018)
+  );
+
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.18);
+
+  transition:
+    transform 0.22s ease,
+    border-color 0.22s ease;
+}
+
+.wishlist-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(215, 181, 109, 0.35);
+}
+
+.wishlist-image {
+  position: relative;
+
+  width: 100%;
+  aspect-ratio: 1 / 1;
+
+  overflow: hidden;
+
+  background: #0d0d0d;
+}
+
+.wishlist-image img {
+  width: 100%;
+  height: 100%;
+
+  display: block;
+
+  object-fit: cover;
+
+  transition:
+    transform 0.35s ease;
+}
+
+.wishlist-card:hover .wishlist-image img {
+  transform: scale(1.04);
+}
+
+.wishlist-placeholder {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: rgba(255, 255, 255, 0.18);
+  font-size: 45px;
+}
+
+.remove-wishlist-button {
+  position: absolute;
+  top: 11px;
+  right: 11px;
+
+  width: 36px;
+  height: 36px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 50%;
+
+  background: rgba(0, 0, 0, 0.72);
+  color: #fff;
+
+  cursor: pointer;
+
+  font-size: 17px;
+
+  backdrop-filter: blur(10px);
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.remove-wishlist-button:hover {
+  transform: scale(1.06);
+  background: rgba(255, 80, 80, 0.18);
+  color: #ff9b9b;
+}
+
+.wishlist-info {
+  padding: 16px;
+}
+
+.wishlist-category {
+  margin-bottom: 7px;
+
+  color: var(--gold);
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.wishlist-name {
+  min-height: 44px;
+  margin-bottom: 9px;
+
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.wishlist-price {
+  margin-bottom: 14px;
+
+  color: var(--gold-light);
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.wishlist-actions {
+  display: grid;
+  grid-template-columns: 1fr 44px;
+  gap: 8px;
+}
+
+.view-product-button,
+.add-cart-button {
+  min-height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 11px;
+
+  cursor: pointer;
+
+  font-size: 12px;
+  font-weight: 850;
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.view-product-button {
+  border: 1px solid var(--gold);
+  background: var(--gold);
+  color: #0a0a0a;
+}
+
+.view-product-button:hover {
+  transform: translateY(-1px);
+  background: var(--gold-light);
+}
+
+.add-cart-button {
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  font-size: 17px;
+}
+
+.add-cart-button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(215, 181, 109, 0.5);
+  background: rgba(215, 181, 109, 0.10);
+}
+
+
+/* =========================================
+   LOADING
+========================================= */
+
+.wishlist-loading {
+  min-height: 280px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 14px;
+
+  border: 1px solid var(--border);
+  border-radius: 20px;
+
+  background: rgba(255, 255, 255, 0.02);
+
+  color: var(--muted);
+  text-align: center;
+}
+
+.loading-spinner {
+  width: 34px;
+  height: 34px;
+
+  border: 3px solid rgba(255, 255, 255, 0.10);
+  border-top-color: var(--gold);
+
+  border-radius: 50%;
+
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+/* =========================================
+   EMPTY STATE
+========================================= */
+
+.empty-state,
+.error-state {
+  padding: 65px 20px;
+
+  text-align: center;
+
+  border: 1px solid var(--border);
+  border-radius: 22px;
+
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(215, 181, 109, 0.06),
+      transparent 55%
+    ),
+    rgba(255, 255, 255, 0.02);
+}
+
+.empty-icon,
+.error-icon {
+  width: 72px;
+  height: 72px;
+
+  margin: 0 auto 20px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: rgba(215, 181, 109, 0.09);
+
+  color: var(--gold-light);
+  font-size: 32px;
+}
+
+.error-icon {
+  background: rgba(255, 90, 90, 0.10);
+  color: #ff9b9b;
+}
+
+.empty-state h2,
+.error-state h2 {
+  margin-bottom: 10px;
+
+  font-size: 25px;
+}
+
+.empty-state > p:not(.eyebrow),
+.error-state > p:not(.eyebrow) {
+  max-width: 520px;
+  margin: 0 auto 24px;
+
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.primary-button {
+  min-height: 45px;
+  padding: 0 20px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid var(--gold);
+  border-radius: 12px;
+
+  background: var(--gold);
+  color: #080808;
+
+  cursor: pointer;
+
+  font-size: 12px;
+  font-weight: 900;
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
+}
+
+.primary-button:hover {
+  transform: translateY(-1px);
+  background: var(--gold-light);
+}
+
+
+/* =========================================
+   FOOTER
+========================================= */
+
+.wishlist-footer {
+  padding: 30px 5%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+
+  border-top: 1px solid var(--border);
+
+  color: var(--muted);
+}
+
+.footer-brand strong {
+  display: block;
+
+  color: var(--text);
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+
+.footer-brand span {
+  display: block;
+  margin-top: 4px;
+
+  font-size: 11px;
+}
+
+.wishlist-footer p {
+  font-size: 10px;
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 1050px) {
+
+  .wishlist-grid {
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+  }
+
+}
+
+
+@media (max-width: 760px) {
+
+  .wishlist-header {
+    padding: 12px 4%;
+  }
+
+  .profile-name {
+    display: none;
+  }
+
+  .shop-button {
+    min-height: 40px;
+    padding: 0 12px;
+    font-size: 11px;
+  }
+
+  .wishlist-main {
+    width: 92%;
+    padding: 48px 0 70px;
+  }
+
+  .wishlist-intro {
+    margin-bottom: 30px;
+  }
+
+  .wishlist-intro h1 {
+    font-size: 42px;
+    letter-spacing: -1.8px;
+  }
+
+  .wishlist-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .browse-button {
+    width: 100%;
+  }
+
+  .wishlist-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .wishlist-info {
+    padding: 13px;
+  }
+
+  .wishlist-name {
+    min-height: auto;
+    font-size: 13px;
+  }
+
+  .wishlist-price {
+    font-size: 16px;
+  }
+
+  .wishlist-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .add-cart-button {
+    min-height: 38px;
+  }
+
+  .wishlist-footer {
+    padding: 25px 4%;
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+}
+
+
+@media (max-width: 430px) {
+
+  .brand-main {
+    font-size: 19px;
+  }
+
+  .brand-sub {
+    display: none;
+  }
+
+  .wishlist-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .wishlist-image {
+    aspect-ratio: 1.15 / 1;
+  }
+
+  .wishlist-intro h1 {
+    font-size: 38px;
+  }
+
+  .profile-menu {
+    top: 72px;
+    right: 4%;
+    width: min(330px, calc(100vw - 24px));
+  }
+
+}
