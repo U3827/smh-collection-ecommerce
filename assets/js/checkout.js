@@ -1,6 +1,7 @@
 // =========================================
 // SMH COLLECTION
 // REAL CHECKOUT + CASH ON DELIVERY
+// PART 1 OF 3
 // =========================================
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -16,31 +17,62 @@ document.addEventListener("DOMContentLoaded", () => {
     currentYear.textContent = new Date().getFullYear();
   }
 
-  const loadingState = document.getElementById("checkoutLoading");
-  const checkoutLayout = document.getElementById("checkoutLayout");
-  const emptyCheckout = document.getElementById("emptyCheckout");
+  const loadingState =
+    document.getElementById("checkoutLoading");
 
-  const checkoutError = document.getElementById("checkoutError");
-  const checkoutErrorMessage = document.getElementById(
-    "checkoutErrorMessage"
-  );
-  const retryButton = document.getElementById("retryButton");
+  const checkoutLayout =
+    document.getElementById("checkoutLayout");
 
-  const checkoutForm = document.getElementById("checkoutForm");
-  const placeOrderButton = document.getElementById("placeOrderButton");
-  const checkoutMessage = document.getElementById("checkoutMessage");
+  const emptyCheckout =
+    document.getElementById("emptyCheckout");
 
-  const checkoutItems = document.getElementById("checkoutItems");
-  const subtotalElement = document.getElementById("subtotal");
-  const totalElement = document.getElementById("totalAmount");
+  const checkoutError =
+    document.getElementById("checkoutError");
 
-  const shippingName = document.getElementById("shippingName");
-  const shippingPhone = document.getElementById("shippingPhone");
-  const shippingAddress = document.getElementById("shippingAddress");
-  const shippingCity = document.getElementById("shippingCity");
-  const shippingState = document.getElementById("shippingState");
-  const shippingCountry = document.getElementById("shippingCountry");
-  const orderNotes = document.getElementById("orderNotes");
+  const checkoutErrorMessage =
+    document.getElementById("checkoutErrorMessage");
+
+  const retryButton =
+    document.getElementById("retryButton");
+
+  const checkoutForm =
+    document.getElementById("checkoutForm");
+
+  const placeOrderButton =
+    document.getElementById("placeOrderButton");
+
+  const checkoutMessage =
+    document.getElementById("checkoutMessage");
+
+  const checkoutItems =
+    document.getElementById("checkoutItems");
+
+  const subtotalElement =
+    document.getElementById("subtotal");
+
+  const totalElement =
+    document.getElementById("totalAmount");
+
+  const shippingName =
+    document.getElementById("shippingName");
+
+  const shippingPhone =
+    document.getElementById("shippingPhone");
+
+  const shippingAddress =
+    document.getElementById("shippingAddress");
+
+  const shippingCity =
+    document.getElementById("shippingCity");
+
+  const shippingState =
+    document.getElementById("shippingState");
+
+  const shippingCountry =
+    document.getElementById("shippingCountry");
+
+  const orderNotes =
+    document.getElementById("orderNotes");
 
   // -----------------------------------------
   // STATE
@@ -84,31 +116,75 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function showLoading() {
-    if (loadingState) loadingState.hidden = false;
-    if (checkoutLayout) checkoutLayout.hidden = true;
-    if (emptyCheckout) emptyCheckout.hidden = true;
-    if (checkoutError) checkoutError.hidden = true;
+    if (loadingState) {
+      loadingState.hidden = false;
+    }
+
+    if (checkoutLayout) {
+      checkoutLayout.hidden = true;
+    }
+
+    if (emptyCheckout) {
+      emptyCheckout.hidden = true;
+    }
+
+    if (checkoutError) {
+      checkoutError.hidden = true;
+    }
   }
 
   function showCheckout() {
-    if (loadingState) loadingState.hidden = true;
-    if (checkoutLayout) checkoutLayout.hidden = false;
-    if (emptyCheckout) emptyCheckout.hidden = true;
-    if (checkoutError) checkoutError.hidden = true;
+    if (loadingState) {
+      loadingState.hidden = true;
+    }
+
+    if (checkoutLayout) {
+      checkoutLayout.hidden = false;
+    }
+
+    if (emptyCheckout) {
+      emptyCheckout.hidden = true;
+    }
+
+    if (checkoutError) {
+      checkoutError.hidden = true;
+    }
   }
 
   function showEmptyCheckout() {
-    if (loadingState) loadingState.hidden = true;
-    if (checkoutLayout) checkoutLayout.hidden = true;
-    if (emptyCheckout) emptyCheckout.hidden = false;
-    if (checkoutError) checkoutError.hidden = true;
+    if (loadingState) {
+      loadingState.hidden = true;
+    }
+
+    if (checkoutLayout) {
+      checkoutLayout.hidden = true;
+    }
+
+    if (emptyCheckout) {
+      emptyCheckout.hidden = false;
+    }
+
+    if (checkoutError) {
+      checkoutError.hidden = true;
+    }
   }
 
   function showError(message) {
-    if (loadingState) loadingState.hidden = true;
-    if (checkoutLayout) checkoutLayout.hidden = true;
-    if (emptyCheckout) emptyCheckout.hidden = true;
-    if (checkoutError) checkoutError.hidden = false;
+    if (loadingState) {
+      loadingState.hidden = true;
+    }
+
+    if (checkoutLayout) {
+      checkoutLayout.hidden = true;
+    }
+
+    if (emptyCheckout) {
+      emptyCheckout.hidden = true;
+    }
+
+    if (checkoutError) {
+      checkoutError.hidden = false;
+    }
 
     if (checkoutErrorMessage) {
       checkoutErrorMessage.textContent =
@@ -121,11 +197,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     placeOrderButton.disabled = loading;
 
-    if (loading) {
-      placeOrderButton.textContent = "Placing Order...";
-    } else {
-      placeOrderButton.textContent = "Place Order";
-    }
+    placeOrderButton.textContent = loading
+      ? "Placing Order..."
+      : "Place Order";
   }
 
   // -----------------------------------------
@@ -134,13 +208,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (typeof window.supabase === "undefined") {
     console.error("Supabase library is missing.");
-    showError("Checkout service could not load. Please refresh the page.");
+
+    showError(
+      "Checkout service could not load. Please refresh the page."
+    );
+
     return;
   }
 
   if (typeof supabaseClient === "undefined") {
     console.error("supabaseClient is missing.");
-    showError("Supabase connection could not be initialized.");
+
+    showError(
+      "Supabase connection could not be initialized."
+    );
+
     return;
   }
 
@@ -148,25 +230,45 @@ document.addEventListener("DOMContentLoaded", () => {
   // PROFILE MENU
   // -----------------------------------------
 
-  const profileButton = document.getElementById("profileButton");
-  const profileMenu = document.getElementById("profileMenu");
+  const profileButton =
+    document.getElementById("profileButton");
 
-  const profileAvatar = document.getElementById("profileAvatar");
-  const profileName = document.getElementById("profileName");
+  const profileMenu =
+    document.getElementById("profileMenu");
 
-  const menuAvatar = document.getElementById("menuAvatar");
-  const menuName = document.getElementById("menuName");
-  const menuEmail = document.getElementById("menuEmail");
+  const profileAvatar =
+    document.getElementById("profileAvatar");
 
-  const myOrdersButton = document.getElementById("myOrdersButton");
-  const wishlistButton = document.getElementById("wishlistButton");
-  const settingsButton = document.getElementById("settingsButton");
-  const logoutButton = document.getElementById("logoutButton");
+  const profileName =
+    document.getElementById("profileName");
+
+  const menuAvatar =
+    document.getElementById("menuAvatar");
+
+  const menuName =
+    document.getElementById("menuName");
+
+  const menuEmail =
+    document.getElementById("menuEmail");
+
+  const myOrdersButton =
+    document.getElementById("myOrdersButton");
+
+  const wishlistButton =
+    document.getElementById("wishlistButton");
+
+  const settingsButton =
+    document.getElementById("settingsButton");
+
+  const logoutButton =
+    document.getElementById("logoutButton");
 
   function getInitial(name) {
     const cleanName = String(name || "").trim();
 
-    if (!cleanName) return "U";
+    if (!cleanName) {
+      return "U";
+    }
 
     return cleanName.charAt(0).toUpperCase();
   }
@@ -175,22 +277,39 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!profileMenu || !profileButton) return;
 
     profileMenu.classList.add("open");
-    profileButton.setAttribute("aria-expanded", "true");
-    profileMenu.setAttribute("aria-hidden", "false");
+
+    profileButton.setAttribute(
+      "aria-expanded",
+      "true"
+    );
+
+    profileMenu.setAttribute(
+      "aria-hidden",
+      "false"
+    );
   }
 
   function closeProfileMenu() {
     if (!profileMenu || !profileButton) return;
 
     profileMenu.classList.remove("open");
-    profileButton.setAttribute("aria-expanded", "false");
-    profileMenu.setAttribute("aria-hidden", "true");
+
+    profileButton.setAttribute(
+      "aria-expanded",
+      "false"
+    );
+
+    profileMenu.setAttribute(
+      "aria-hidden",
+      "true"
+    );
   }
 
   function toggleProfileMenu() {
     if (!profileMenu) return;
 
-    const isOpen = profileMenu.classList.contains("open");
+    const isOpen =
+      profileMenu.classList.contains("open");
 
     if (isOpen) {
       closeProfileMenu();
@@ -202,11 +321,17 @@ document.addEventListener("DOMContentLoaded", () => {
   function populateProfileMenu(profile) {
     if (!profile) return;
 
-    const name = profile.full_name || "Account";
-    const email = profile.email || currentUser?.email || "";
+    const name =
+      profile.full_name || "Account";
+
+    const email =
+      profile.email ||
+      currentUser?.email ||
+      "";
 
     if (profileAvatar) {
-      profileAvatar.textContent = getInitial(name);
+      profileAvatar.textContent =
+        getInitial(name);
     }
 
     if (profileName) {
@@ -214,7 +339,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (menuAvatar) {
-      menuAvatar.textContent = getInitial(name);
+      menuAvatar.textContent =
+        getInitial(name);
     }
 
     if (menuName) {
@@ -227,22 +353,28 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   if (profileButton) {
-    profileButton.addEventListener("click", (event) => {
-      event.stopPropagation();
-      toggleProfileMenu();
-    });
+    profileButton.addEventListener(
+      "click",
+      (event) => {
+        event.stopPropagation();
+        toggleProfileMenu();
+      }
+    );
   }
 
-  document.addEventListener("click", (event) => {
-    if (
-      profileMenu &&
-      profileButton &&
-      !profileMenu.contains(event.target) &&
-      !profileButton.contains(event.target)
-    ) {
-      closeProfileMenu();
+  document.addEventListener(
+    "click",
+    (event) => {
+      if (
+        profileMenu &&
+        profileButton &&
+        !profileMenu.contains(event.target) &&
+        !profileButton.contains(event.target)
+      ) {
+        closeProfileMenu();
+      }
     }
-  });
+  );
 
   // -----------------------------------------
   // PROFILE LOADING
@@ -265,7 +397,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     currentUser = user;
 
-    const { data: profile, error: profileError } = await supabaseClient
+    const {
+      data: profile,
+      error: profileError
+    } = await supabaseClient
       .from("profiles")
       .select(
         "id, full_name, email, role, is_active, avatar_url"
@@ -281,41 +416,56 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!profile.is_active) {
       await supabaseClient.auth.signOut();
-      window.location.href = "login.html";
+
+      window.location.href =
+        "login.html";
+
       return false;
     }
 
     if (profile.role === "admin") {
-      window.location.href = "admin-dashboard.html";
+      window.location.href =
+        "admin-dashboard.html";
+
       return false;
     }
 
     if (profile.role === "seller") {
-      window.location.href = "seller-dashboard.html";
+      window.location.href =
+        "seller-dashboard.html";
+
       return false;
     }
 
     if (profile.role !== "buyer") {
-      throw new Error("Your account has an invalid account role.");
+      throw new Error(
+        "Your account has an invalid account role."
+      );
     }
 
     populateProfileMenu(profile);
 
     return true;
   }
-
   // -----------------------------------------
   // CART
   // -----------------------------------------
 
   async function getOrCreateCart() {
     if (!currentUser) {
-      throw new Error("Your session has expired. Please sign in again.");
+      throw new Error(
+        "Your session has expired. Please sign in again."
+      );
     }
 
-    const { data: existingCart, error: cartError } = await supabaseClient
+    const {
+      data: existingCart,
+      error: cartError
+    } = await supabaseClient
       .from("carts")
-      .select("id, buyer_id, created_at, updated_at")
+      .select(
+        "id, buyer_id, created_at, updated_at"
+      )
       .eq("buyer_id", currentUser.id)
       .maybeSingle();
 
@@ -327,12 +477,17 @@ document.addEventListener("DOMContentLoaded", () => {
       return existingCart;
     }
 
-    const { data: newCart, error: createError } = await supabaseClient
+    const {
+      data: newCart,
+      error: createError
+    } = await supabaseClient
       .from("carts")
       .insert({
         buyer_id: currentUser.id
       })
-      .select("id, buyer_id, created_at, updated_at")
+      .select(
+        "id, buyer_id, created_at, updated_at"
+      )
       .single();
 
     if (createError) {
@@ -343,9 +498,13 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   async function loadCartItems() {
-    currentCart = await getOrCreateCart();
+    currentCart =
+      await getOrCreateCart();
 
-    const { data, error } = await supabaseClient
+    const {
+      data,
+      error
+    } = await supabaseClient
       .from("cart_items")
       .select(`
         id,
@@ -372,7 +531,10 @@ document.addEventListener("DOMContentLoaded", () => {
           )
         )
       `)
-      .eq("cart_id", currentCart.id)
+      .eq(
+        "cart_id",
+        currentCart.id
+      )
       .order("created_at", {
         ascending: true
       });
@@ -381,13 +543,15 @@ document.addEventListener("DOMContentLoaded", () => {
       throw error;
     }
 
-    const validItems = (data || []).filter(
-      (item) =>
-        item.products &&
-        item.products.is_active === true
-    );
+    const validItems =
+      (data || []).filter(
+        (item) =>
+          item.products &&
+          item.products.is_active === true
+      );
 
-    currentCartItems = validItems;
+    currentCartItems =
+      validItems;
 
     return validItems;
   }
@@ -397,11 +561,19 @@ document.addEventListener("DOMContentLoaded", () => {
   // -----------------------------------------
 
   async function refreshCartProducts() {
-    if (!currentCart || !currentCart.id) {
-      throw new Error("Your shopping cart could not be found.");
+    if (
+      !currentCart ||
+      !currentCart.id
+    ) {
+      throw new Error(
+        "Your shopping cart could not be found."
+      );
     }
 
-    const { data, error } = await supabaseClient
+    const {
+      data,
+      error
+    } = await supabaseClient
       .from("cart_items")
       .select(`
         id,
@@ -426,23 +598,30 @@ document.addEventListener("DOMContentLoaded", () => {
           )
         )
       `)
-      .eq("cart_id", currentCart.id);
+      .eq(
+        "cart_id",
+        currentCart.id
+      );
 
     if (error) {
       throw error;
     }
 
-    currentCartItems = (data || []).filter(
-      (item) =>
-        item.products &&
-        item.products.is_active === true
-    );
+    currentCartItems =
+      (data || []).filter(
+        (item) =>
+          item.products &&
+          item.products.is_active === true
+      );
 
     return currentCartItems;
   }
 
   function validateCartStock(items) {
-    if (!items || items.length === 0) {
+    if (
+      !items ||
+      items.length === 0
+    ) {
       return {
         valid: false,
         message: "Your cart is empty."
@@ -450,7 +629,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     for (const item of items) {
-      const product = item.products;
+      const product =
+        item.products;
 
       if (!product) {
         return {
@@ -468,7 +648,9 @@ document.addEventListener("DOMContentLoaded", () => {
         };
       }
 
-      if (Number(product.stock) <= 0) {
+      if (
+        Number(product.stock) <= 0
+      ) {
         return {
           valid: false,
           message:
@@ -476,7 +658,10 @@ document.addEventListener("DOMContentLoaded", () => {
         };
       }
 
-      if (Number(item.quantity) > Number(product.stock)) {
+      if (
+        Number(item.quantity) >
+        Number(product.stock)
+      ) {
         return {
           valid: false,
           message:
@@ -491,87 +676,125 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // -----------------------------------------
-  // RENDER CHECKOUT ITEMS
+  // CHECKOUT DISPLAY
   // -----------------------------------------
 
   function calculateSubtotal(items) {
-    return (items || []).reduce((total, item) => {
-      const product = item.products;
+    return (items || []).reduce(
+      (total, item) => {
+        const product =
+          item.products;
 
-      if (!product) return total;
+        if (!product) {
+          return total;
+        }
 
-      const price = Number(product.price) || 0;
-      const quantity = Number(item.quantity) || 0;
+        const price =
+          Number(product.price) || 0;
 
-      return total + price * quantity;
-    }, 0);
+        const quantity =
+          Number(item.quantity) || 0;
+
+        return (
+          total +
+          price * quantity
+        );
+      },
+      0
+    );
   }
 
   function renderCheckoutItems(items) {
-    if (!checkoutItems) return;
+    if (!checkoutItems) {
+      return;
+    }
 
-    if (!items || items.length === 0) {
+    if (
+      !items ||
+      items.length === 0
+    ) {
       checkoutItems.innerHTML = "";
       return;
     }
 
-    checkoutItems.innerHTML = items
-      .map((item) => {
-        const product = item.products;
+    checkoutItems.innerHTML =
+      items
+        .map((item) => {
+          const product =
+            item.products;
 
-        const name = product?.name || "Product";
-        const image = product?.image_url || "";
-        const price = Number(product?.price) || 0;
-        const quantity = Number(item.quantity) || 0;
-        const itemTotal = price * quantity;
+          const name =
+            product?.name ||
+            "Product";
 
-        const imageHTML = image
-          ? `
-            <img
-              src="${escapeHTML(image)}"
-              alt="${escapeHTML(name)}"
-              class="checkout-item-image"
-              loading="lazy"
-            >
-          `
-          : `
-            <div class="checkout-item-placeholder">
-              SMH
-            </div>
+          const image =
+            product?.image_url ||
+            "";
+
+          const price =
+            Number(product?.price) ||
+            0;
+
+          const quantity =
+            Number(item.quantity) ||
+            0;
+
+          const itemTotal =
+            price * quantity;
+
+          const imageHTML = image
+            ? `
+              <img
+                src="${escapeHTML(image)}"
+                alt="${escapeHTML(name)}"
+                class="checkout-item-image"
+                loading="lazy"
+              >
+            `
+            : `
+              <div class="checkout-item-placeholder">
+                SMH
+              </div>
+            `;
+
+          return `
+            <article class="checkout-item">
+              ${imageHTML}
+
+              <div class="checkout-item-info">
+                <h3>${escapeHTML(name)}</h3>
+
+                <p>
+                  ${formatCurrency(price)}
+                  × ${quantity}
+                </p>
+              </div>
+
+              <strong class="checkout-item-total">
+                ${formatCurrency(itemTotal)}
+              </strong>
+            </article>
           `;
-
-        return `
-          <article class="checkout-item">
-            ${imageHTML}
-
-            <div class="checkout-item-info">
-              <h3>${escapeHTML(name)}</h3>
-              <p>
-                ${formatCurrency(price)}
-                × ${quantity}
-              </p>
-            </div>
-
-            <strong class="checkout-item-total">
-              ${formatCurrency(itemTotal)}
-            </strong>
-          </article>
-        `;
-      })
-      .join("");
+        })
+        .join("");
   }
 
   function renderTotals(items) {
-    currentSubtotal = calculateSubtotal(items);
+    currentSubtotal =
+      calculateSubtotal(items);
 
     if (subtotalElement) {
       subtotalElement.textContent =
-        formatCurrency(currentSubtotal);
+        formatCurrency(
+          currentSubtotal
+        );
     }
 
     if (totalElement) {
       totalElement.textContent =
-        formatCurrency(currentSubtotal);
+        formatCurrency(
+          currentSubtotal
+        );
     }
   }
 
@@ -585,14 +808,16 @@ document.addEventListener("DOMContentLoaded", () => {
       !shippingName.value.trim() &&
       currentProfile?.full_name
     ) {
-      shippingName.value = currentProfile.full_name;
+      shippingName.value =
+        currentProfile.full_name;
     }
 
     if (
       shippingCountry &&
       !shippingCountry.value.trim()
     ) {
-      shippingCountry.value = "Nigeria";
+      shippingCountry.value =
+        "Nigeria";
     }
   }
 
@@ -601,21 +826,27 @@ document.addEventListener("DOMContentLoaded", () => {
   // -----------------------------------------
 
   function generateOrderNumber() {
-    const now = new Date();
+    const now =
+      new Date();
 
-    const year = now.getFullYear();
-    const month = String(
-      now.getMonth() + 1
-    ).padStart(2, "0");
+    const year =
+      now.getFullYear();
 
-    const day = String(
-      now.getDate()
-    ).padStart(2, "0");
+    const month =
+      String(
+        now.getMonth() + 1
+      ).padStart(2, "0");
 
-    const randomPart = Math.random()
-      .toString(36)
-      .substring(2, 8)
-      .toUpperCase();
+    const day =
+      String(
+        now.getDate()
+      ).padStart(2, "0");
+
+    const randomPart =
+      Math.random()
+        .toString(36)
+        .substring(2, 8)
+        .toUpperCase();
 
     return `SMH-${year}${month}${day}-${randomPart}`;
   }
@@ -625,12 +856,29 @@ document.addEventListener("DOMContentLoaded", () => {
   // -----------------------------------------
 
   function validateShippingForm() {
-    const name = shippingName?.value.trim() || "";
-    const phone = shippingPhone?.value.trim() || "";
-    const address = shippingAddress?.value.trim() || "";
-    const city = shippingCity?.value.trim() || "";
-    const state = shippingState?.value.trim() || "";
-    const country = shippingCountry?.value.trim() || "";
+    const name =
+      shippingName?.value.trim() ||
+      "";
+
+    const phone =
+      shippingPhone?.value.trim() ||
+      "";
+
+    const address =
+      shippingAddress?.value.trim() ||
+      "";
+
+    const city =
+      shippingCity?.value.trim() ||
+      "";
+
+    const state =
+      shippingState?.value.trim() ||
+      "";
+
+    const country =
+      shippingCountry?.value.trim() ||
+      "";
 
     if (!name) {
       return "Please enter the recipient's full name.";
@@ -670,7 +918,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     return null;
   }
-
   // -----------------------------------------
   // CREATE ORDER
   // -----------------------------------------
@@ -682,14 +929,17 @@ document.addEventListener("DOMContentLoaded", () => {
       );
     }
 
-    // Re-fetch cart immediately before placing order.
-    const freshItems = await refreshCartProducts();
+    // Refresh cart immediately before ordering.
+    const freshItems =
+      await refreshCartProducts();
 
     const stockValidation =
       validateCartStock(freshItems);
 
     if (!stockValidation.valid) {
-      throw new Error(stockValidation.message);
+      throw new Error(
+        stockValidation.message
+      );
     }
 
     const subtotal =
@@ -706,28 +956,54 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const orderData = {
       buyer_id: currentUser.id,
-      order_number: orderNumber,
-      status: "pending",
-      payment_method: "cash_on_delivery",
-      payment_status: "unpaid",
-      subtotal: subtotal,
-      delivery_fee: 0,
-      total_amount: subtotal,
+
+      order_number:
+        orderNumber,
+
+      status:
+        "pending",
+
+      payment_method:
+        "cash_on_delivery",
+
+      payment_status:
+        "unpaid",
+
+      subtotal:
+        subtotal,
+
+      delivery_fee:
+        0,
+
+      total_amount:
+        subtotal,
+
       shipping_name:
         shippingName.value.trim(),
+
       phone:
         shippingPhone.value.trim(),
+
       address:
         shippingAddress.value.trim(),
+
       city:
         shippingCity.value.trim(),
+
       state:
         shippingState.value.trim(),
+
       country:
         shippingCountry.value.trim(),
+
       notes:
-        orderNotes?.value.trim() || null
+        orderNotes?.value.trim() ||
+        null
     };
+
+    // -----------------------------------------
+    // CREATE ORDER
+    // -----------------------------------------
 
     const {
       data: order,
@@ -751,26 +1027,48 @@ document.addEventListener("DOMContentLoaded", () => {
       throw orderError;
     }
 
-    // Build order items.
-    const orderItems = freshItems.map((item) => {
-      const product = item.products;
+    // -----------------------------------------
+    // CREATE ORDER ITEMS
+    // -----------------------------------------
 
-      const price = Number(product.price) || 0;
-      const quantity =
-        Number(item.quantity) || 0;
+    const orderItems =
+      freshItems.map((item) => {
+        const product =
+          item.products;
 
-      return {
-        order_id: order.id,
-        product_id: product.id,
-        seller_id: product.seller_id,
-        product_name: product.name,
-        product_price: price,
-        quantity: quantity,
-        item_total: price * quantity
-      };
-    });
+        const price =
+          Number(product.price) || 0;
 
-    if (orderItems.length === 0) {
+        const quantity =
+          Number(item.quantity) || 0;
+
+        return {
+          order_id:
+            order.id,
+
+          product_id:
+            product.id,
+
+          seller_id:
+            product.seller_id,
+
+          product_name:
+            product.name,
+
+          product_price:
+            price,
+
+          quantity:
+            quantity,
+
+          item_total:
+            price * quantity
+        };
+      });
+
+    if (
+      orderItems.length === 0
+    ) {
       throw new Error(
         "No products were available to create this order."
       );
@@ -789,18 +1087,24 @@ document.addEventListener("DOMContentLoaded", () => {
       );
 
       throw new Error(
-        "The order was created, but its items could not be saved. Please contact SMH Collection support with your order number: " +
+        "The order was created, but its items could not be saved. Please contact SMH Collection support with order number: " +
           order.order_number
       );
     }
 
-    // Clear cart after successful order creation.
+    // -----------------------------------------
+    // CLEAR CART
+    // -----------------------------------------
+
     const {
       error: clearCartError
     } = await supabaseClient
       .from("cart_items")
       .delete()
-      .eq("cart_id", currentCart.id);
+      .eq(
+        "cart_id",
+        currentCart.id
+      );
 
     if (clearCartError) {
       console.warn(
@@ -818,4 +1122,227 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (checkoutForm) {
     checkoutForm.addEventListener(
-      "su
+      "submit",
+      async (event) => {
+        event.preventDefault();
+
+        showMessage("");
+
+        const validationError =
+          validateShippingForm();
+
+        if (validationError) {
+          showMessage(
+            validationError,
+            "error"
+          );
+
+          return;
+        }
+
+        setButtonLoading(true);
+
+        try {
+          const order =
+            await createOrder();
+
+          showMessage(
+            `Order ${order.order_number} placed successfully. Redirecting...`,
+            "success"
+          );
+
+          checkoutForm.reset();
+
+          setTimeout(() => {
+            window.location.href =
+              `order-details.html?id=${encodeURIComponent(
+                order.id
+              )}`;
+          }, 900);
+
+        } catch (error) {
+          console.error(
+            "Checkout error:",
+            error
+          );
+
+          showMessage(
+            error.message ||
+              "Unable to place your order. Please try again.",
+            "error"
+          );
+
+        } finally {
+          setButtonLoading(false);
+        }
+      }
+    );
+  }
+
+  // -----------------------------------------
+  // PROFILE MENU ACTIONS
+  // -----------------------------------------
+
+  if (myOrdersButton) {
+    myOrdersButton.addEventListener(
+      "click",
+      () => {
+        window.location.href =
+          "orders.html";
+      }
+    );
+  }
+
+  if (wishlistButton) {
+    wishlistButton.addEventListener(
+      "click",
+      () => {
+        window.location.href =
+          "wishlist.html";
+      }
+    );
+  }
+
+  if (settingsButton) {
+    settingsButton.addEventListener(
+      "click",
+      () => {
+        window.location.href =
+          "account-settings.html";
+      }
+    );
+  }
+
+  if (logoutButton) {
+    logoutButton.addEventListener(
+      "click",
+      async () => {
+        try {
+          logoutButton.disabled =
+            true;
+
+          logoutButton.textContent =
+            "Signing out...";
+
+          const {
+            error
+          } =
+            await supabaseClient.auth.signOut();
+
+          if (error) {
+            throw error;
+          }
+
+          window.location.href =
+            "login.html";
+
+        } catch (error) {
+          console.error(
+            "Logout error:",
+            error
+          );
+
+          logoutButton.disabled =
+            false;
+
+          logoutButton.innerHTML =
+            "<span>↪</span> Sign Out";
+
+          showMessage(
+            "Unable to sign out. Please try again.",
+            "error"
+          );
+        }
+      }
+    );
+  }
+
+  // -----------------------------------------
+  // RETRY
+  // -----------------------------------------
+
+  if (retryButton) {
+    retryButton.addEventListener(
+      "click",
+      () => {
+        initializeCheckout();
+      }
+    );
+  }
+
+  // -----------------------------------------
+  // INITIALIZE CHECKOUT
+  // -----------------------------------------
+
+  async function initializeCheckout() {
+    showLoading();
+    showMessage("");
+
+    try {
+      const authenticated =
+        await loadProfile();
+
+      if (!authenticated) {
+        return;
+      }
+
+      const items =
+        await loadCartItems();
+
+      if (
+        !items ||
+        items.length === 0
+      ) {
+        showEmptyCheckout();
+        return;
+      }
+
+      const stockValidation =
+        validateCartStock(items);
+
+      if (!stockValidation.valid) {
+        showError(
+          stockValidation.message
+        );
+
+        return;
+      }
+
+      renderCheckoutItems(items);
+
+      renderTotals(items);
+
+      prefillShippingInformation();
+
+      showCheckout();
+
+    } catch (error) {
+      console.error(
+        "Checkout initialization error:",
+        error
+      );
+
+      if (
+        error.message &&
+        error.message.includes("JWT")
+      ) {
+        window.location.href =
+          "login.html";
+
+        return;
+      }
+
+      showError(
+        error.message ||
+          "Unable to load checkout. Please try again."
+      );
+    }
+  }
+
+  // -----------------------------------------
+  // START
+  // -----------------------------------------
+
+  initializeCheckout();
+
+});
