@@ -1,11 +1,16 @@
 // =========================================
 // SMH COLLECTION
 // REAL BUYER ORDER HISTORY
+// PART 1 OF 3
 // =========================================
 
 document.addEventListener("DOMContentLoaded", () => {
 
   console.log("SMH Collection Orders loaded.");
+
+  // =========================================
+  // BASIC ELEMENTS
+  // =========================================
 
   const currentYear =
     document.getElementById("currentYear");
@@ -17,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   // =========================================
-  // ELEMENTS
+  // ORDER ELEMENTS
   // =========================================
 
   const ordersList =
@@ -92,11 +97,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let currentUser = null;
 
+  let currentProfile = null;
+
   let allOrders = [];
 
 
   // =========================================
-  // CHECK SUPABASE
+  // SUPABASE CHECK
   // =========================================
 
   if (
@@ -122,7 +129,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function escapeHTML(value) {
 
-    if (value === null || value === undefined) {
+    if (
+      value === null ||
+      value === undefined
+    ) {
       return "";
     }
 
@@ -160,7 +170,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const date =
       new Date(dateValue);
 
-    if (Number.isNaN(date.getTime())) {
+    if (
+      Number.isNaN(
+        date.getTime()
+      )
+    ) {
       return "Date unavailable";
     }
 
@@ -184,10 +198,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const parts =
-      name
+      String(name)
         .trim()
         .split(/\s+/)
         .filter(Boolean);
+
+    if (parts.length === 0) {
+      return "U";
+    }
 
     if (parts.length === 1) {
       return parts[0]
@@ -208,10 +226,10 @@ document.addEventListener("DOMContentLoaded", () => {
       return "Unknown";
     }
 
-    return status
-      .charAt(0)
-      .toUpperCase() +
-      status.slice(1);
+    return (
+      status.charAt(0).toUpperCase() +
+      status.slice(1)
+    );
   }
 
 
@@ -318,118 +336,229 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   // =========================================
-  // PROFILE
+  // PROFILE MENU
   // =========================================
 
-  async function loadProfile(user) {
+  function openProfileMenu() {
 
-    try {
+    if (!profileMenu) {
+      return;
+    }
 
-      const {
-        data: profile,
-        error
-      } = await supabaseClient
-        .from("profiles")
-        .select(
-          "id, full_name, email, role, is_active, avatar_url"
-        )
-        .eq("id", user.id)
-        .single();
+    profileMenu.classList.add("open");
 
-      if (error) {
-        throw error;
-      }
-
-      if (!profile) {
-        throw new Error(
-          "Your account profile could not be found."
-        );
-      }
-
-      if (
-        profile.role !== "buyer"
-      ) {
-
-        if (
-          profile.role === "admin"
-        ) {
-          window.location.href =
-            "admin-dashboard.html";
-
-          return;
-        }
-
-        if (
-          profile.role === "seller"
-        ) {
-          window.location.href =
-            "seller-dashboard.html";
-
-          return;
-        }
-
-        throw new Error(
-          "This page is only available to buyer accounts."
-        );
-      }
-
-      if (!profile.is_active) {
-
-        await supabaseClient.auth.signOut();
-
-        window.location.href =
-          "login.html";
-
-        return;
-      }
-
-      const name =
-        profile.full_name ||
-        user.email ||
-        "Account";
-
-      const initials =
-        getInitials(name);
-
-      if (profileName) {
-        profileName.textContent =
-          name;
-      }
-
-      if (profileAvatar) {
-        profileAvatar.textContent =
-          initials;
-      }
-
-      if (menuName) {
-        menuName.textContent =
-          name;
-      }
-
-      if (menuEmail) {
-        menuEmail.textContent =
-          profile.email ||
-          user.email ||
-          "";
-      }
-
-      if (menuAvatar) {
-        menuAvatar.textContent =
-          initials;
-      }
-
-    } catch (error) {
-
-      console.error(
-        "Profile loading error:",
-        error
+    if (profileButton) {
+      profileButton.setAttribute(
+        "aria-expanded",
+        "true"
       );
+    }
 
-      throw error;
+    profileMenu.setAttribute(
+      "aria-hidden",
+      "false"
+    );
+  }
+
+
+  function closeProfileMenu() {
+
+    if (!profileMenu) {
+      return;
+    }
+
+    profileMenu.classList.remove("open");
+
+    if (profileButton) {
+      profileButton.setAttribute(
+        "aria-expanded",
+        "false"
+      );
+    }
+
+    profileMenu.setAttribute(
+      "aria-hidden",
+      "true"
+    );
+  }
+
+
+  function toggleProfileMenu() {
+
+    if (!profileMenu) {
+      return;
+    }
+
+    const isOpen =
+      profileMenu.classList.contains("open");
+
+    if (isOpen) {
+      closeProfileMenu();
+    } else {
+      openProfileMenu();
     }
   }
 
 
+  // =========================================
+  // PROFILE BUTTON EVENTS
+  // =========================================
+
+  if (profileButton) {
+
+    profileButton.addEventListener(
+      "click",
+      (event) => {
+
+        event.stopPropagation();
+
+        toggleProfileMenu();
+      }
+    );
+  }
+
+
+  document.addEventListener(
+    "click",
+    (event) => {
+
+      if (
+        profileMenu &&
+        profileButton &&
+        !profileMenu.contains(
+          event.target
+        ) &&
+        !profileButton.contains(
+          event.target
+        )
+      ) {
+
+        closeProfileMenu();
+      }
+    }
+  );
+
+
+  // =========================================
+  // LOAD PROFILE
+  // =========================================
+
+  async function loadProfile(user) {
+
+    const {
+      data: profile,
+      error
+    } = await supabaseClient
+      .from("profiles")
+      .select(
+        "id, full_name, email, role, is_active, avatar_url"
+      )
+      .eq("id", user.id)
+      .single();
+
+    if (error) {
+      throw error;
+    }
+
+    if (!profile) {
+      throw new Error(
+        "Your account profile could not be found."
+      );
+    }
+
+    currentProfile = profile;
+
+    // ---------------------------------------
+    // ACCOUNT STATUS
+    // ---------------------------------------
+
+    if (!profile.is_active) {
+
+      await supabaseClient.auth.signOut();
+
+      window.location.href =
+        "login.html";
+
+      return false;
+    }
+
+
+    // ---------------------------------------
+    // ROLE ROUTING
+    // ---------------------------------------
+
+    if (profile.role === "admin") {
+
+      window.location.href =
+        "admin-dashboard.html";
+
+      return false;
+    }
+
+
+    if (profile.role === "seller") {
+
+      window.location.href =
+        "seller-dashboard.html";
+
+      return false;
+    }
+
+
+    if (profile.role !== "buyer") {
+
+      throw new Error(
+        "This page is only available to buyer accounts."
+      );
+    }
+
+
+    // ---------------------------------------
+    // PROFILE DISPLAY
+    // ---------------------------------------
+
+    const name =
+      profile.full_name ||
+      user.email ||
+      "Account";
+
+    const initials =
+      getInitials(name);
+
+    if (profileName) {
+      profileName.textContent =
+        name;
+    }
+
+    if (profileAvatar) {
+      profileAvatar.textContent =
+        initials;
+    }
+
+    if (menuName) {
+      menuName.textContent =
+        name;
+    }
+
+    if (menuAvatar) {
+      menuAvatar.textContent =
+        initials;
+    }
+
+    if (menuEmail) {
+      menuEmail.textContent =
+        profile.email ||
+        user.email ||
+        "";
+    }
+
+    return true;
+  }
+
+
+  // =========================================
+  // END OF PART 1
+  // =========================================
   // =========================================
   // LOAD ORDERS
   // =========================================
@@ -513,7 +642,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   // =========================================
-  // FILTER
+  // FILTER ORDERS
   // =========================================
 
   function getFilteredOrders() {
@@ -531,7 +660,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     return allOrders.filter(
       (order) =>
-        order.status === selectedStatus
+        order.status ===
+        selectedStatus
     );
   }
 
@@ -542,15 +672,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function renderOrders(orders) {
 
-    if (!orders || orders.length === 0) {
+    if (
+      !orders ||
+      orders.length === 0
+    ) {
 
       if (
         allOrders.length === 0
       ) {
+
         showEmpty();
+
       } else {
 
         if (ordersList) {
+
           ordersList.hidden = false;
 
           ordersList.innerHTML = `
@@ -655,47 +791,59 @@ document.addEventListener("DOMContentLoaded", () => {
       );
 
 
+    // ---------------------------------------
+    // ORDER ITEMS
+    // ---------------------------------------
+
     const itemHTML =
       visibleItems.length > 0
 
         ? visibleItems
             .map(
-              (item) => `
-                <div class="order-item">
+              (item) => {
 
-                  <div class="order-item-image">
+                const quantity =
+                  Number(
+                    item.quantity
+                  ) || 0;
 
-                    <div class="no-image">
-                      ◇
+                const price =
+                  Number(
+                    item.product_price
+                  ) || 0;
+
+                return `
+                  <div class="order-item">
+
+                    <div class="order-item-image">
+
+                      <div class="no-image">
+                        ◇
+                      </div>
+
+                    </div>
+
+                    <div class="order-item-info">
+
+                      <div class="order-item-name">
+                        ${escapeHTML(
+                          item.product_name ||
+                          "Product"
+                        )}
+                      </div>
+
+                      <div class="order-item-meta">
+
+                        ${quantity} ×
+                        ${formatPrice(price)}
+
+                      </div>
+
                     </div>
 
                   </div>
-
-                  <div class="order-item-info">
-
-                    <div class="order-item-name">
-                      ${escapeHTML(
-                        item.product_name ||
-                        "Product"
-                      )}
-                    </div>
-
-                    <div class="order-item-meta">
-
-                      ${Number(
-                        item.quantity || 0
-                      )} ×
-
-                      ${formatPrice(
-                        item.product_price
-                      )}
-
-                    </div>
-
-                  </div>
-
-                </div>
-              `
+                `;
+              }
             )
             .join("")
 
@@ -714,34 +862,42 @@ document.addEventListener("DOMContentLoaded", () => {
         `;
 
 
+    // ---------------------------------------
+    // EXTRA ITEMS
+    // ---------------------------------------
+
     const extraHTML =
       extraItemCount > 0
 
         ? `
           <div class="order-item-meta">
+
             + ${extraItemCount}
             more ${
               extraItemCount === 1
                 ? "item"
                 : "items"
             }
+
           </div>
         `
 
         : "";
 
 
+    // ---------------------------------------
+    // TOTALS
+    // ---------------------------------------
+
     const subtotal =
       Number(
         order.subtotal
       ) || 0;
 
-
     const deliveryFee =
       Number(
         order.delivery_fee
       ) || 0;
-
 
     const total =
       Number(
@@ -751,10 +907,18 @@ document.addEventListener("DOMContentLoaded", () => {
       deliveryFee;
 
 
+    // ---------------------------------------
+    // STATUS
+    // ---------------------------------------
+
     const status =
       order.status ||
       "pending";
 
+
+    // ---------------------------------------
+    // SHIPPING LOCATION
+    // ---------------------------------------
 
     const shippingLocation =
       [
@@ -765,6 +929,10 @@ document.addEventListener("DOMContentLoaded", () => {
         .filter(Boolean)
         .join(", ");
 
+
+    // ---------------------------------------
+    // ORDER CARD
+    // ---------------------------------------
 
     return `
       <article
@@ -917,45 +1085,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   // =========================================
-  // PROFILE MENU
+  // STATUS FILTER EVENT
   // =========================================
 
-  if (profileButton) {
+  if (statusFilter) {
 
-    profileButton.addEventListener(
-      "click",
-      (event) => {
+    statusFilter.addEventListener(
+      "change",
+      () => {
 
-        event.stopPropagation();
-
-        if (profileMenu) {
-          profileMenu.classList.toggle(
-            "open"
-          );
-        }
+        renderOrders(
+          getFilteredOrders()
+        );
       }
     );
   }
 
 
-  document.addEventListener(
-    "click",
-    (event) => {
-
-      if (
-        profileMenu &&
-        !profileMenu.contains(event.target) &&
-        !profileButton?.contains(event.target)
-      ) {
-
-        profileMenu.classList.remove(
-          "open"
-        );
-      }
-    }
-  );
-
-
+  // =========================================
+  // END OF PART 2
+  // =========================================
   // =========================================
   // NAVIGATION
   // =========================================
@@ -965,6 +1114,7 @@ document.addEventListener("DOMContentLoaded", () => {
     backToShop.addEventListener(
       "click",
       () => {
+
         window.location.href =
           "buyer-dashboard.html";
       }
@@ -977,6 +1127,7 @@ document.addEventListener("DOMContentLoaded", () => {
     startShoppingButton.addEventListener(
       "click",
       () => {
+
         window.location.href =
           "buyer-dashboard.html";
       }
@@ -984,11 +1135,17 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
 
+  // =========================================
+  // PROFILE MENU ACTIONS
+  // =========================================
+
   if (myOrdersButton) {
 
     myOrdersButton.addEventListener(
       "click",
       () => {
+
+        closeProfileMenu();
 
         window.location.href =
           "orders.html";
@@ -1003,6 +1160,8 @@ document.addEventListener("DOMContentLoaded", () => {
       "click",
       () => {
 
+        closeProfileMenu();
+
         window.location.href =
           "wishlist.html";
       }
@@ -1015,6 +1174,8 @@ document.addEventListener("DOMContentLoaded", () => {
     settingsButton.addEventListener(
       "click",
       () => {
+
+        closeProfileMenu();
 
         window.location.href =
           "account-settings.html";
@@ -1033,7 +1194,8 @@ document.addEventListener("DOMContentLoaded", () => {
       "click",
       async () => {
 
-        logoutButton.disabled = true;
+        logoutButton.disabled =
+          true;
 
         logoutButton.innerHTML =
           "<span>↪</span> Signing out...";
@@ -1060,7 +1222,8 @@ document.addEventListener("DOMContentLoaded", () => {
             error
           );
 
-          logoutButton.disabled = false;
+          logoutButton.disabled =
+            false;
 
           logoutButton.innerHTML =
             "<span>↪</span> Sign Out";
@@ -1069,24 +1232,6 @@ document.addEventListener("DOMContentLoaded", () => {
             "Unable to sign out. Please try again."
           );
         }
-      }
-    );
-  }
-
-
-  // =========================================
-  // STATUS FILTER
-  // =========================================
-
-  if (statusFilter) {
-
-    statusFilter.addEventListener(
-      "change",
-      () => {
-
-        renderOrders(
-          getFilteredOrders()
-        );
       }
     );
   }
@@ -1115,16 +1260,12 @@ document.addEventListener("DOMContentLoaded", () => {
           button.dataset.orderId;
 
         if (!orderId) {
+          console.error(
+            "Order ID is missing."
+          );
+
           return;
         }
-
-        /*
-          The detailed order page will be
-          connected later.
-
-          For now we keep the real order ID
-          ready for that system.
-        */
 
         window.location.href =
           `order-details.html?id=${encodeURIComponent(
@@ -1143,14 +1284,119 @@ document.addEventListener("DOMContentLoaded", () => {
 
     retryButton.addEventListener(
       "click",
-      () => {
+      async () => {
 
-        loadOrders();
+        await loadOrders();
       }
     );
   }
 
 
   // =========================================
-  // INITIALIZE
-  
+  // INITIALIZE ORDERS PAGE
+  // =========================================
+
+  async function initializeOrders() {
+
+    showLoading();
+
+    try {
+
+      const {
+        data: {
+          user
+        },
+        error
+      } =
+        await supabaseClient.auth
+          .getUser();
+
+      if (error) {
+        throw error;
+      }
+
+
+      // -------------------------------------
+      // NOT LOGGED IN
+      // -------------------------------------
+
+      if (!user) {
+
+        window.location.href =
+          "login.html";
+
+        return;
+      }
+
+
+      // -------------------------------------
+      // SAVE CURRENT USER
+      // -------------------------------------
+
+      currentUser =
+        user;
+
+
+      // -------------------------------------
+      // LOAD PROFILE
+      // -------------------------------------
+
+      const profileLoaded =
+        await loadProfile(user);
+
+      if (!profileLoaded) {
+        return;
+      }
+
+
+      // -------------------------------------
+      // LOAD ORDERS
+      // -------------------------------------
+
+      await loadOrders();
+
+    } catch (error) {
+
+      console.error(
+        "Orders initialization error:",
+        error
+      );
+
+      showError(
+        error.message ||
+        "Unable to load your orders. Please try again."
+      );
+    }
+  }
+
+
+  // =========================================
+  // AUTH STATE LISTENER
+  // =========================================
+
+  supabaseClient.auth.onAuthStateChange(
+    (event, session) => {
+
+      console.log(
+        "Orders auth event:",
+        event
+      );
+
+      if (
+        event === "SIGNED_OUT"
+      ) {
+
+        window.location.href =
+          "login.html";
+      }
+    }
+  );
+
+
+  // =========================================
+  // START
+  // =========================================
+
+  initializeOrders();
+
+});
