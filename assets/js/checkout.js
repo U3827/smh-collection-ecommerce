@@ -1,7 +1,7 @@
 // =========================================
 // SMH COLLECTION
 // REAL CHECKOUT + CASH ON DELIVERY
-// PART 1 OF 3
+// PART 1 OF 4
 // =========================================
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -11,10 +11,12 @@ document.addEventListener("DOMContentLoaded", () => {
   // BASIC ELEMENTS
   // -----------------------------------------
 
-  const currentYear = document.getElementById("currentYear");
+  const currentYear =
+    document.getElementById("currentYear");
 
   if (currentYear) {
-    currentYear.textContent = new Date().getFullYear();
+    currentYear.textContent =
+      new Date().getFullYear();
   }
 
   const loadingState =
@@ -30,7 +32,9 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("checkoutError");
 
   const checkoutErrorMessage =
-    document.getElementById("checkoutErrorMessage");
+    document.getElementById(
+      "checkoutErrorMessage"
+    );
 
   const retryButton =
     document.getElementById("retryButton");
@@ -39,10 +43,14 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("checkoutForm");
 
   const placeOrderButton =
-    document.getElementById("placeOrderButton");
+    document.getElementById(
+      "placeOrderButton"
+    );
 
   const checkoutMessage =
-    document.getElementById("checkoutMessage");
+    document.getElementById(
+      "checkoutMessage"
+    );
 
   const checkoutItems =
     document.getElementById("checkoutItems");
@@ -51,28 +59,44 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("subtotal");
 
   const totalElement =
-    document.getElementById("totalAmount");
+    document.getElementById(
+      "totalAmount"
+    );
 
   const shippingName =
-    document.getElementById("shippingName");
+    document.getElementById(
+      "shippingName"
+    );
 
   const shippingPhone =
-    document.getElementById("shippingPhone");
+    document.getElementById(
+      "shippingPhone"
+    );
 
   const shippingAddress =
-    document.getElementById("shippingAddress");
+    document.getElementById(
+      "shippingAddress"
+    );
 
   const shippingCity =
-    document.getElementById("shippingCity");
+    document.getElementById(
+      "shippingCity"
+    );
 
   const shippingState =
-    document.getElementById("shippingState");
+    document.getElementById(
+      "shippingState"
+    );
 
   const shippingCountry =
-    document.getElementById("shippingCountry");
+    document.getElementById(
+      "shippingCountry"
+    );
 
   const orderNotes =
-    document.getElementById("orderNotes");
+    document.getElementById(
+      "orderNotes"
+    );
 
   // -----------------------------------------
   // STATE
@@ -104,14 +128,24 @@ document.addEventListener("DOMContentLoaded", () => {
     }).format(Number(amount) || 0);
   }
 
-  function showMessage(message, type = "error") {
-    if (!checkoutMessage) return;
+  function showMessage(
+    message,
+    type = "error"
+  ) {
+    if (!checkoutMessage) {
+      return;
+    }
 
-    checkoutMessage.textContent = message;
-    checkoutMessage.className = "checkout-message";
+    checkoutMessage.textContent =
+      message;
+
+    checkoutMessage.className =
+      "checkout-message";
 
     if (message) {
-      checkoutMessage.classList.add(type);
+      checkoutMessage.classList.add(
+        type
+      );
     }
   }
 
@@ -188,26 +222,36 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (checkoutErrorMessage) {
       checkoutErrorMessage.textContent =
-        message || "Unable to load checkout.";
+        message ||
+        "Unable to load checkout.";
     }
   }
 
   function setButtonLoading(loading) {
-    if (!placeOrderButton) return;
+    if (!placeOrderButton) {
+      return;
+    }
 
-    placeOrderButton.disabled = loading;
+    placeOrderButton.disabled =
+      loading;
 
-    placeOrderButton.textContent = loading
-      ? "Placing Order..."
-      : "Place Order";
+    placeOrderButton.textContent =
+      loading
+        ? "Placing Order..."
+        : "Place Order";
   }
 
   // -----------------------------------------
   // SUPABASE CHECK
   // -----------------------------------------
 
-  if (typeof window.supabase === "undefined") {
-    console.error("Supabase library is missing.");
+  if (
+    typeof window.supabase ===
+    "undefined"
+  ) {
+    console.error(
+      "Supabase library is missing."
+    );
 
     showError(
       "Checkout service could not load. Please refresh the page."
@@ -216,8 +260,13 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  if (typeof supabaseClient === "undefined") {
-    console.error("supabaseClient is missing.");
+  if (
+    typeof supabaseClient ===
+    "undefined"
+  ) {
+    console.error(
+      "supabaseClient is missing."
+    );
 
     showError(
       "Supabase connection could not be initialized."
@@ -231,50 +280,80 @@ document.addEventListener("DOMContentLoaded", () => {
   // -----------------------------------------
 
   const profileButton =
-    document.getElementById("profileButton");
+    document.getElementById(
+      "profileButton"
+    );
 
   const profileMenu =
-    document.getElementById("profileMenu");
+    document.getElementById(
+      "profileMenu"
+    );
 
   const profileAvatar =
-    document.getElementById("profileAvatar");
+    document.getElementById(
+      "profileAvatar"
+    );
 
   const profileName =
-    document.getElementById("profileName");
+    document.getElementById(
+      "profileName"
+    );
 
   const menuAvatar =
-    document.getElementById("menuAvatar");
+    document.getElementById(
+      "menuAvatar"
+    );
 
   const menuName =
-    document.getElementById("menuName");
+    document.getElementById(
+      "menuName"
+    );
 
   const menuEmail =
-    document.getElementById("menuEmail");
+    document.getElementById(
+      "menuEmail"
+    );
 
   const myOrdersButton =
-    document.getElementById("myOrdersButton");
+    document.getElementById(
+      "myOrdersButton"
+    );
 
   const wishlistButton =
-    document.getElementById("wishlistButton");
+    document.getElementById(
+      "wishlistButton"
+    );
 
   const settingsButton =
-    document.getElementById("settingsButton");
+    document.getElementById(
+      "settingsButton"
+    );
 
   const logoutButton =
-    document.getElementById("logoutButton");
+    document.getElementById(
+      "logoutButton"
+    );
 
   function getInitial(name) {
-    const cleanName = String(name || "").trim();
+    const cleanName =
+      String(name || "").trim();
 
     if (!cleanName) {
       return "U";
     }
 
-    return cleanName.charAt(0).toUpperCase();
+    return cleanName
+      .charAt(0)
+      .toUpperCase();
   }
 
   function openProfileMenu() {
-    if (!profileMenu || !profileButton) return;
+    if (
+      !profileMenu ||
+      !profileButton
+    ) {
+      return;
+    }
 
     profileMenu.classList.add("open");
 
@@ -290,9 +369,16 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function closeProfileMenu() {
-    if (!profileMenu || !profileButton) return;
+    if (
+      !profileMenu ||
+      !profileButton
+    ) {
+      return;
+    }
 
-    profileMenu.classList.remove("open");
+    profileMenu.classList.remove(
+      "open"
+    );
 
     profileButton.setAttribute(
       "aria-expanded",
@@ -306,10 +392,14 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function toggleProfileMenu() {
-    if (!profileMenu) return;
+    if (!profileMenu) {
+      return;
+    }
 
     const isOpen =
-      profileMenu.classList.contains("open");
+      profileMenu.classList.contains(
+        "open"
+      );
 
     if (isOpen) {
       closeProfileMenu();
@@ -318,11 +408,16 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  function populateProfileMenu(profile) {
-    if (!profile) return;
+  function populateProfileMenu(
+    profile
+  ) {
+    if (!profile) {
+      return;
+    }
 
     const name =
-      profile.full_name || "Account";
+      profile.full_name ||
+      "Account";
 
     const email =
       profile.email ||
@@ -335,7 +430,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (profileName) {
-      profileName.textContent = name;
+      profileName.textContent =
+        name;
     }
 
     if (menuAvatar) {
@@ -344,11 +440,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (menuName) {
-      menuName.textContent = name;
+      menuName.textContent =
+        name;
     }
 
     if (menuEmail) {
-      menuEmail.textContent = email;
+      menuEmail.textContent =
+        email;
     }
   }
 
@@ -368,981 +466,1027 @@ document.addEventListener("DOMContentLoaded", () => {
       if (
         profileMenu &&
         profileButton &&
-        !profileMenu.contains(event.target) &&
-        !profileButton.contains(event.target)
+        !profileMenu.contains(
+          event.target
+        ) &&
+        !profileButton.contains(
+          event.target
+        )
       ) {
         closeProfileMenu();
       }
     }
   );
+// -----------------------------------------
+// PROFILE LOADING
+// -----------------------------------------
 
-  // -----------------------------------------
-  // PROFILE LOADING
-  // -----------------------------------------
+async function loadProfile() {
+  const {
+    data: { user },
+    error: userError
+  } = await supabaseClient.auth.getUser();
 
-  async function loadProfile() {
-    const {
-      data: { user },
-      error: userError
-    } = await supabaseClient.auth.getUser();
-
-    if (userError) {
-      throw userError;
-    }
-
-    if (!user) {
-      window.location.href = "login.html";
-      return false;
-    }
-
-    currentUser = user;
-
-    const {
-      data: profile,
-      error: profileError
-    } = await supabaseClient
-      .from("profiles")
-      .select(
-        "id, full_name, email, role, is_active, avatar_url"
-      )
-      .eq("id", user.id)
-      .single();
-
-    if (profileError) {
-      throw profileError;
-    }
-
-    currentProfile = profile;
-
-    if (!profile.is_active) {
-      await supabaseClient.auth.signOut();
-
-      window.location.href =
-        "login.html";
-
-      return false;
-    }
-
-    if (profile.role === "admin") {
-      window.location.href =
-        "admin-dashboard.html";
-
-      return false;
-    }
-
-    if (profile.role === "seller") {
-      window.location.href =
-        "seller-dashboard.html";
-
-      return false;
-    }
-
-    if (profile.role !== "buyer") {
-      throw new Error(
-        "Your account has an invalid account role."
-      );
-    }
-
-    populateProfileMenu(profile);
-
-    return true;
-  }
-  // -----------------------------------------
-  // CART
-  // -----------------------------------------
-
-  async function getOrCreateCart() {
-    if (!currentUser) {
-      throw new Error(
-        "Your session has expired. Please sign in again."
-      );
-    }
-
-    const {
-      data: existingCart,
-      error: cartError
-    } = await supabaseClient
-      .from("carts")
-      .select(
-        "id, buyer_id, created_at, updated_at"
-      )
-      .eq("buyer_id", currentUser.id)
-      .maybeSingle();
-
-    if (cartError) {
-      throw cartError;
-    }
-
-    if (existingCart) {
-      return existingCart;
-    }
-
-    const {
-      data: newCart,
-      error: createError
-    } = await supabaseClient
-      .from("carts")
-      .insert({
-        buyer_id: currentUser.id
-      })
-      .select(
-        "id, buyer_id, created_at, updated_at"
-      )
-      .single();
-
-    if (createError) {
-      throw createError;
-    }
-
-    return newCart;
+  if (userError) {
+    throw userError;
   }
 
-  async function loadCartItems() {
-    currentCart =
-      await getOrCreateCart();
+  if (!user) {
+    window.location.href = "login.html";
+    return false;
+  }
 
-    const {
-      data,
-      error
-    } = await supabaseClient
-      .from("cart_items")
-      .select(`
+  currentUser = user;
+
+  const {
+    data: profile,
+    error: profileError
+  } = await supabaseClient
+    .from("profiles")
+    .select(
+      "id, full_name, email, role, is_active, avatar_url"
+    )
+    .eq("id", user.id)
+    .single();
+
+  if (profileError) {
+    throw profileError;
+  }
+
+  currentProfile = profile;
+
+  if (!profile.is_active) {
+    await supabaseClient.auth.signOut();
+
+    window.location.href =
+      "login.html";
+
+    return false;
+  }
+
+  if (profile.role === "admin") {
+    window.location.href =
+      "admin-dashboard.html";
+
+    return false;
+  }
+
+  if (profile.role === "seller") {
+    window.location.href =
+      "seller-dashboard.html";
+
+    return false;
+  }
+
+  if (profile.role !== "buyer") {
+    throw new Error(
+      "Your account has an invalid account role."
+    );
+  }
+
+  populateProfileMenu(profile);
+
+  return true;
+}
+
+// -----------------------------------------
+// CART
+// -----------------------------------------
+
+async function getOrCreateCart() {
+  if (!currentUser) {
+    throw new Error(
+      "Your session has expired. Please sign in again."
+    );
+  }
+
+  const {
+    data: existingCart,
+    error: cartError
+  } = await supabaseClient
+    .from("carts")
+    .select(
+      "id, buyer_id, created_at, updated_at"
+    )
+    .eq(
+      "buyer_id",
+      currentUser.id
+    )
+    .maybeSingle();
+
+  if (cartError) {
+    throw cartError;
+  }
+
+  if (existingCart) {
+    return existingCart;
+  }
+
+  const {
+    data: newCart,
+    error: createError
+  } = await supabaseClient
+    .from("carts")
+    .insert({
+      buyer_id: currentUser.id
+    })
+    .select(
+      "id, buyer_id, created_at, updated_at"
+    )
+    .single();
+
+  if (createError) {
+    throw createError;
+  }
+
+  return newCart;
+}
+
+async function loadCartItems() {
+  currentCart =
+    await getOrCreateCart();
+
+  const {
+    data,
+    error
+  } = await supabaseClient
+    .from("cart_items")
+    .select(`
+      id,
+      cart_id,
+      product_id,
+      quantity,
+      created_at,
+      updated_at,
+      products (
         id,
-        cart_id,
-        product_id,
-        quantity,
-        created_at,
-        updated_at,
-        products (
+        seller_id,
+        category_id,
+        name,
+        slug,
+        description,
+        price,
+        stock,
+        image_url,
+        is_active,
+        categories (
           id,
-          seller_id,
-          category_id,
           name,
-          slug,
-          description,
-          price,
-          stock,
-          image_url,
-          is_active,
-          categories (
-            id,
-            name,
-            slug
-          )
+          slug
         )
-      `)
-      .eq(
-        "cart_id",
-        currentCart.id
       )
-      .order("created_at", {
-        ascending: true
-      });
+    `)
+    .eq(
+      "cart_id",
+      currentCart.id
+    )
+    .order("created_at", {
+      ascending: true
+    });
 
-    if (error) {
-      throw error;
-    }
-
-    const validItems =
-      (data || []).filter(
-        (item) =>
-          item.products &&
-          item.products.is_active === true
-      );
-
-    currentCartItems =
-      validItems;
-
-    return validItems;
+  if (error) {
+    throw error;
   }
 
-  // -----------------------------------------
-  // STOCK VALIDATION
-  // -----------------------------------------
+  const validItems =
+    (data || []).filter(
+      (item) =>
+        item.products &&
+        item.products.is_active === true
+    );
 
-  async function refreshCartProducts() {
-    if (
-      !currentCart ||
-      !currentCart.id
-    ) {
-      throw new Error(
-        "Your shopping cart could not be found."
-      );
-    }
+  currentCartItems =
+    validItems;
 
-    const {
-      data,
-      error
-    } = await supabaseClient
-      .from("cart_items")
-      .select(`
+  return validItems;
+}
+
+// -----------------------------------------
+// STOCK VALIDATION
+// -----------------------------------------
+
+async function refreshCartProducts() {
+  if (
+    !currentCart ||
+    !currentCart.id
+  ) {
+    throw new Error(
+      "Your shopping cart could not be found."
+    );
+  }
+
+  const {
+    data,
+    error
+  } = await supabaseClient
+    .from("cart_items")
+    .select(`
+      id,
+      cart_id,
+      product_id,
+      quantity,
+      products (
         id,
-        cart_id,
-        product_id,
-        quantity,
-        products (
+        seller_id,
+        category_id,
+        name,
+        slug,
+        description,
+        price,
+        stock,
+        image_url,
+        is_active,
+        categories (
           id,
-          seller_id,
-          category_id,
           name,
-          slug,
-          description,
-          price,
-          stock,
-          image_url,
-          is_active,
-          categories (
-            id,
-            name,
-            slug
-          )
+          slug
         )
-      `)
-      .eq(
-        "cart_id",
-        currentCart.id
-      );
+      )
+    `)
+    .eq(
+      "cart_id",
+      currentCart.id
+    );
 
-    if (error) {
-      throw error;
-    }
-
-    currentCartItems =
-      (data || []).filter(
-        (item) =>
-          item.products &&
-          item.products.is_active === true
-      );
-
-    return currentCartItems;
+  if (error) {
+    throw error;
   }
 
-  function validateCartStock(items) {
-    if (
-      !items ||
-      items.length === 0
-    ) {
+  currentCartItems =
+    (data || []).filter(
+      (item) =>
+        item.products &&
+        item.products.is_active === true
+    );
+
+  return currentCartItems;
+}
+
+function validateCartStock(items) {
+  if (
+    !items ||
+    items.length === 0
+  ) {
+    return {
+      valid: false,
+      message: "Your cart is empty."
+    };
+  }
+
+  for (const item of items) {
+    const product =
+      item.products;
+
+    if (!product) {
       return {
         valid: false,
-        message: "Your cart is empty."
+        message:
+          "One of the products in your cart is no longer available."
       };
     }
 
-    for (const item of items) {
+    if (!product.is_active) {
+      return {
+        valid: false,
+        message:
+          `"${product.name}" is no longer available.`
+      };
+    }
+
+    if (
+      Number(product.stock) <= 0
+    ) {
+      return {
+        valid: false,
+        message:
+          `"${product.name}" is currently out of stock.`
+      };
+    }
+
+    if (
+      Number(item.quantity) >
+      Number(product.stock)
+    ) {
+      return {
+        valid: false,
+        message:
+          `Only ${product.stock} unit(s) of "${product.name}" are currently available. Please update your cart.`
+      };
+    }
+  }
+
+  return {
+    valid: true
+  };
+}
+// -----------------------------------------
+// CHECKOUT DISPLAY
+// -----------------------------------------
+
+function calculateSubtotal(items) {
+  return (items || []).reduce(
+    (total, item) => {
       const product =
         item.products;
 
       if (!product) {
-        return {
-          valid: false,
-          message:
-            "One of the products in your cart is no longer available."
-        };
+        return total;
       }
 
-      if (!product.is_active) {
-        return {
-          valid: false,
-          message:
-            `"${product.name}" is no longer available.`
-        };
-      }
+      const price =
+        Number(product.price) || 0;
 
-      if (
-        Number(product.stock) <= 0
-      ) {
-        return {
-          valid: false,
-          message:
-            `"${product.name}" is currently out of stock.`
-        };
-      }
+      const quantity =
+        Number(item.quantity) || 0;
 
-      if (
-        Number(item.quantity) >
-        Number(product.stock)
-      ) {
-        return {
-          valid: false,
-          message:
-            `Only ${product.stock} unit(s) of "${product.name}" are currently available. Please update your cart.`
-        };
-      }
-    }
+      return (
+        total +
+        price * quantity
+      );
+    },
+    0
+  );
+}
 
-    return {
-      valid: true
-    };
+function renderCheckoutItems(items) {
+  if (!checkoutItems) {
+    return;
   }
 
-  // -----------------------------------------
-  // CHECKOUT DISPLAY
-  // -----------------------------------------
+  if (
+    !items ||
+    items.length === 0
+  ) {
+    checkoutItems.innerHTML = "";
+    return;
+  }
 
-  function calculateSubtotal(items) {
-    return (items || []).reduce(
-      (total, item) => {
+  checkoutItems.innerHTML =
+    items
+      .map((item) => {
         const product =
           item.products;
 
-        if (!product) {
-          return total;
-        }
+        const name =
+          product?.name ||
+          "Product";
+
+        const image =
+          product?.image_url ||
+          "";
 
         const price =
-          Number(product.price) || 0;
+          Number(product?.price) ||
+          0;
 
         const quantity =
-          Number(item.quantity) || 0;
+          Number(item.quantity) ||
+          0;
 
-        return (
-          total +
-          price * quantity
-        );
-      },
-      0
+        const itemTotal =
+          price * quantity;
+
+        const imageHTML = image
+          ? `
+            <img
+              src="${escapeHTML(image)}"
+              alt="${escapeHTML(name)}"
+              class="checkout-item-image"
+              loading="lazy"
+            >
+          `
+          : `
+            <div class="checkout-item-placeholder">
+              SMH
+            </div>
+          `;
+
+        return `
+          <article class="checkout-item">
+            ${imageHTML}
+
+            <div class="checkout-item-info">
+              <h3>${escapeHTML(name)}</h3>
+
+              <p>
+                ${formatCurrency(price)}
+                × ${quantity}
+              </p>
+            </div>
+
+            <strong class="checkout-item-total">
+              ${formatCurrency(itemTotal)}
+            </strong>
+          </article>
+        `;
+      })
+      .join("");
+}
+
+function renderTotals(items) {
+  currentSubtotal =
+    calculateSubtotal(items);
+
+  if (subtotalElement) {
+    subtotalElement.textContent =
+      formatCurrency(
+        currentSubtotal
+      );
+  }
+
+  if (totalElement) {
+    totalElement.textContent =
+      formatCurrency(
+        currentSubtotal
+      );
+  }
+}
+
+// -----------------------------------------
+// PREFILL SHIPPING INFORMATION
+// -----------------------------------------
+
+function prefillShippingInformation() {
+  if (
+    shippingName &&
+    !shippingName.value.trim() &&
+    currentProfile?.full_name
+  ) {
+    shippingName.value =
+      currentProfile.full_name;
+  }
+
+  if (
+    shippingCountry &&
+    !shippingCountry.value.trim()
+  ) {
+    shippingCountry.value =
+      "Nigeria";
+  }
+}
+
+// -----------------------------------------
+// ORDER NUMBER
+// -----------------------------------------
+
+function generateOrderNumber() {
+  const now =
+    new Date();
+
+  const year =
+    now.getFullYear();
+
+  const month =
+    String(
+      now.getMonth() + 1
+    ).padStart(2, "0");
+
+  const day =
+    String(
+      now.getDate()
+    ).padStart(2, "0");
+
+  const randomPart =
+    Math.random()
+      .toString(36)
+      .substring(2, 8)
+      .toUpperCase();
+
+  return `SMH-${year}${month}${day}-${randomPart}`;
+}
+
+// -----------------------------------------
+// FORM VALIDATION
+// -----------------------------------------
+
+function validateShippingForm() {
+  const name =
+    shippingName?.value.trim() ||
+    "";
+
+  const phone =
+    shippingPhone?.value.trim() ||
+    "";
+
+  const address =
+    shippingAddress?.value.trim() ||
+    "";
+
+  const city =
+    shippingCity?.value.trim() ||
+    "";
+
+  const state =
+    shippingState?.value.trim() ||
+    "";
+
+  const country =
+    shippingCountry?.value.trim() ||
+    "";
+
+  if (!name) {
+    return "Please enter the recipient's full name.";
+  }
+
+  if (name.length < 2) {
+    return "Please enter a valid recipient name.";
+  }
+
+  if (!phone) {
+    return "Please enter a phone number.";
+  }
+
+  if (phone.length < 7) {
+    return "Please enter a valid phone number.";
+  }
+
+  if (!address) {
+    return "Please enter your delivery address.";
+  }
+
+  if (address.length < 5) {
+    return "Please enter a more complete delivery address.";
+  }
+
+  if (!city) {
+    return "Please enter your city.";
+  }
+
+  if (!state) {
+    return "Please enter your state.";
+  }
+
+  if (!country) {
+    return "Please enter your country.";
+  }
+
+  return null;
+}
+
+// -----------------------------------------
+// CREATE ORDER
+// -----------------------------------------
+
+async function createOrder() {
+  if (!currentUser) {
+    throw new Error(
+      "Your session has expired. Please sign in again."
     );
   }
 
-  function renderCheckoutItems(items) {
-    if (!checkoutItems) {
+  // Refresh cart immediately before ordering.
+  const freshItems =
+    await refreshCartProducts();
+
+  const stockValidation =
+    validateCartStock(
+      freshItems
+    );
+
+  if (!stockValidation.valid) {
+    throw new Error(
+      stockValidation.message
+    );
+  }
+
+  const subtotal =
+    calculateSubtotal(
+      freshItems
+    );
+
+  if (subtotal <= 0) {
+    throw new Error(
+      "Your order total must be greater than zero."
+    );
+  }
+
+  const orderNumber =
+    generateOrderNumber();
+
+  // IMPORTANT:
+  // These names MUST match the
+  // actual columns in public.orders.
+  const orderData = {
+    buyer_id:
+      currentUser.id,
+
+    order_number:
+      orderNumber,
+
+    status:
+      "pending",
+
+    payment_method:
+      "cash_on_delivery",
+
+    payment_status:
+      "unpaid",
+
+    subtotal:
+      subtotal,
+
+    delivery_fee:
+      0,
+
+    total_amount:
+      subtotal,
+
+    shipping_name:
+      shippingName.value.trim(),
+
+    shipping_phone:
+      shippingPhone.value.trim(),
+
+    shipping_address:
+      shippingAddress.value.trim(),
+
+    shipping_city:
+      shippingCity.value.trim(),
+
+    shipping_state:
+      shippingState.value.trim(),
+
+    shipping_country:
+      shippingCountry.value.trim(),
+
+    notes:
+      orderNotes?.value.trim() ||
+      null
+  };
+
+  // -----------------------------------------
+  // CREATE ORDER
+  // -----------------------------------------
+
+  const {
+    data: order,
+    error: orderError
+  } = await supabaseClient
+    .from("orders")
+    .insert(orderData)
+    .select(`
+      id,
+      order_number,
+      status,
+      payment_method,
+      payment_status,
+      subtotal,
+      delivery_fee,
+      total_amount,
+      shipping_name,
+      shipping_phone,
+      shipping_address,
+      shipping_city,
+      shipping_state,
+      shipping_country,
+      notes,
+      created_at
+    `)
+    .single();
+
+  if (orderError) {
+    console.error(
+      "Create order error:",
+      orderError
+    );
+
+    throw orderError;
+  }
+
+  if (!order) {
+    throw new Error(
+      "The order was not created."
+    );
+  }
+  // -----------------------------------------
+  // CREATE ORDER ITEMS
+  // -----------------------------------------
+
+  const orderItems =
+    freshItems.map((item) => {
+      const product =
+        item.products;
+
+      const price =
+        Number(product.price) || 0;
+
+      const quantity =
+        Number(item.quantity) || 0;
+
+      return {
+        order_id:
+          order.id,
+
+        product_id:
+          product.id,
+
+        seller_id:
+          product.seller_id,
+
+        product_name:
+          product.name,
+
+        product_price:
+          price,
+
+        quantity:
+          quantity,
+
+        item_total:
+          price * quantity
+      };
+    });
+
+  if (orderItems.length === 0) {
+    throw new Error(
+      "No products were found for this order."
+    );
+  }
+
+  const {
+    error: orderItemsError
+  } = await supabaseClient
+    .from("order_items")
+    .insert(orderItems);
+
+  if (orderItemsError) {
+    console.error(
+      "Create order items error:",
+      orderItemsError
+    );
+
+    // Remove the order if its items
+    // could not be created.
+    await supabaseClient
+      .from("orders")
+      .delete()
+      .eq("id", order.id);
+
+    throw orderItemsError;
+  }
+
+  // -----------------------------------------
+  // CLEAR CART
+  // -----------------------------------------
+
+  const {
+    error: clearCartError
+  } = await supabaseClient
+    .from("cart_items")
+    .delete()
+    .eq(
+      "cart_id",
+      currentCart.id
+    );
+
+  if (clearCartError) {
+    console.error(
+      "Clear cart error:",
+      clearCartError
+    );
+
+    // The order already exists, so we
+    // don't cancel it here.
+    console.warn(
+      "Order was created, but the cart could not be cleared."
+    );
+  }
+
+  return order;
+}
+
+// -----------------------------------------
+// PLACE ORDER
+// -----------------------------------------
+
+async function handlePlaceOrder() {
+  showMessage("");
+
+  const validationError =
+    validateShippingForm();
+
+  if (validationError) {
+    showMessage(
+      validationError,
+      "error"
+    );
+
+    return;
+  }
+
+  setButtonLoading(true);
+
+  try {
+    const order =
+      await createOrder();
+
+    showMessage(
+      `Order ${order.order_number} placed successfully.`,
+      "success"
+    );
+
+    if (placeOrderButton) {
+      placeOrderButton.disabled =
+        true;
+
+      placeOrderButton.textContent =
+        "Order Placed";
+    }
+
+    // Give the success message a moment
+    // before moving to the orders page.
+    setTimeout(() => {
+      window.location.href =
+        `orders.html?order=${encodeURIComponent(
+          order.id
+        )}`;
+    }, 1200);
+
+  } catch (error) {
+    console.error(
+      "Place order error:",
+      error
+    );
+
+    showMessage(
+      error?.message ||
+        "Unable to place your order. Please try again.",
+      "error"
+    );
+
+    setButtonLoading(false);
+  }
+}
+
+// -----------------------------------------
+// PROFILE MENU ACTIONS
+// -----------------------------------------
+
+if (myOrdersButton) {
+  myOrdersButton.addEventListener(
+    "click",
+    () => {
+      window.location.href =
+        "orders.html";
+    }
+  );
+}
+
+if (wishlistButton) {
+  wishlistButton.addEventListener(
+    "click",
+    () => {
+      window.location.href =
+        "wishlist.html";
+    }
+  );
+}
+
+if (settingsButton) {
+  settingsButton.addEventListener(
+    "click",
+    () => {
+      window.location.href =
+        "account-settings.html";
+    }
+  );
+}
+
+if (logoutButton) {
+  logoutButton.addEventListener(
+    "click",
+    async () => {
+      try {
+        await supabaseClient.auth.signOut();
+      } catch (error) {
+        console.error(
+          "Logout error:",
+          error
+        );
+      }
+
+      window.location.href =
+        "login.html";
+    }
+  );
+}
+
+// -----------------------------------------
+// FORM SUBMISSION
+// -----------------------------------------
+
+if (checkoutForm) {
+  checkoutForm.addEventListener(
+    "submit",
+    async (event) => {
+      event.preventDefault();
+
+      await handlePlaceOrder();
+    }
+  );
+}
+
+if (placeOrderButton) {
+  placeOrderButton.addEventListener(
+    "click",
+    async (event) => {
+      if (
+        checkoutForm &&
+        event.target ===
+          placeOrderButton
+      ) {
+        return;
+      }
+
+      await handlePlaceOrder();
+    }
+  );
+}
+
+// -----------------------------------------
+// RETRY
+// -----------------------------------------
+
+if (retryButton) {
+  retryButton.addEventListener(
+    "click",
+    () => {
+      window.location.reload();
+    }
+  );
+}
+
+// -----------------------------------------
+// INITIALIZE CHECKOUT
+// -----------------------------------------
+
+async function initializeCheckout() {
+  try {
+    showLoading();
+
+    const authenticated =
+      await loadProfile();
+
+    if (!authenticated) {
       return;
     }
+
+    const items =
+      await loadCartItems();
 
     if (
       !items ||
       items.length === 0
     ) {
-      checkoutItems.innerHTML = "";
+      showEmptyCheckout();
       return;
     }
 
-    checkoutItems.innerHTML =
+    renderCheckoutItems(
       items
-        .map((item) => {
-          const product =
-            item.products;
+    );
 
-          const name =
-            product?.name ||
-            "Product";
+    renderTotals(
+      items
+    );
 
-          const image =
-            product?.image_url ||
-            "";
+    prefillShippingInformation();
 
-          const price =
-            Number(product?.price) ||
-            0;
+    showCheckout();
 
-          const quantity =
-            Number(item.quantity) ||
-            0;
+  } catch (error) {
+    console.error(
+      "Checkout initialization error:",
+      error
+    );
 
-          const itemTotal =
-            price * quantity;
-
-          const imageHTML = image
-            ? `
-              <img
-                src="${escapeHTML(image)}"
-                alt="${escapeHTML(name)}"
-                class="checkout-item-image"
-                loading="lazy"
-              >
-            `
-            : `
-              <div class="checkout-item-placeholder">
-                SMH
-              </div>
-            `;
-
-          return `
-            <article class="checkout-item">
-              ${imageHTML}
-
-              <div class="checkout-item-info">
-                <h3>${escapeHTML(name)}</h3>
-
-                <p>
-                  ${formatCurrency(price)}
-                  × ${quantity}
-                </p>
-              </div>
-
-              <strong class="checkout-item-total">
-                ${formatCurrency(itemTotal)}
-              </strong>
-            </article>
-          `;
-        })
-        .join("");
+    showError(
+      error?.message ||
+        "Unable to load checkout."
+    );
   }
+}
 
-  function renderTotals(items) {
-    currentSubtotal =
-      calculateSubtotal(items);
+// -----------------------------------------
+// AUTH STATE
+// -----------------------------------------
 
-    if (subtotalElement) {
-      subtotalElement.textContent =
-        formatCurrency(
-          currentSubtotal
-        );
-    }
-
-    if (totalElement) {
-      totalElement.textContent =
-        formatCurrency(
-          currentSubtotal
-        );
-    }
-  }
-
-  // -----------------------------------------
-  // PREFILL SHIPPING INFORMATION
-  // -----------------------------------------
-
-  function prefillShippingInformation() {
+supabaseClient.auth.onAuthStateChange(
+  (event, session) => {
     if (
-      shippingName &&
-      !shippingName.value.trim() &&
-      currentProfile?.full_name
+      event === "SIGNED_OUT" ||
+      !session
     ) {
-      shippingName.value =
-        currentProfile.full_name;
-    }
-
-    if (
-      shippingCountry &&
-      !shippingCountry.value.trim()
-    ) {
-      shippingCountry.value =
-        "Nigeria";
+      window.location.href =
+        "login.html";
     }
   }
+);
 
-  // -----------------------------------------
-  // ORDER NUMBER
-  // -----------------------------------------
+// -----------------------------------------
+// START CHECKOUT
+// -----------------------------------------
 
-  function generateOrderNumber() {
-    const now =
-      new Date();
-
-    const year =
-      now.getFullYear();
-
-    const month =
-      String(
-        now.getMonth() + 1
-      ).padStart(2, "0");
-
-    const day =
-      String(
-        now.getDate()
-      ).padStart(2, "0");
-
-    const randomPart =
-      Math.random()
-        .toString(36)
-        .substring(2, 8)
-        .toUpperCase();
-
-    return `SMH-${year}${month}${day}-${randomPart}`;
-  }
-
-  // -----------------------------------------
-  // FORM VALIDATION
-  // -----------------------------------------
-
-  function validateShippingForm() {
-    const name =
-      shippingName?.value.trim() ||
-      "";
-
-    const phone =
-      shippingPhone?.value.trim() ||
-      "";
-
-    const address =
-      shippingAddress?.value.trim() ||
-      "";
-
-    const city =
-      shippingCity?.value.trim() ||
-      "";
-
-    const state =
-      shippingState?.value.trim() ||
-      "";
-
-    const country =
-      shippingCountry?.value.trim() ||
-      "";
-
-    if (!name) {
-      return "Please enter the recipient's full name.";
-    }
-
-    if (name.length < 2) {
-      return "Please enter a valid recipient name.";
-    }
-
-    if (!phone) {
-      return "Please enter a phone number.";
-    }
-
-    if (phone.length < 7) {
-      return "Please enter a valid phone number.";
-    }
-
-    if (!address) {
-      return "Please enter your delivery address.";
-    }
-
-    if (address.length < 5) {
-      return "Please enter a more complete delivery address.";
-    }
-
-    if (!city) {
-      return "Please enter your city.";
-    }
-
-    if (!state) {
-      return "Please enter your state.";
-    }
-
-    if (!country) {
-      return "Please enter your country.";
-    }
-
-    return null;
-  }
-  // -----------------------------------------
-  // CREATE ORDER
-  // -----------------------------------------
-
-  async function createOrder() {
-    if (!currentUser) {
-      throw new Error(
-        "Your session has expired. Please sign in again."
-      );
-    }
-
-    // Refresh cart immediately before ordering.
-    const freshItems =
-      await refreshCartProducts();
-
-    const stockValidation =
-      validateCartStock(freshItems);
-
-    if (!stockValidation.valid) {
-      throw new Error(
-        stockValidation.message
-      );
-    }
-
-    const subtotal =
-      calculateSubtotal(freshItems);
-
-    if (subtotal <= 0) {
-      throw new Error(
-        "Your order total must be greater than zero."
-      );
-    }
-
-    const orderNumber =
-      generateOrderNumber();
-
-    const orderData = {
-      buyer_id: currentUser.id,
-
-      order_number:
-        orderNumber,
-
-      status:
-        "pending",
-
-      payment_method:
-        "cash_on_delivery",
-
-      payment_status:
-        "unpaid",
-
-      subtotal:
-        subtotal,
-
-      delivery_fee:
-        0,
-
-      total_amount:
-        subtotal,
-
-      shipping_name:
-        shippingName.value.trim(),
-
-      phone:
-        shippingPhone.value.trim(),
-
-      address:
-        shippingAddress.value.trim(),
-
-      city:
-        shippingCity.value.trim(),
-
-      state:
-        shippingState.value.trim(),
-
-      country:
-        shippingCountry.value.trim(),
-
-      notes:
-        orderNotes?.value.trim() ||
-        null
-    };
-
-    // -----------------------------------------
-    // CREATE ORDER
-    // -----------------------------------------
-
-    const {
-      data: order,
-      error: orderError
-    } = await supabaseClient
-      .from("orders")
-      .insert(orderData)
-      .select(`
-        id,
-        order_number,
-        status,
-        payment_method,
-        payment_status,
-        subtotal,
-        delivery_fee,
-        total_amount
-      `)
-      .single();
-
-    if (orderError) {
-      throw orderError;
-    }
-
-    // -----------------------------------------
-    // CREATE ORDER ITEMS
-    // -----------------------------------------
-
-    const orderItems =
-      freshItems.map((item) => {
-        const product =
-          item.products;
-
-        const price =
-          Number(product.price) || 0;
-
-        const quantity =
-          Number(item.quantity) || 0;
-
-        return {
-          order_id:
-            order.id,
-
-          product_id:
-            product.id,
-
-          seller_id:
-            product.seller_id,
-
-          product_name:
-            product.name,
-
-          product_price:
-            price,
-
-          quantity:
-            quantity,
-
-          item_total:
-            price * quantity
-        };
-      });
-
-    if (
-      orderItems.length === 0
-    ) {
-      throw new Error(
-        "No products were available to create this order."
-      );
-    }
-
-    const {
-      error: itemsError
-    } = await supabaseClient
-      .from("order_items")
-      .insert(orderItems);
-
-    if (itemsError) {
-      console.error(
-        "Order item creation error:",
-        itemsError
-      );
-
-      throw new Error(
-        "The order was created, but its items could not be saved. Please contact SMH Collection support with order number: " +
-          order.order_number
-      );
-    }
-
-    // -----------------------------------------
-    // CLEAR CART
-    // -----------------------------------------
-
-    const {
-      error: clearCartError
-    } = await supabaseClient
-      .from("cart_items")
-      .delete()
-      .eq(
-        "cart_id",
-        currentCart.id
-      );
-
-    if (clearCartError) {
-      console.warn(
-        "Cart clearing warning:",
-        clearCartError
-      );
-    }
-
-    return order;
-  }
-
-  // -----------------------------------------
-  // FORM SUBMISSION
-  // -----------------------------------------
-
-  if (checkoutForm) {
-    checkoutForm.addEventListener(
-      "submit",
-      async (event) => {
-        event.preventDefault();
-
-        showMessage("");
-
-        const validationError =
-          validateShippingForm();
-
-        if (validationError) {
-          showMessage(
-            validationError,
-            "error"
-          );
-
-          return;
-        }
-
-        setButtonLoading(true);
-
-        try {
-          const order =
-            await createOrder();
-
-          showMessage(
-            `Order ${order.order_number} placed successfully. Redirecting...`,
-            "success"
-          );
-
-          checkoutForm.reset();
-
-          setTimeout(() => {
-            window.location.href =
-              `order-details.html?id=${encodeURIComponent(
-                order.id
-              )}`;
-          }, 900);
-
-        } catch (error) {
-          console.error(
-            "Checkout error:",
-            error
-          );
-
-          showMessage(
-            error.message ||
-              "Unable to place your order. Please try again.",
-            "error"
-          );
-
-        } finally {
-          setButtonLoading(false);
-        }
-      }
-    );
-  }
-
-  // -----------------------------------------
-  // PROFILE MENU ACTIONS
-  // -----------------------------------------
-
-  if (myOrdersButton) {
-    myOrdersButton.addEventListener(
-      "click",
-      () => {
-        window.location.href =
-          "orders.html";
-      }
-    );
-  }
-
-  if (wishlistButton) {
-    wishlistButton.addEventListener(
-      "click",
-      () => {
-        window.location.href =
-          "wishlist.html";
-      }
-    );
-  }
-
-  if (settingsButton) {
-    settingsButton.addEventListener(
-      "click",
-      () => {
-        window.location.href =
-          "account-settings.html";
-      }
-    );
-  }
-
-  if (logoutButton) {
-    logoutButton.addEventListener(
-      "click",
-      async () => {
-        try {
-          logoutButton.disabled =
-            true;
-
-          logoutButton.textContent =
-            "Signing out...";
-
-          const {
-            error
-          } =
-            await supabaseClient.auth.signOut();
-
-          if (error) {
-            throw error;
-          }
-
-          window.location.href =
-            "login.html";
-
-        } catch (error) {
-          console.error(
-            "Logout error:",
-            error
-          );
-
-          logoutButton.disabled =
-            false;
-
-          logoutButton.innerHTML =
-            "<span>↪</span> Sign Out";
-
-          showMessage(
-            "Unable to sign out. Please try again.",
-            "error"
-          );
-        }
-      }
-    );
-  }
-
-  // -----------------------------------------
-  // RETRY
-  // -----------------------------------------
-
-  if (retryButton) {
-    retryButton.addEventListener(
-      "click",
-      () => {
-        initializeCheckout();
-      }
-    );
-  }
-
-  // -----------------------------------------
-  // INITIALIZE CHECKOUT
-  // -----------------------------------------
-
-  async function initializeCheckout() {
-    showLoading();
-    showMessage("");
-
-    try {
-      const authenticated =
-        await loadProfile();
-
-      if (!authenticated) {
-        return;
-      }
-
-      const items =
-        await loadCartItems();
-
-      if (
-        !items ||
-        items.length === 0
-      ) {
-        showEmptyCheckout();
-        return;
-      }
-
-      const stockValidation =
-        validateCartStock(items);
-
-      if (!stockValidation.valid) {
-        showError(
-          stockValidation.message
-        );
-
-        return;
-      }
-
-      renderCheckoutItems(items);
-
-      renderTotals(items);
-
-      prefillShippingInformation();
-
-      showCheckout();
-
-    } catch (error) {
-      console.error(
-        "Checkout initialization error:",
-        error
-      );
-
-      if (
-        error.message &&
-        error.message.includes("JWT")
-      ) {
-        window.location.href =
-          "login.html";
-
-        return;
-      }
-
-      showError(
-        error.message ||
-          "Unable to load checkout. Please try again."
-      );
-    }
-  }
-
-  // -----------------------------------------
-  // START
-  // -----------------------------------------
-
-  initializeCheckout();
+initializeCheckout();
 
 });
