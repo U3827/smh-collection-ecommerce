@@ -1,7 +1,7 @@
 // =========================================
 // SMH COLLECTION
 // REAL SHOPPING CART
-// PART 1 OF 3
+// CART.JS — PART 1 OF 4
 // =========================================
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   console.log("SMH Collection Cart loaded.");
 
   // =========================================
-  // ELEMENTS
+  // DOM ELEMENTS
   // =========================================
 
   const currentYear =
@@ -71,26 +71,34 @@ document.addEventListener("DOMContentLoaded", async () => {
       "Supabase client is unavailable."
     );
 
-    showError(
-      "The shopping service could not load. Please refresh the page."
-    );
+    if (cartError) {
+      cartError.hidden = false;
+    }
+
+    if (cartErrorMessage) {
+      cartErrorMessage.textContent =
+        "The shopping service could not load.";
+    }
 
     return;
   }
 
 
   // =========================================
-  // STATE
+  // APPLICATION STATE
   // =========================================
 
   let currentUser = null;
+
   let currentProfile = null;
+
   let currentCart = null;
+
   let cartData = [];
 
 
   // =========================================
-  // HELPERS
+  // HELPER: ESCAPE HTML
   // =========================================
 
   function escapeHTML(value) {
@@ -103,6 +111,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       .replace(/'/g, "&#039;");
   }
 
+
+  // =========================================
+  // HELPER: FORMAT MONEY
+  // =========================================
 
   function formatMoney(value) {
 
@@ -117,6 +129,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
 
+  // =========================================
+  // HELPER: GET INITIALS
+  // =========================================
+
   function getInitials(name) {
 
     if (!name) {
@@ -129,12 +145,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         .split(/\s+/)
         .filter(Boolean);
 
+
     if (parts.length === 1) {
 
       return parts[0]
         .substring(0, 2)
         .toUpperCase();
     }
+
 
     return (
       parts[0].charAt(0) +
@@ -144,7 +162,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
   // =========================================
-  // UI STATES
+  // UI: LOADING
   // =========================================
 
   function showLoading() {
@@ -167,6 +185,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
 
+  // =========================================
+  // UI: CART
+  // =========================================
+
   function showCart() {
 
     if (cartLoading) {
@@ -187,6 +209,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
 
+  // =========================================
+  // UI: EMPTY CART
+  // =========================================
+
   function showEmptyCart() {
 
     if (cartLoading) {
@@ -206,6 +232,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
+
+  // =========================================
+  // UI: ERROR
+  // =========================================
 
   function showError(message) {
 
@@ -246,9 +276,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     } =
       await supabaseClient.auth.getUser();
 
+
     if (error) {
       throw error;
     }
+
 
     if (!data.user) {
 
@@ -257,6 +289,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       return false;
     }
+
 
     currentUser =
       data.user;
@@ -286,9 +319,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         )
         .single();
 
+
     if (error) {
       throw error;
     }
+
 
     if (!data) {
 
@@ -319,6 +354,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         return false;
       }
 
+
       if (data.role === "seller") {
 
         window.location.href =
@@ -326,6 +362,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         return false;
       }
+
 
       await supabaseClient.auth.signOut();
 
@@ -343,10 +380,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     return true;
   }
-
-
   // =========================================
-  // PROFILE UI
+  // UPDATE PROFILE UI
   // =========================================
 
   function updateProfileUI() {
@@ -354,6 +389,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!currentProfile) {
       return;
     }
+
 
     const name =
       currentProfile.full_name ||
@@ -399,20 +435,24 @@ document.addEventListener("DOMContentLoaded", async () => {
         name;
     }
 
+
     if (profileAvatar) {
       profileAvatar.textContent =
         initials;
     }
+
 
     if (menuName) {
       menuName.textContent =
         name;
     }
 
+
     if (menuEmail) {
       menuEmail.textContent =
         email;
     }
+
 
     if (menuAvatar) {
       menuAvatar.textContent =
@@ -433,7 +473,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     } =
       await supabaseClient
         .from("carts")
-        .select("id, buyer_id")
+        .select(
+          "id, buyer_id"
+        )
         .eq(
           "buyer_id",
           currentUser.id
@@ -541,198 +583,32 @@ document.addEventListener("DOMContentLoaded", async () => {
           item.products &&
           item.products.is_active !== false
       );
-  // =========================================
-  // RENDER CART
-  // =========================================
 
-  function renderCart() {
 
-    if (!cartItems) {
+    if (cartData.length === 0) {
+
+      updateSummary();
+
+      showEmptyCart();
+
       return;
     }
 
-    cartItems.innerHTML =
-      cartData.map(item => {
 
-        const product =
-          item.products;
+    renderCart();
 
-        const quantity =
-          Number(item.quantity) || 1;
-
-        const price =
-          Number(product.price) || 0;
-
-        const stock =
-          Number(product.stock) || 0;
-
-        const itemTotal =
-          price * quantity;
-
-        const image =
-          product.image_url ||
-          "assets/images/placeholder-product.png";
-
-        const category =
-          product.categories?.name ||
-          "Product";
-
-        const productName =
-          escapeHTML(product.name);
-
-        const safeImage =
-          escapeHTML(image);
-
-        const safeCategory =
-          escapeHTML(category);
-
-        const safeDescription =
-          escapeHTML(
-            product.description || ""
-          );
-
-
-        return `
-          <article
-            class="cart-item"
-            data-cart-item-id="${item.id}"
-          >
-
-            <div class="cart-item-image">
-              <a
-                href="product.html?id=${encodeURIComponent(product.id)}"
-              >
-                <img
-                  src="${safeImage}"
-                  alt="${productName}"
-                  loading="lazy"
-                  onerror="this.src='assets/images/placeholder-product.png'"
-                >
-              </a>
-            </div>
-
-
-            <div class="cart-item-details">
-
-              <div class="cart-item-category">
-                ${safeCategory}
-              </div>
-
-              <h3 class="cart-item-name">
-                <a
-                  href="product.html?id=${encodeURIComponent(product.id)}"
-                >
-                  ${productName}
-                </a>
-              </h3>
-
-              ${
-                safeDescription
-                  ? `
-                    <p class="cart-item-description">
-                      ${safeDescription}
-                    </p>
-                  `
-                  : ""
-              }
-
-              <div class="cart-item-price">
-                ${formatMoney(price)}
-              </div>
-
-              ${
-                stock <= 0
-                  ? `
-                    <div class="cart-item-stock out">
-                      Out of stock
-                    </div>
-                  `
-                  : `
-                    <div class="cart-item-stock">
-                      ${stock} available
-                    </div>
-                  `
-              }
-
-            </div>
-
-
-            <div class="cart-item-controls">
-
-              <div class="quantity-control">
-
-                <button
-                  type="button"
-                  class="quantity-button"
-                  data-action="decrease"
-                  data-cart-item-id="${item.id}"
-                  aria-label="Decrease quantity"
-                  ${
-                    quantity <= 1
-                      ? "disabled"
-                      : ""
-                  }
-                >
-                  −
-                </button>
-
-
-                <span class="quantity-value">
-                  ${quantity}
-                </span>
-
-
-                <button
-                  type="button"
-                  class="quantity-button"
-                  data-action="increase"
-                  data-cart-item-id="${item.id}"
-                  aria-label="Increase quantity"
-                  ${
-                    quantity >= stock
-                      ? "disabled"
-                      : ""
-                  }
-                >
-                  +
-                </button>
-
-              </div>
-
-
-              <div class="cart-item-total">
-                ${formatMoney(itemTotal)}
-              </div>
-
-
-              <button
-                type="button"
-                class="remove-item-button"
-                data-action="remove"
-                data-cart-item-id="${item.id}"
-              >
-                Remove
-              </button>
-
-            </div>
-
-          </article>
-        `;
-
-      }).join("");
-
-
-    updateSummary();
+    showCart();
   }
 
 
   // =========================================
-  // UPDATE SUMMARY
+  // UPDATE CART SUMMARY
   // =========================================
 
   function updateSummary() {
 
     let totalItems = 0;
+
     let subtotal = 0;
 
 
@@ -743,6 +619,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       const price =
         Number(item.products?.price) || 0;
+
 
       totalItems += quantity;
 
@@ -785,6 +662,196 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
   // =========================================
+  // RENDER CART
+  // =========================================
+
+  function renderCart() {
+
+    if (!cartItems) {
+      return;
+    }
+
+
+    cartItems.innerHTML =
+      cartData.map(item => {
+
+        const product =
+          item.products;
+
+
+        const quantity =
+          Number(item.quantity) || 1;
+
+
+        const price =
+          Number(product.price) || 0;
+
+
+        const stock =
+          Number(product.stock) || 0;
+
+
+        const itemTotal =
+          price * quantity;
+
+
+        const image =
+          product.image_url ||
+          "assets/images/placeholder-product.png";
+
+
+        const category =
+          product.categories?.name ||
+          "Product";
+
+
+        const productName =
+          escapeHTML(
+            product.name
+          );
+
+
+        const safeImage =
+          escapeHTML(
+            image
+          );
+
+
+        const safeCategory =
+          escapeHTML(
+            category
+          );
+
+
+        return `
+          <article
+            class="cart-item"
+            data-cart-item-id="${item.id}"
+          >
+
+            <div class="cart-item-image">
+
+              <a
+                href="product.html?id=${encodeURIComponent(product.id)}"
+              >
+
+                <img
+                  src="${safeImage}"
+                  alt="${productName}"
+                  loading="lazy"
+                >
+
+              </a>
+
+            </div>
+
+
+            <div class="cart-item-details">
+
+              <div class="cart-item-category">
+                ${safeCategory}
+              </div>
+
+
+              <h3 class="cart-item-name">
+
+                <a
+                  href="product.html?id=${encodeURIComponent(product.id)}"
+                >
+                  ${productName}
+                </a>
+
+              </h3>
+
+
+              <div class="cart-item-price">
+                ${formatMoney(price)}
+              </div>
+
+
+              ${
+                stock > 0
+                  ? `
+                    <div class="cart-item-stock">
+                      ${stock} available
+                    </div>
+                  `
+                  : `
+                    <div class="cart-item-stock out">
+                      Out of stock
+                    </div>
+                  `
+              }
+
+            </div>
+
+
+            <div class="cart-item-controls">
+
+              <div class="quantity-control">
+
+                <button
+                  type="button"
+                  class="quantity-button"
+                  data-action="decrease"
+                  data-cart-item-id="${item.id}"
+                  ${
+                    quantity <= 1
+                      ? "disabled"
+                      : ""
+                  }
+                >
+                  −
+                </button>
+
+
+                <span class="quantity-value">
+                  ${quantity}
+                </span>
+
+
+                <button
+                  type="button"
+                  class="quantity-button"
+                  data-action="increase"
+                  data-cart-item-id="${item.id}"
+                  ${
+                    quantity >= stock
+                      ? "disabled"
+                      : ""
+                  }
+                >
+                  +
+                </button>
+
+              </div>
+
+
+              <div class="cart-item-total">
+                ${formatMoney(itemTotal)}
+              </div>
+
+
+              <button
+                type="button"
+                class="remove-item-button"
+                data-action="remove"
+                data-cart-item-id="${item.id}"
+              >
+                Remove
+              </button>
+
+            </div>
+
+          </article>
+        `;
+
+      }).join("");
+
+
+    updateSummary();
+  }
+  // =========================================
   // UPDATE QUANTITY
   // =========================================
 
@@ -801,6 +868,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
     if (!item) {
+
       throw new Error(
         "Cart item could not be found."
       );
@@ -808,7 +876,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
     const stock =
-      Number(item.products?.stock) || 0;
+      Number(
+        item.products?.stock
+      ) || 0;
 
 
     if (newQuantity < 1) {
@@ -833,7 +903,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       throw new Error(
         `Only ${stock} item${
-          stock === 1 ? "" : "s"
+          stock === 1
+            ? ""
+            : "s"
         } available in stock.`
       );
     }
@@ -917,7 +989,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       );
 
 
-    if (cartData.length === 0) {
+    if (
+      cartData.length === 0
+    ) {
 
       updateSummary();
 
@@ -932,7 +1006,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
   // =========================================
-  // CART ITEM BUTTONS
+  // CART BUTTON EVENTS
   // =========================================
 
   if (cartItems) {
@@ -954,6 +1028,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         const action =
           button.dataset.action;
+
 
         const cartItemId =
           button.dataset.cartItemId;
@@ -978,6 +1053,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
           if (!item) {
+
             throw new Error(
               "This cart item is no longer available."
             );
@@ -990,7 +1066,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             ) || 1;
 
 
-          if (action === "increase") {
+          if (
+            action ===
+            "increase"
+          ) {
 
             await updateQuantity(
               cartItemId,
@@ -1000,7 +1079,10 @@ document.addEventListener("DOMContentLoaded", async () => {
           }
 
 
-          else if (action === "decrease") {
+          else if (
+            action ===
+            "decrease"
+          ) {
 
             await updateQuantity(
               cartItemId,
@@ -1010,7 +1092,10 @@ document.addEventListener("DOMContentLoaded", async () => {
           }
 
 
-          else if (action === "remove") {
+          else if (
+            action ===
+            "remove"
+          ) {
 
             await removeCartItem(
               cartItemId
@@ -1045,7 +1130,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
   // =========================================
-  // CHECKOUT BUTTON
+  // CHECKOUT
   // =========================================
 
   if (checkoutButton) {
@@ -1054,7 +1139,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       "click",
       () => {
 
-        if (!cartData.length) {
+        if (
+          cartData.length === 0
+        ) {
           return;
         }
 
@@ -1067,7 +1154,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
   // =========================================
-  // PROFILE MENU
+  // PROFILE MENU ELEMENTS
   // =========================================
 
   const profileButton =
@@ -1075,11 +1162,40 @@ document.addEventListener("DOMContentLoaded", async () => {
       "profileButton"
     );
 
+
   const profileMenu =
     document.getElementById(
       "profileMenu"
     );
 
+
+  const myOrdersButton =
+    document.getElementById(
+      "myOrdersButton"
+    );
+
+
+  const wishlistButton =
+    document.getElementById(
+      "wishlistButton"
+    );
+
+
+  const settingsButton =
+    document.getElementById(
+      "settingsButton"
+    );
+
+
+  const logoutButton =
+    document.getElementById(
+      "logoutButton"
+    );
+
+
+  // =========================================
+  // PROFILE MENU TOGGLE
+  // =========================================
 
   function closeProfileMenu() {
 
@@ -1087,7 +1203,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
+
     profileMenu.hidden = true;
+
 
     if (profileButton) {
 
@@ -1160,29 +1278,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
   // =========================================
-  // PROFILE MENU BUTTONS
+  // MY ORDERS
   // =========================================
-
-  const myOrdersButton =
-    document.getElementById(
-      "myOrdersButton"
-    );
-
-  const wishlistButton =
-    document.getElementById(
-      "wishlistButton"
-    );
-
-  const settingsButton =
-    document.getElementById(
-      "settingsButton"
-    );
-
-  const logoutButton =
-    document.getElementById(
-      "logoutButton"
-    );
-
 
   if (myOrdersButton) {
 
@@ -1197,6 +1294,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
 
+  // =========================================
+  // WISHLIST
+  // =========================================
+
   if (wishlistButton) {
 
     wishlistButton.addEventListener(
@@ -1210,6 +1311,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
 
+  // =========================================
+  // SETTINGS
+  // =========================================
+
   if (settingsButton) {
 
     settingsButton.addEventListener(
@@ -1217,202 +1322,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       () => {
 
         window.location.href =
-          "settings.html";
+          "account-settings.html";
       }
     );
-  }
-
-
-  if (logoutButton) {
-
-    logoutButton.addEventListener(
-      "click",
-      async () => {
-
-        logoutButton.disabled = true;
-
-        try {
-
-          const {
-            error
-          } =
-            await supabaseClient.auth.signOut();
-
-
-          if (error) {
-            throw error;
-          }
-
-
-          window.location.href =
-            "login.html";
-
-        }
-
-
-        catch (error) {
-
-          console.error(
-            "Logout error:",
-            error
-          );
-
-
-          alert(
-            error.message ||
-            "Unable to log out."
-          );
-
-
-          logoutButton.disabled =
-            false;
-        }
-      }
-    );
-  }
-  // =========================================
-  // RETRY BUTTON
-  // =========================================
-
-  if (retryButton) {
-
-    retryButton.addEventListener(
-      "click",
-      async () => {
-
-        try {
-
-          await loadCart();
-
-        }
-
-        catch (error) {
-
-          console.error(
-            "Retry cart loading error:",
-            error
-          );
-
-          showError(
-            error.message ||
-            "Unable to load your cart. Please try again."
-          );
-        }
-      }
-    );
-  }
-
-
-  // =========================================
-  // INITIALIZE CART
-  // =========================================
-
-  async function initializeCart() {
-
-    try {
-
-      showLoading();
-
-
-      // ---------------------------------------
-      // Check logged-in user
-      // ---------------------------------------
-
-      const userLoaded =
-        await loadCurrentUser();
-
-
-      if (!userLoaded) {
-        return;
-      }
-
-
-      // ---------------------------------------
-      // Load buyer profile
-      // ---------------------------------------
-
-      const profileLoaded =
-        await loadProfile();
-
-
-      if (!profileLoaded) {
-        return;
-      }
-
-
-      // ---------------------------------------
-      // Load shopping cart
-      // ---------------------------------------
-
-      await loadCart();
-
-    }
-
-    catch (error) {
-
-      console.error(
-        "Cart initialization error:",
-        error
-      );
-
-
-      showError(
-        error.message ||
-        "Unable to load your shopping cart. Please try again."
-      );
-    }
-  }
-
-
-  // =========================================
-  // AUTH STATE CHANGES
-  // =========================================
-
-  supabaseClient.auth.onAuthStateChange(
-    (event, session) => {
-
-      if (
-        event === "SIGNED_OUT"
-      ) {
-
-        window.location.href =
-          "login.html";
-
-        return;
-      }
-
-
-      if (
-        event === "TOKEN_REFRESHED" &&
-        !session
-      ) {
-
-        window.location.href =
-          "login.html";
-      }
-    }
-  );
-
-
-  // =========================================
-  // START CART
-  // =========================================
-
-  initializeCart();
-
-});
-
-    if (cartData.length === 0) {
-
-      updateSummary();
-
-      showEmptyCart();
-
-      return;
-    }
-
-
-    renderCart();
-
-    showCart();
   }
