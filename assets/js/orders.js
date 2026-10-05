@@ -21,37 +21,66 @@ document.addEventListener("DOMContentLoaded", () => {
   // DOM ELEMENTS
   // =========================================
 
-  const profileButton = document.getElementById("profileButton");
-  const profileMenu = document.getElementById("profileMenu");
+  const profileButton =
+    document.getElementById("profileButton");
 
-  const profileAvatar = document.getElementById("profileAvatar");
-  const profileName = document.getElementById("profileName");
+  const profileMenu =
+    document.getElementById("profileMenu");
 
-  const menuAvatar = document.getElementById("menuAvatar");
-  const menuName = document.getElementById("menuName");
-  const menuEmail = document.getElementById("menuEmail");
+  const profileAvatar =
+    document.getElementById("profileAvatar");
 
-  const myOrdersButton = document.getElementById("myOrdersButton");
-  const wishlistButton = document.getElementById("wishlistButton");
-  const settingsButton = document.getElementById("settingsButton");
-  const logoutButton = document.getElementById("logoutButton");
+  const profileName =
+    document.getElementById("profileName");
 
-  const orderCount = document.getElementById("orderCount");
-  const statusFilter = document.getElementById("statusFilter");
+  const menuAvatar =
+    document.getElementById("menuAvatar");
 
-  const ordersList = document.getElementById("ordersList");
+  const menuName =
+    document.getElementById("menuName");
 
-  const emptyState = document.getElementById("emptyState");
+  const menuEmail =
+    document.getElementById("menuEmail");
+
+  const myOrdersButton =
+    document.getElementById("myOrdersButton");
+
+  const wishlistButton =
+    document.getElementById("wishlistButton");
+
+  const settingsButton =
+    document.getElementById("settingsButton");
+
+  const logoutButton =
+    document.getElementById("logoutButton");
+
+  const orderCount =
+    document.getElementById("orderCount");
+
+  const statusFilter =
+    document.getElementById("statusFilter");
+
+  const ordersList =
+    document.getElementById("ordersList");
+
+  const emptyState =
+    document.getElementById("emptyState");
+
   const startShoppingButton =
     document.getElementById("startShoppingButton");
 
-  const errorState = document.getElementById("errorState");
-  const errorMessage = document.getElementById("errorMessage");
-  const retryButton = document.getElementById("retryButton");
+  const errorState =
+    document.getElementById("errorState");
+
+  const errorMessage =
+    document.getElementById("errorMessage");
+
+  const retryButton =
+    document.getElementById("retryButton");
 
 
   // =========================================
-  // STATE
+  // PAGE STATE
   // =========================================
 
   let currentUser = null;
@@ -67,7 +96,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (typeof window.supabase === "undefined") {
 
-    console.error("Supabase library is missing.");
+    console.error(
+      "Supabase library is missing."
+    );
 
     showError(
       "Authentication service could not load. Please refresh the page."
@@ -77,9 +108,13 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
 
-  if (typeof supabaseClient === "undefined") {
+  if (
+    typeof supabaseClient === "undefined"
+  ) {
 
-    console.error("supabaseClient is missing.");
+    console.error(
+      "supabaseClient is missing."
+    );
 
     showError(
       "Supabase connection could not be initialized."
@@ -95,7 +130,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function escapeHTML(value) {
 
-    if (value === null || value === undefined) {
+    if (
+      value === null ||
+      value === undefined
+    ) {
       return "";
     }
 
@@ -110,12 +148,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function formatCurrency(amount) {
 
-    const number = Number(amount) || 0;
+    const number =
+      Number(amount) || 0;
 
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD"
-    }).format(number);
+    return new Intl.NumberFormat(
+      "en-US",
+      {
+        style: "currency",
+        currency: "USD"
+      }
+    ).format(number);
   }
 
 
@@ -125,17 +167,25 @@ document.addEventListener("DOMContentLoaded", () => {
       return "Date unavailable";
     }
 
-    const date = new Date(dateValue);
+    const date =
+      new Date(dateValue);
 
-    if (Number.isNaN(date.getTime())) {
+    if (
+      Number.isNaN(
+        date.getTime()
+      )
+    ) {
       return "Date unavailable";
     }
 
-    return new Intl.DateTimeFormat("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric"
-    }).format(date);
+    return new Intl.DateTimeFormat(
+      "en-US",
+      {
+        year: "numeric",
+        month: "short",
+        day: "numeric"
+      }
+    ).format(date);
   }
 
 
@@ -145,19 +195,27 @@ document.addEventListener("DOMContentLoaded", () => {
       return "Date unavailable";
     }
 
-    const date = new Date(dateValue);
+    const date =
+      new Date(dateValue);
 
-    if (Number.isNaN(date.getTime())) {
+    if (
+      Number.isNaN(
+        date.getTime()
+      )
+    ) {
       return "Date unavailable";
     }
 
-    return new Intl.DateTimeFormat("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "numeric",
-      minute: "2-digit"
-    }).format(date);
+    return new Intl.DateTimeFormat(
+      "en-US",
+      {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit"
+      }
+    ).format(date);
   }
 
 
@@ -167,9 +225,12 @@ document.addEventListener("DOMContentLoaded", () => {
       return "Pending";
     }
 
-    return status
+    return String(status)
       .replace(/_/g, " ")
-      .replace(/\b\w/g, letter => letter.toUpperCase());
+      .replace(
+        /\b\w/g,
+        letter => letter.toUpperCase()
+      );
   }
 
 
@@ -184,7 +245,9 @@ document.addEventListener("DOMContentLoaded", () => {
       "cancelled"
     ];
 
-    if (validStatuses.includes(status)) {
+    if (
+      validStatuses.includes(status)
+    ) {
       return status;
     }
 
@@ -204,11 +267,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
       ordersList.innerHTML = `
         <div class="loading-state">
+
           <div class="loading-spinner"></div>
 
           <p>
             Loading your orders...
           </p>
+
         </div>
       `;
     }
@@ -270,13 +335,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (errorMessage) {
+
       errorMessage.textContent =
         message ||
         "Something went wrong while loading your orders.";
     }
 
     if (orderCount) {
-      orderCount.textContent = "Unable to load orders";
+      orderCount.textContent =
+        "Unable to load orders";
     }
   }
 
@@ -287,29 +354,47 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function openProfileMenu() {
 
-    if (!profileMenu || !profileButton) {
+    if (
+      !profileMenu ||
+      !profileButton
+    ) {
       return;
     }
 
     profileMenu.classList.add("open");
 
-    profileMenu.setAttribute("aria-hidden", "false");
+    profileMenu.setAttribute(
+      "aria-hidden",
+      "false"
+    );
 
-    profileButton.setAttribute("aria-expanded", "true");
+    profileButton.setAttribute(
+      "aria-expanded",
+      "true"
+    );
   }
 
 
   function closeProfileMenu() {
 
-    if (!profileMenu || !profileButton) {
+    if (
+      !profileMenu ||
+      !profileButton
+    ) {
       return;
     }
 
     profileMenu.classList.remove("open");
 
-    profileMenu.setAttribute("aria-hidden", "true");
+    profileMenu.setAttribute(
+      "aria-hidden",
+      "true"
+    );
 
-    profileButton.setAttribute("aria-expanded", "false");
+    profileButton.setAttribute(
+      "aria-expanded",
+      "false"
+    );
   }
 
 
@@ -332,31 +417,38 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (profileButton) {
 
-    profileButton.addEventListener("click", (event) => {
+    profileButton.addEventListener(
+      "click",
+      (event) => {
 
-      event.stopPropagation();
+        event.stopPropagation();
 
-      toggleProfileMenu();
-
-    });
+        toggleProfileMenu();
+      }
+    );
   }
 
 
-  document.addEventListener("click", (event) => {
+  document.addEventListener(
+    "click",
+    (event) => {
 
-    if (!profileMenu || !profileButton) {
-      return;
+      if (
+        !profileMenu ||
+        !profileButton
+      ) {
+        return;
+      }
+
+      if (
+        !profileMenu.contains(event.target) &&
+        !profileButton.contains(event.target)
+      ) {
+
+        closeProfileMenu();
+      }
     }
-
-    if (
-      !profileMenu.contains(event.target) &&
-      !profileButton.contains(event.target)
-    ) {
-
-      closeProfileMenu();
-    }
-
-  });
+  );
 
 
   // =========================================
@@ -365,7 +457,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function loadProfile(user) {
 
-    const { data: profile, error } = await supabaseClient
+    const {
+      data: profile,
+      error
+    } = await supabaseClient
       .from("profiles")
       .select(`
         id,
@@ -385,6 +480,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     if (!profile) {
+
       throw new Error(
         "Your account profile could not be found."
       );
@@ -402,7 +498,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     // =========================================
-    // ORDERS PAGE IS FOR BUYERS
+    // ROLE PROTECTION
     // =========================================
 
     if (profile.role !== "buyer") {
@@ -443,12 +539,10 @@ document.addEventListener("DOMContentLoaded", () => {
       user.email?.split("@")[0] ||
       "Account";
 
-
     const email =
       profile.email ||
       user.email ||
       "";
-
 
     const firstLetter =
       name.trim().charAt(0).toUpperCase() ||
@@ -459,15 +553,27 @@ document.addEventListener("DOMContentLoaded", () => {
       profileName.textContent = name;
     }
 
-
     if (profileAvatar) {
-      profileAvatar.textContent = firstLetter;
+      profileAvatar.textContent =
+        firstLetter;
     }
-
 
     if (menuName) {
       menuName.textContent = name;
     }
+
+    if (menuEmail) {
+      menuEmail.textContent = email;
+    }
+
+    if (menuAvatar) {
+      menuAvatar.textContent =
+        firstLetter;
+    }
+
+
+    return profile;
+  }
 // =========================================
 // LOAD ORDERS FROM SUPABASE
 // PART 2 OF 3
@@ -480,7 +586,9 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
 
       if (!currentUser) {
-        throw new Error("You are not signed in.");
+        throw new Error(
+          "You are not signed in."
+        );
       }
 
 
@@ -488,7 +596,10 @@ document.addEventListener("DOMContentLoaded", () => {
       // FETCH BUYER ORDERS
       // =========================================
 
-      const { data: orders, error } = await supabaseClient
+      const {
+        data: orders,
+        error
+      } = await supabaseClient
         .from("orders")
         .select(`
           id,
@@ -518,10 +629,16 @@ document.addEventListener("DOMContentLoaded", () => {
             seller_id
           )
         `)
-        .eq("buyer_id", currentUser.id)
-        .order("created_at", {
-          ascending: false
-        });
+        .eq(
+          "buyer_id",
+          currentUser.id
+        )
+        .order(
+          "created_at",
+          {
+            ascending: false
+          }
+        );
 
 
       if (error) {
@@ -529,23 +646,25 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
 
-      allOrders = Array.isArray(orders)
-        ? orders
-        : [];
+      allOrders =
+        Array.isArray(orders)
+          ? orders
+          : [];
 
 
       // =========================================
-      // ORDER COUNT
+      // UPDATE ORDER COUNT
       // =========================================
 
       updateOrderCount();
 
 
       // =========================================
-      // APPLY CURRENT FILTER
+      // APPLY FILTER
       // =========================================
 
       applyOrderFilter();
+
 
     } catch (error) {
 
@@ -573,7 +692,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    const count = allOrders.length;
+    const count =
+      allOrders.length;
 
 
     if (count === 0) {
@@ -586,7 +706,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     orderCount.textContent =
-      `${count} ${count === 1 ? "order" : "orders"}`;
+      `${count} ${
+        count === 1
+          ? "order"
+          : "orders"
+      }`;
   }
 
 
@@ -607,16 +731,16 @@ document.addEventListener("DOMContentLoaded", () => {
       !selectedStatus
     ) {
 
-      filteredOrders = [...allOrders];
+      filteredOrders =
+        [...allOrders];
 
     } else {
 
       filteredOrders =
-        allOrders.filter((order) => {
-
-          return order.status === selectedStatus;
-
-        });
+        allOrders.filter(
+          (order) =>
+            order.status === selectedStatus
+        );
     }
 
 
@@ -625,7 +749,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   // =========================================
-  // STATUS FILTER EVENT
+  // STATUS FILTER
   // =========================================
 
   if (statusFilter) {
@@ -653,7 +777,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     // =========================================
-    // NO ORDERS AT ALL
+    // NO ORDERS
     // =========================================
 
     if (allOrders.length === 0) {
@@ -671,7 +795,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (filteredOrders.length === 0) {
 
       showOrders();
-
 
       ordersList.innerHTML = `
         <div class="empty-filter-state">
@@ -696,15 +819,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     // =========================================
-    // RENDER ORDER CARDS
+    // DISPLAY ORDERS
     // =========================================
 
     showOrders();
 
-
     ordersList.innerHTML =
       filteredOrders
-        .map(order => createOrderCard(order))
+        .map(
+          (order) =>
+            createOrderCard(order)
+        )
         .join("");
   }
 
@@ -724,14 +849,23 @@ document.addEventListener("DOMContentLoaded", () => {
     const itemCount =
       items.reduce(
         (total, item) => {
-          return total + (Number(item.quantity) || 0);
+
+          return (
+            total +
+            (
+              Number(item.quantity) ||
+              0
+            )
+          );
+
         },
         0
       );
 
 
     const status =
-      order.status || "pending";
+      order.status ||
+      "pending";
 
 
     const statusLabel =
@@ -743,42 +877,60 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     const paymentMethod =
-      order.payment_method === "cash_on_delivery"
+      order.payment_method ===
+      "cash_on_delivery"
         ? "Cash on Delivery"
-        : formatStatus(order.payment_method);
+        : formatStatus(
+            order.payment_method
+          );
 
 
     const paymentStatus =
-      order.payment_status || "unpaid";
+      order.payment_status ||
+      "unpaid";
 
 
     const paymentLabel =
-      formatStatus(paymentStatus);
+      formatStatus(
+        paymentStatus
+      );
 
 
     const total =
-      Number(order.total_amount) || 0;
+      Number(
+        order.total_amount
+      ) || 0;
 
 
     const subtotal =
-      Number(order.subtotal) || 0;
+      Number(
+        order.subtotal
+      ) || 0;
 
 
     const deliveryFee =
-      Number(order.delivery_fee) || 0;
+      Number(
+        order.delivery_fee
+      ) || 0;
 
 
     const orderNumber =
       order.order_number ||
-      `SMH-${String(order.id).slice(0, 8).toUpperCase()}`;
+      `SMH-${String(order.id)
+        .slice(0, 8)
+        .toUpperCase()}`;
 
 
     const createdDate =
-      formatDate(order.created_at);
+      formatDate(
+        order.created_at
+      );
 
 
     const createdDateTime =
-      formatDateTime(order.created_at);
+      formatDateTime(
+        order.created_at
+      );
 
 
     const firstItem =
@@ -788,7 +940,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     const remainingItems =
-      Math.max(items.length - 1, 0);
+      Math.max(
+        items.length - 1,
+        0
+      );
 
 
     const firstProductName =
@@ -797,11 +952,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     const firstProductQuantity =
-      Number(firstItem?.quantity) || 1;
+      Number(
+        firstItem?.quantity
+      ) || 1;
 
 
     const firstProductPrice =
-      Number(firstItem?.product_price) || 0;
+      Number(
+        firstItem?.product_price
+      ) || 0;
+
+
+    const productInitial =
+      firstProductName
+        .trim()
+        .charAt(0)
+        .toUpperCase() ||
+      "P";
 
 
     return `
@@ -811,7 +978,7 @@ document.addEventListener("DOMContentLoaded", () => {
       >
 
         <!-- =================================
-             ORDER CARD HEADER
+             ORDER HEADER
         ================================== -->
 
         <div class="order-card-header">
@@ -846,37 +1013,45 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
         <!-- =================================
-             ORDER CARD BODY
+             ORDER BODY
         ================================== -->
 
         <div class="order-card-body">
 
 
-          <!-- PRODUCT SUMMARY -->
+          <!-- PRODUCT -->
 
           <div class="order-product-summary">
 
             <div class="product-placeholder">
-              ${escapeHTML(
-                firstProductName
-                  .trim()
-                  .charAt(0)
-                  .toUpperCase() || "P"
-              )}
+              ${escapeHTML(productInitial)}
             </div>
 
 
             <div class="product-summary-content">
 
               <strong>
-                ${escapeHTML(firstProductName)}
+                ${escapeHTML(
+                  firstProductName
+                )}
               </strong>
 
               <span>
+
                 ${firstProductQuantity}
-                ${firstProductQuantity === 1 ? "item" : "items"}
+
+                ${
+                  firstProductQuantity === 1
+                    ? "item"
+                    : "items"
+                }
+
                 ×
-                ${formatCurrency(firstProductPrice)}
+
+                ${formatCurrency(
+                  firstProductPrice
+                )}
+
               </span>
 
 
@@ -924,7 +1099,9 @@ document.addEventListener("DOMContentLoaded", () => {
               </span>
 
               <strong>
-                ${escapeHTML(paymentMethod)}
+                ${escapeHTML(
+                  paymentMethod
+                )}
               </strong>
 
             </div>
@@ -939,7 +1116,9 @@ document.addEventListener("DOMContentLoaded", () => {
               <strong
                 class="payment-status payment-${escapeHTML(paymentStatus)}"
               >
-                ${escapeHTML(paymentLabel)}
+                ${escapeHTML(
+                  paymentLabel
+                )}
               </strong>
 
             </div>
@@ -963,11 +1142,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
         <!-- =================================
-             ORDER CARD FOOTER
+             ORDER FOOTER
         ================================== -->
 
         <div class="order-card-footer">
-
 
           <div class="order-total-breakdown">
 
@@ -979,11 +1157,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
             <span>
               Delivery:
+
               ${
                 deliveryFee > 0
-                  ? formatCurrency(deliveryFee)
+                  ? formatCurrency(
+                      deliveryFee
+                    )
                   : "FREE"
               }
+
             </span>
 
           </div>
@@ -994,10 +1176,13 @@ document.addEventListener("DOMContentLoaded", () => {
             class="view-order-button"
             data-order-id="${escapeHTML(order.id)}"
           >
+
             View Order
+
             <span aria-hidden="true">
               →
             </span>
+
           </button>
 
         </div>
@@ -1008,7 +1193,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   // =========================================
-  // VIEW ORDER BUTTONS
+  // VIEW ORDER
   // =========================================
 
   if (ordersList) {
@@ -1043,27 +1228,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
         window.location.href =
-          `order-details.html?id=${encodeURIComponent(orderId)}`;
+          `order-details.html?id=${encodeURIComponent(
+            orderId
+          )}`;
 
       }
     );
   }
-
-
-    if (menuEmail) {
-      menuEmail.textContent = email;
-    }
-
-
-    if (menuAvatar) {
-      menuAvatar.textContent = firstLetter;
-    }
-
-
-    return profile;
-  }
 // =========================================
-// NAVIGATION + ACCOUNT ACTIONS
+// ACCOUNT NAVIGATION + INITIALIZATION
 // PART 3 OF 3
 // =========================================
 
@@ -1076,11 +1249,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     startShoppingButton.addEventListener(
       "click",
-      () => {
+      (event) => {
+
+        event.preventDefault();
 
         window.location.href =
           "buyer-dashboard.html";
-
       }
     );
   }
@@ -1102,7 +1276,6 @@ document.addEventListener("DOMContentLoaded", () => {
           top: 0,
           behavior: "smooth"
         });
-
       }
     );
   }
@@ -1122,7 +1295,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         window.location.href =
           "wishlist.html";
-
       }
     );
   }
@@ -1142,7 +1314,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         window.location.href =
           "account-settings.html";
-
       }
     );
   }
@@ -1160,10 +1331,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
         closeProfileMenu();
 
-        logoutButton.disabled = true;
-
         const originalContent =
           logoutButton.innerHTML;
+
+
+        logoutButton.disabled = true;
 
         logoutButton.innerHTML =
           "<span>↪</span> Signing Out...";
@@ -1171,7 +1343,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         try {
 
-          const { error } =
+          const {
+            error
+          } =
             await supabaseClient.auth.signOut();
 
 
@@ -1225,7 +1399,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   // =========================================
-  // AUTHENTICATION + INITIALIZATION
+  // INITIALIZE ORDERS PAGE
   // =========================================
 
   async function initializeOrders() {
@@ -1244,7 +1418,8 @@ document.addEventListener("DOMContentLoaded", () => {
           user
         },
         error: sessionError
-      } = await supabaseClient.auth.getUser();
+      } =
+        await supabaseClient.auth.getUser();
 
 
       if (sessionError) {
@@ -1253,7 +1428,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
       // =========================================
-      // NOT LOGGED IN
+      // USER NOT SIGNED IN
       // =========================================
 
       if (!user) {
@@ -1305,7 +1480,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   // =========================================
-  // AUTH STATE CHANGES
+  // AUTH STATE LISTENER
   // =========================================
 
   supabaseClient.auth.onAuthStateChange(
@@ -1317,10 +1492,6 @@ document.addEventListener("DOMContentLoaded", () => {
       );
 
 
-      // =========================================
-      // SIGNED OUT
-      // =========================================
-
       if (event === "SIGNED_OUT") {
 
         window.location.href =
@@ -1329,10 +1500,6 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-
-      // =========================================
-      // SESSION EXPIRED / MISSING
-      // =========================================
 
       if (
         !session &&
@@ -1344,13 +1511,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         return;
       }
-
     }
   );
 
 
   // =========================================
-  // INITIALIZE PAGE
+  // START ORDERS PAGE
   // =========================================
 
   initializeOrders();
