@@ -663,3 +663,29 @@ input:focus-visible {
     animation: none;
   }
 }
+/* =========================================================
+   WISHLIST BUTTON
+   ========================================================= */
+
+.wishlist-button {
+  transition:
+    transform 0.15s ease,
+    opacity 0.15s ease,
+    background 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.wishlist-button:hover {
+  background: #222;
+  border-color: #666;
+}
+
+.wishlist-button.active {
+  background: rgba(255, 92, 92, 0.08);
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.wishlist-button.active:hover {
+  background: rgba(255, 92, 92, 0.14);
+}
