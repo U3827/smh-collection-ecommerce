@@ -1,731 +1,775 @@
-// =========================================
-// SMH COLLECTION
-// REAL BUYER WISHLIST
-// =========================================
+/* =========================================================
+   SMH COLLECTION — WISHLIST
+   ========================================================= */
 
-document.addEventListener("DOMContentLoaded", async () => {
+document.addEventListener("DOMContentLoaded", () => {
+  "use strict";
 
-  console.log("SMH Collection Wishlist loaded.");
+  // =========================================================
+  // DOM ELEMENTS
+  // =========================================================
 
-  // =========================================
-  // ELEMENTS
-  // =========================================
+  const wishlistLoading =
+    document.getElementById("wishlistLoading");
 
-  const currentYear =
-    document.getElementById("currentYear");
+  const wishlistLogin =
+    document.getElementById("wishlistLogin");
 
-  const loadingState =
-    document.getElementById("loadingState");
+  const wishlistError =
+    document.getElementById("wishlistError");
+
+  const wishlistErrorMessage =
+    document.getElementById("wishlistErrorMessage");
+
+  const wishlistEmpty =
+    document.getElementById("wishlistEmpty");
+
+  const wishlistContent =
+    document.getElementById("wishlistContent");
 
   const wishlistGrid =
     document.getElementById("wishlistGrid");
 
-  const emptyState =
-    document.getElementById("emptyState");
+  const wishlistCount =
+    document.getElementById("wishlistCount");
 
-  const errorState =
-    document.getElementById("errorState");
-
-  const errorMessage =
-    document.getElementById("errorMessage");
+  const cartCount =
+    document.getElementById("cartCount");
 
   const retryButton =
     document.getElementById("retryButton");
 
-  const wishlistCount =
-    document.getElementById("wishlistCount");
+  const backButton =
+    document.getElementById("backButton");
 
-  // =========================================
-  // PROFILE
-  // =========================================
 
-  const profileButton =
-    document.getElementById("profileButton");
-
-  const profileMenu =
-    document.getElementById("profileMenu");
-
-  const profileAvatar =
-    document.getElementById("profileAvatar");
-
-  const profileName =
-    document.getElementById("profileName");
-
-  const menuAvatar =
-    document.getElementById("menuAvatar");
-
-  const menuName =
-    document.getElementById("menuName");
-
-  const menuEmail =
-    document.getElementById("menuEmail");
-
-  const myOrdersButton =
-    document.getElementById("myOrdersButton");
-
-  const wishlistButton =
-    document.getElementById("wishlistButton");
-
-  const settingsButton =
-    document.getElementById("settingsButton");
-
-  const logoutButton =
-    document.getElementById("logoutButton");
-
-  // =========================================
+  // =========================================================
   // STATE
-  // =========================================
+  // =========================================================
 
   let currentUser = null;
   let wishlistItems = [];
+  let currentCart = null;
 
-  // =========================================
-  // YEAR
-  // =========================================
 
-  if (currentYear) {
-    currentYear.textContent =
-      new Date().getFullYear();
-  }
-
-  // =========================================
+  // =========================================================
   // SUPABASE CHECK
-  // =========================================
+  // =========================================================
 
   if (
-    typeof window.supabase === "undefined" ||
-    typeof supabaseClient === "undefined"
+    typeof supabaseClient === "undefined" ||
+    !supabaseClient
   ) {
-    console.error("Supabase client is unavailable.");
+
+    console.error(
+      "Supabase client is not available."
+    );
 
     showError(
-      "The connection to SMH Collection could not be initialized."
+      "The connection to SMH Collection could not be established."
     );
 
     return;
   }
 
-  // =========================================
-  // HELPERS
-  // =========================================
 
-  function escapeHTML(value) {
-    if (
-      value === null ||
-      value === undefined
-    ) {
-      return "";
-    }
+  // =========================================================
+  // PAGE STATE
+  // =========================================================
 
-    return String(value)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
+  function hideAllStates() {
+
+    wishlistLoading.classList.add("hidden");
+    wishlistLogin.classList.add("hidden");
+    wishlistError.classList.add("hidden");
+    wishlistEmpty.classList.add("hidden");
+    wishlistContent.classList.add("hidden");
+
   }
 
-  function formatPrice(value) {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 2
-    }).format(Number(value) || 0);
-  }
-
-  function getInitials(name) {
-    if (!name) {
-      return "U";
-    }
-
-    const parts = name
-      .trim()
-      .split(/\s+/)
-      .filter(Boolean);
-
-    if (parts.length === 1) {
-      return parts[0]
-        .substring(0, 2)
-        .toUpperCase();
-    }
-
-    return (
-      parts[0][0] +
-      parts[parts.length - 1][0]
-    ).toUpperCase();
-  }
-
-  // =========================================
-  // UI STATES
-  // =========================================
 
   function showLoading() {
-    if (loadingState) {
-      loadingState.hidden = false;
-    }
 
-    if (wishlistGrid) {
-      wishlistGrid.hidden = true;
-    }
+    hideAllStates();
 
-    if (emptyState) {
-      emptyState.hidden = true;
-    }
+    wishlistLoading.classList.remove("hidden");
 
-    if (errorState) {
-      errorState.hidden = true;
-    }
   }
 
-  function showEmpty() {
-    if (loadingState) {
-      loadingState.hidden = true;
-    }
 
-    if (wishlistGrid) {
-      wishlistGrid.hidden = true;
-    }
+  function showLogin() {
 
-    if (emptyState) {
-      emptyState.hidden = false;
-    }
+    hideAllStates();
 
-    if (errorState) {
-      errorState.hidden = true;
-    }
+    wishlistLogin.classList.remove("hidden");
 
-    if (wishlistCount) {
-      wishlistCount.textContent =
-        "No saved products";
-    }
   }
 
-  function showProducts() {
-    if (loadingState) {
-      loadingState.hidden = true;
-    }
-
-    if (wishlistGrid) {
-      wishlistGrid.hidden = false;
-    }
-
-    if (emptyState) {
-      emptyState.hidden = true;
-    }
-
-    if (errorState) {
-      errorState.hidden = true;
-    }
-  }
 
   function showError(message) {
-    if (loadingState) {
-      loadingState.hidden = true;
-    }
 
-    if (wishlistGrid) {
-      wishlistGrid.hidden = true;
-    }
+    hideAllStates();
 
-    if (emptyState) {
-      emptyState.hidden = true;
-    }
+    wishlistErrorMessage.textContent =
+      message ||
+      "Something went wrong while loading your wishlist.";
 
-    if (errorState) {
-      errorState.hidden = false;
-    }
+    wishlistError.classList.remove("hidden");
 
-    if (errorMessage) {
-      errorMessage.textContent =
-        message ||
-        "Something went wrong while loading your wishlist.";
-    }
-
-    if (wishlistCount) {
-      wishlistCount.textContent =
-        "Unable to load wishlist";
-    }
   }
 
-  // =========================================
-  // AUTHENTICATION
-  // =========================================
 
-  async function loadCurrentUser() {
-    const {
-      data,
-      error
-    } = await supabaseClient.auth.getUser();
+  function showEmpty() {
 
-    if (error) {
-      throw error;
-    }
+    hideAllStates();
 
-    if (!data.user) {
-      window.location.href = "login.html";
-      return false;
-    }
+    wishlistEmpty.classList.remove("hidden");
 
-    currentUser = data.user;
-
-    return true;
   }
 
-  // =========================================
-  // LOAD PROFILE
-  // =========================================
 
-  async function loadProfile() {
-    const {
-      data: profile,
-      error
-    } = await supabaseClient
-      .from("profiles")
-      .select(
-        "id, full_name, email, role, is_active, avatar_url"
-      )
-      .eq("id", currentUser.id)
-      .single();
+  function showContent() {
 
-    if (error) {
-      throw error;
-    }
+    hideAllStates();
 
-    if (!profile) {
-      throw new Error(
-        "Your account profile could not be found."
+    wishlistContent.classList.remove("hidden");
+
+  }
+
+
+  // =========================================================
+  // MESSAGE
+  // =========================================================
+
+  let messageTimer = null;
+
+  function showMessage(
+    message,
+    type = "success"
+  ) {
+
+    let messageElement =
+      document.getElementById("wishlistMessage");
+
+    if (!messageElement) {
+
+      messageElement =
+        document.createElement("div");
+
+      messageElement.id =
+        "wishlistMessage";
+
+      document.body.appendChild(
+        messageElement
       );
     }
 
-    if (!profile.is_active) {
-      await supabaseClient.auth.signOut();
+    messageElement.textContent = message;
 
-      window.location.href =
-        "login.html";
+    messageElement.className =
+      `show ${type}`;
+
+    clearTimeout(messageTimer);
+
+    messageTimer = setTimeout(() => {
+
+      messageElement.classList.remove(
+        "show"
+      );
+
+    }, 2500);
+
+  }
+
+
+  // =========================================================
+  // LOAD CURRENT USER
+  // =========================================================
+
+  async function loadCurrentUser() {
+
+    try {
+
+      const {
+        data,
+        error
+      } = await supabaseClient.auth.getUser();
+
+      if (error) {
+
+        console.error(
+          "User authentication error:",
+          error
+        );
+
+        currentUser = null;
+
+        return null;
+      }
+
+      currentUser =
+        data?.user || null;
+
+      return currentUser;
+
+    } catch (error) {
+
+      console.error(
+        "Unexpected authentication error:",
+        error
+      );
+
+      currentUser = null;
+
+      return null;
+    }
+  }
+
+
+  // =========================================================
+  // UPDATE CART COUNT
+  // =========================================================
+
+  async function updateCartCount() {
+
+    if (!cartCount) {
+      return;
+    }
+
+    await loadCurrentUser();
+
+    if (!currentUser) {
+
+      cartCount.textContent = "0";
 
       return;
     }
 
-    // =======================================
-    // ROLE PROTECTION
-    // =======================================
+    try {
 
-    if (profile.role !== "buyer") {
+      const {
+        data,
+        error
+      } = await supabaseClient
+        .from("carts")
+        .select(`
+          id,
+          cart_items (
+            quantity
+          )
+        `)
+        .eq(
+          "buyer_id",
+          currentUser.id
+        )
+        .maybeSingle();
 
-      if (profile.role === "admin") {
-        window.location.href =
-          "admin-dashboard.html";
+      if (error) {
+
+        console.error(
+          "Cart count error:",
+          error
+        );
+
+        cartCount.textContent = "0";
+
         return;
       }
 
-      if (profile.role === "seller") {
-        window.location.href =
-          "seller-dashboard.html";
+      currentCart = data || null;
+
+      if (
+        !currentCart ||
+        !currentCart.cart_items
+      ) {
+
+        cartCount.textContent = "0";
+
         return;
       }
 
-      throw new Error(
-        "This page is only available to buyer accounts."
+      const totalItems =
+        currentCart.cart_items.reduce(
+          (total, item) =>
+            total +
+            Number(item.quantity || 0),
+          0
+        );
+
+      cartCount.textContent =
+        String(totalItems);
+
+    } catch (error) {
+
+      console.error(
+        "Unexpected cart count error:",
+        error
       );
-    }
 
-    const name =
-      profile.full_name ||
-      currentUser.email ||
-      "Account";
-
-    const initials =
-      getInitials(name);
-
-    if (profileName) {
-      profileName.textContent =
-        name;
-    }
-
-    if (profileAvatar) {
-      profileAvatar.textContent =
-        initials;
-    }
-
-    if (menuName) {
-      menuName.textContent =
-        name;
-    }
-
-    if (menuAvatar) {
-      menuAvatar.textContent =
-        initials;
-    }
-
-    if (menuEmail) {
-      menuEmail.textContent =
-        profile.email ||
-        currentUser.email ||
-        "";
+      cartCount.textContent = "0";
     }
   }
 
-  // =========================================
+
+  // =========================================================
   // LOAD WISHLIST
-  // =========================================
+  // =========================================================
 
   async function loadWishlist() {
 
     showLoading();
 
-    const {
-      data,
-      error
-    } = await supabaseClient
-      .from("wishlist")
-      .select(`
-        id,
-        buyer_id,
-        product_id,
-        created_at,
-        products (
-          id,
-          name,
-          slug,
-          description,
-          price,
-          stock,
-          image_url,
-          is_active,
-          categories (
-            id,
-            name,
-            slug
-          )
-        )
-      `)
-      .eq(
-        "buyer_id",
-        currentUser.id
-      )
-      .order(
-        "created_at",
-        {
-          ascending: false
-        }
-      );
+    const user =
+      await loadCurrentUser();
 
-    if (error) {
-      throw error;
+    if (!user) {
+
+      wishlistCount.textContent =
+        "0 items";
+
+      showLogin();
+
+      return;
     }
 
-    wishlistItems =
-      Array.isArray(data)
-        ? data
-        : [];
+    try {
 
-    renderWishlist();
+      const {
+        data,
+        error
+      } = await supabaseClient
+        .from("wishlists")
+        .select(`
+          id,
+          product_id,
+          created_at,
+          products (
+            id,
+            category_id,
+            name,
+            slug,
+            description,
+            price,
+            stock,
+            image_url,
+            is_active,
+            categories (
+              id,
+              name
+            )
+          )
+        `)
+        .eq(
+          "buyer_id",
+          currentUser.id
+        )
+        .order(
+          "created_at",
+          {
+            ascending: false
+          }
+        );
+
+      if (error) {
+
+        console.error(
+          "Wishlist loading error:",
+          error
+        );
+
+        showError(
+          "Unable to load your wishlist. Please try again."
+        );
+
+        return;
+      }
+
+      wishlistItems =
+        Array.isArray(data)
+          ? data
+          : [];
+
+      updateWishlistCount();
+
+      if (
+        wishlistItems.length === 0
+      ) {
+
+        showEmpty();
+
+        return;
+      }
+
+      renderWishlist();
+
+      showContent();
+
+    } catch (error) {
+
+      console.error(
+        "Unexpected wishlist loading error:",
+        error
+      );
+
+      showError(
+        "Something went wrong while loading your wishlist."
+      );
+    }
   }
 
-  // =========================================
+
+  // =========================================================
+  // UPDATE WISHLIST COUNT
+  // =========================================================
+
+  function updateWishlistCount() {
+
+    const count =
+      wishlistItems.length;
+
+    wishlistCount.textContent =
+      count === 1
+        ? "1 item"
+        : `${count} items`;
+
+  }
+
+
+  // =========================================================
+  // FORMAT PRICE
+  // =========================================================
+
+  function formatPrice(price) {
+
+    const numericPrice =
+      Number(price);
+
+    if (
+      !Number.isFinite(
+        numericPrice
+      )
+    ) {
+
+      return "$0.00";
+    }
+
+    return new Intl.NumberFormat(
+      "en-US",
+      {
+        style: "currency",
+        currency: "USD"
+      }
+    ).format(
+      numericPrice
+    );
+  }
+
+
+  // =========================================================
+  // ESCAPE HTML
+  // =========================================================
+
+  function escapeHtml(value) {
+
+    return String(value ?? "")
+      .replace(
+        /&/g,
+        "&amp;"
+      )
+      .replace(
+        /</g,
+        "&lt;"
+      )
+      .replace(
+        />/g,
+        "&gt;"
+      )
+      .replace(
+        /"/g,
+        "&quot;"
+      )
+      .replace(
+        /'/g,
+        "&#039;"
+      );
+  }
+
+
+  // =========================================================
+  // PRODUCT IMAGE
+  // =========================================================
+
+  function getProductImage(product) {
+
+    if (
+      product &&
+      product.image_url
+    ) {
+
+      return product.image_url;
+    }
+
+    return "assets/images/product-placeholder.png";
+  }
+
+
+  // =========================================================
   // RENDER WISHLIST
-  // =========================================
+  // =========================================================
 
   function renderWishlist() {
 
-    if (!wishlistGrid) {
-      return;
-    }
+    wishlistGrid.innerHTML = "";
 
-    if (!wishlistItems.length) {
+    wishlistItems.forEach(
+      (wishlistItem) => {
+
+        const product =
+          wishlistItem.products;
+
+        if (!product) {
+          return;
+        }
+
+        const card =
+          createWishlistCard(
+            wishlistItem,
+            product
+          );
+
+        wishlistGrid.appendChild(
+          card
+        );
+
+      }
+    );
+
+    if (
+      wishlistGrid.children.length === 0
+    ) {
+
       showEmpty();
-      return;
     }
-
-    showProducts();
-
-    if (wishlistCount) {
-      wishlistCount.textContent =
-        `${wishlistItems.length} ${
-          wishlistItems.length === 1
-            ? "saved product"
-            : "saved products"
-        }`;
-    }
-
-    wishlistGrid.innerHTML =
-      wishlistItems
-        .map(createWishlistCard)
-        .join("");
-
-    attachWishlistEvents();
   }
 
-  // =========================================
-  // CREATE CARD
-  // =========================================
 
-  function createWishlistCard(item) {
+  // =========================================================
+  // CREATE WISHLIST CARD
+  // =========================================================
 
-    const product =
-      item.products;
+  function createWishlistCard(
+    wishlistItem,
+    product
+  ) {
 
-    // Product deleted from database
-    if (!product) {
+    const card =
+      document.createElement("article");
 
-      return `
-        <article
-          class="wishlist-card"
-          data-wishlist-id="${escapeHTML(item.id)}"
-        >
-
-          <div class="wishlist-image">
-
-            <div class="wishlist-placeholder">
-              ◇
-            </div>
-
-            <button
-              type="button"
-              class="remove-wishlist-button"
-              data-remove-id="${escapeHTML(item.id)}"
-              aria-label="Remove unavailable product"
-            >
-              ×
-            </button>
-
-          </div>
-
-          <div class="wishlist-info">
-
-            <div class="wishlist-category">
-              UNAVAILABLE
-            </div>
-
-            <h3 class="wishlist-name">
-              Product no longer available
-            </h3>
-
-            <div class="wishlist-actions">
-
-              <button
-                type="button"
-                class="view-product-button"
-                disabled
-              >
-                Unavailable
-              </button>
-
-            </div>
-
-          </div>
-
-        </article>
-      `;
-    }
-
-    const productId =
-      product.id;
-
-    const productName =
-      escapeHTML(
-        product.name ||
-        "Product"
-      );
+    card.className =
+      "wishlist-card";
 
     const categoryName =
       product.categories?.name ||
-      "General";
-
-    const image =
-      product.image_url ||
-      "";
-
-    const price =
-      formatPrice(product.price);
+      "Product";
 
     const stock =
       Number(product.stock || 0);
 
-    const unavailable =
-      !product.is_active ||
-      stock <= 0;
+    const isInStock =
+      product.is_active === true &&
+      stock > 0;
 
-    return `
-      <article
-        class="wishlist-card"
-        data-wishlist-id="${escapeHTML(item.id)}"
-      >
+    const imageUrl =
+      getProductImage(product);
 
-        <div class="wishlist-image">
+    card.innerHTML = `
+      <div class="wishlist-image-wrapper">
 
+        <img
+          src="${escapeHtml(imageUrl)}"
+          alt="${escapeHtml(product.name)}"
+          loading="lazy"
+        >
+
+        <span
+          class="stock-badge ${
+            isInStock
+              ? "in-stock"
+              : "out-of-stock"
+          }"
+        >
           ${
-            image
-              ? `
-                <img
-                  src="${escapeHTML(image)}"
-                  alt="${productName}"
-                  loading="lazy"
-                >
-              `
-              : `
-                <div class="wishlist-placeholder">
-                  ◇
-                </div>
-              `
+            isInStock
+              ? `${stock} in stock`
+              : "Out of stock"
           }
+        </span>
+
+      </div>
+
+      <div class="wishlist-card-body">
+
+        <div class="product-category">
+          ${escapeHtml(categoryName)}
+        </div>
+
+        <h2 class="product-name">
+          ${escapeHtml(product.name)}
+        </h2>
+
+        <div class="product-price">
+          ${formatPrice(product.price)}
+        </div>
+
+        <div class="wishlist-actions">
+
+          <a
+            href="product.html?id=${encodeURIComponent(product.id)}"
+            class="view-product-button"
+          >
+            View Product
+          </a>
+
+          <button
+            type="button"
+            class="add-cart-button"
+            data-product-id="${escapeHtml(product.id)}"
+            ${
+              isInStock
+                ? ""
+                : "disabled"
+            }
+          >
+            ${
+              isInStock
+                ? "Add to Cart"
+                : "Unavailable"
+            }
+          </button>
 
           <button
             type="button"
             class="remove-wishlist-button"
-            data-remove-id="${escapeHTML(item.id)}"
-            aria-label="Remove ${productName} from wishlist"
+            data-wishlist-id="${escapeHtml(wishlistItem.id)}"
+            data-product-id="${escapeHtml(product.id)}"
           >
-            ×
+            ♡ Remove from Wishlist
           </button>
 
         </div>
 
-        <div class="wishlist-info">
-
-          <div class="wishlist-category">
-            ${escapeHTML(categoryName)}
-          </div>
-
-          <h3 class="wishlist-name">
-            ${productName}
-          </h3>
-
-          <div class="wishlist-price">
-            ${price}
-          </div>
-
-          <div class="wishlist-actions">
-
-            <button
-              type="button"
-              class="view-product-button"
-              data-product-id="${escapeHTML(productId)}"
-              ${unavailable ? "disabled" : ""}
-            >
-              ${
-                unavailable
-                  ? "Unavailable"
-                  : "View Product"
-              }
-            </button>
-
-            <button
-              type="button"
-              class="add-cart-button"
-              data-cart-product-id="${escapeHTML(productId)}"
-              aria-label="Add ${productName} to cart"
-              ${unavailable ? "disabled" : ""}
-            >
-              🛒
-            </button>
-
-          </div>
-
-        </div>
-
-      </article>
+      </div>
     `;
-  }
 
-  // =========================================
-  // ATTACH WISHLIST EVENTS
-  // =========================================
 
-  function attachWishlistEvents() {
+    // =======================================================
+    // IMAGE ERROR FALLBACK
+    // =======================================================
 
-    // REMOVE
-    document
-      .querySelectorAll("[data-remove-id]")
-      .forEach((button) => {
+    const image =
+      card.querySelector("img");
 
-        button.addEventListener(
-          "click",
-          async () => {
+    image.addEventListener(
+      "error",
+      () => {
 
-            const wishlistId =
-              button.dataset.removeId;
+        image.src =
+          "assets/images/product-placeholder.png";
 
-            if (!wishlistId) {
-              return;
-            }
+      },
+      {
+        once: true
+      }
+    );
 
-            await removeFromWishlist(
-              wishlistId
-            );
-          }
-        );
-      });
 
-    // VIEW PRODUCT
-    document
-      .querySelectorAll("[data-product-id]")
-      .forEach((button) => {
-
-        button.addEventListener(
-          "click",
-          () => {
-
-            if (button.disabled) {
-              return;
-            }
-
-            const productId =
-              button.dataset.productId;
-
-            if (!productId) {
-              return;
-            }
-
-            window.location.href =
-              `product.html?id=${encodeURIComponent(productId)}`;
-          }
-        );
-      });
-
+    // =======================================================
     // ADD TO CART
-    document
-      .querySelectorAll("[data-cart-product-id]")
-      .forEach((button) => {
+    // =======================================================
 
-        button.addEventListener(
-          "click",
-          async () => {
+    const addCartButton =
+      card.querySelector(
+        ".add-cart-button"
+      );
 
-            if (button.disabled) {
-              return;
-            }
+    if (addCartButton) {
 
-            const productId =
-              button.dataset.cartProductId;
+      addCartButton.addEventListener(
+        "click",
+        () => {
 
-            if (!productId) {
-              return;
-            }
+          addToCart(
+            product,
+            addCartButton
+          );
 
-            await addToCart(
-              productId,
-              button
-            );
-          }
-        );
-      });
+        }
+      );
+    }
+
+
+    // =======================================================
+    // REMOVE FROM WISHLIST
+    // =======================================================
+
+    const removeButton =
+      card.querySelector(
+        ".remove-wishlist-button"
+      );
+
+    if (removeButton) {
+
+      removeButton.addEventListener(
+        "click",
+        () => {
+
+          removeFromWishlist(
+            wishlistItem.id,
+            product.id,
+            removeButton
+          );
+
+        }
+      );
+    }
+
+
+    return card;
   }
 
-  // =========================================
+
+  // =========================================================
   // REMOVE FROM WISHLIST
-  // =========================================
+  // =========================================================
 
   async function removeFromWishlist(
-    wishlistId
+    wishlistId,
+    productId,
+    button
   ) {
+
+    if (!currentUser) {
+
+      showLogin();
+
+      return;
+    }
+
+    if (button) {
+
+      button.disabled = true;
+
+      button.textContent =
+        "Removing...";
+
+    }
 
     try {
 
       const {
         error
       } = await supabaseClient
-        .from("wishlist")
+        .from("wishlists")
         .delete()
         .eq(
           "id",
@@ -734,10 +778,22 @@ document.addEventListener("DOMContentLoaded", async () => {
         .eq(
           "buyer_id",
           currentUser.id
+        )
+        .eq(
+          "product_id",
+          productId
         );
 
       if (error) {
-        throw error;
+
+        console.error(
+          "Wishlist removal error:",
+          error
+        );
+
+        throw new Error(
+          "Unable to remove this product."
+        );
       }
 
       wishlistItems =
@@ -745,6 +801,22 @@ document.addEventListener("DOMContentLoaded", async () => {
           (item) =>
             item.id !== wishlistId
         );
+
+      updateWishlistCount();
+
+      showMessage(
+        "Removed from your wishlist.",
+        "success"
+      );
+
+      if (
+        wishlistItems.length === 0
+      ) {
+
+        showEmpty();
+
+        return;
+      }
 
       renderWishlist();
 
@@ -755,37 +827,56 @@ document.addEventListener("DOMContentLoaded", async () => {
         error
       );
 
-      alert(
+      showMessage(
         error.message ||
-        "Unable to remove this product from your wishlist."
+          "Unable to remove this product.",
+        "error"
       );
+
+      if (button) {
+
+        button.disabled = false;
+
+        button.textContent =
+          "♡ Remove from Wishlist";
+      }
     }
   }
 
-  // =========================================
+
+  // =========================================================
   // GET OR CREATE CART
-  // =========================================
+  // =========================================================
 
   async function getOrCreateCart() {
 
+    if (!currentUser) {
+
+      throw new Error(
+        "Please log in before adding products to your cart."
+      );
+    }
+
     const {
-      data: cart,
-      error
+      data: existingCart,
+      error: cartError
     } = await supabaseClient
       .from("carts")
-      .select("id")
+      .select("id, buyer_id")
       .eq(
         "buyer_id",
         currentUser.id
       )
       .maybeSingle();
 
-    if (error) {
-      throw error;
+    if (cartError) {
+
+      throw cartError;
     }
 
-    if (cart) {
-      return cart;
+    if (existingCart) {
+
+      return existingCart;
     }
 
     const {
@@ -797,32 +888,75 @@ document.addEventListener("DOMContentLoaded", async () => {
         buyer_id:
           currentUser.id
       })
-      .select("id")
+      .select("id, buyer_id")
       .single();
 
     if (createError) {
+
       throw createError;
     }
 
     return newCart;
   }
 
-  // =========================================
+
+  // =========================================================
   // ADD TO CART
-  // =========================================
+  // =========================================================
 
   async function addToCart(
-    productId,
+    product,
     button
   ) {
 
-    const originalText =
-      button.innerHTML;
+    if (!currentUser) {
 
-    try {
+      showMessage(
+        "Please log in to add products to your cart.",
+        "error"
+      );
+
+      return;
+    }
+
+    if (
+      !product ||
+      !product.id
+    ) {
+
+      showMessage(
+        "Product information is unavailable.",
+        "error"
+      );
+
+      return;
+    }
+
+    const stock =
+      Number(product.stock || 0);
+
+    if (
+      product.is_active !== true ||
+      stock <= 0
+    ) {
+
+      showMessage(
+        "This product is currently unavailable.",
+        "error"
+      );
+
+      return;
+    }
+
+    if (button) {
 
       button.disabled = true;
-      button.innerHTML = "…";
+
+      button.textContent =
+        "Adding...";
+    }
+
+    try {
 
       const cart =
         await getOrCreateCart();
@@ -841,72 +975,77 @@ document.addEventListener("DOMContentLoaded", async () => {
         )
         .eq(
           "product_id",
-          productId
+          product.id
         )
         .maybeSingle();
 
       if (existingError) {
+
         throw existingError;
       }
 
       if (existingItem) {
 
+        const newQuantity =
+          Number(
+            existingItem.quantity
+          ) + 1;
+
+        if (
+          newQuantity > stock
+        ) {
+
+          throw new Error(
+            `Only ${stock} item${stock === 1 ? "" : "s"} available in stock.`
+          );
+        }
+
         const {
-          error
+          error: updateError
         } = await supabaseClient
           .from("cart_items")
           .update({
             quantity:
-              Number(
-                existingItem.quantity
-              ) + 1
+              newQuantity
           })
           .eq(
             "id",
             existingItem.id
           );
 
-        if (error) {
-          throw error;
+        if (updateError) {
+
+          throw updateError;
         }
 
       } else {
 
         const {
-          error
+          error: insertError
         } = await supabaseClient
           .from("cart_items")
           .insert({
             cart_id:
               cart.id,
+
             product_id:
-              productId,
+              product.id,
+
             quantity: 1
           });
 
-        if (error) {
-          throw error;
+        if (insertError) {
+
+          throw insertError;
         }
       }
 
-      button.innerHTML = "✓";
-
-      alert(
-        "Product added to your cart."
+      showMessage(
+        "Product added to your cart.",
+        "success"
       );
 
-      setTimeout(() => {
-
-        if (
-          document.body.contains(button)
-        ) {
-          button.innerHTML =
-            originalText;
-
-          button.disabled = false;
-        }
-
-      }, 900);
+      await updateCartCount();
 
     } catch (error) {
 
@@ -915,150 +1054,97 @@ document.addEventListener("DOMContentLoaded", async () => {
         error
       );
 
-      button.innerHTML =
-        originalText;
-
-      button.disabled = false;
-
-      alert(
+      showMessage(
         error.message ||
-        "Unable to add this product to your cart."
+          "Unable to add this product to your cart.",
+        "error"
       );
+
+    } finally {
+
+      if (button) {
+
+        button.disabled = false;
+
+        button.textContent =
+          "Add to Cart";
+      }
     }
   }
 
-  // =========================================
-  // PROFILE MENU
-  // =========================================
 
-  if (
-    profileButton &&
-    profileMenu
-  ) {
+  // =========================================================
+  // BACK BUTTON
+  // =========================================================
 
-    profileButton.addEventListener(
-      "click",
-      (event) => {
+  function goBack() {
 
-        event.stopPropagation();
+    if (document.referrer) {
 
-        const isOpen =
-          profileMenu.classList.contains(
-            "open"
+      try {
+
+        const referrerUrl =
+          new URL(
+            document.referrer
           );
 
-        profileMenu.classList.toggle(
-          "open",
-          !isOpen
-        );
+        if (
+          referrerUrl.origin ===
+          window.location.origin
+        ) {
 
-        profileButton.setAttribute(
-          "aria-expanded",
-          String(!isOpen)
-        );
+          window.history.back();
 
-        profileMenu.setAttribute(
-          "aria-hidden",
-          String(isOpen)
-        );
-      }
-    );
-  }
+          return;
+        }
 
-  document.addEventListener(
-    "click",
-    (event) => {
+      } catch (error) {
 
-      if (
-        profileMenu &&
-        profileButton &&
-        !profileMenu.contains(event.target) &&
-        !profileButton.contains(event.target)
-      ) {
-
-        profileMenu.classList.remove(
-          "open"
-        );
-
-        profileButton.setAttribute(
-          "aria-expanded",
-          "false"
-        );
-
-        profileMenu.setAttribute(
-          "aria-hidden",
-          "true"
+        console.warn(
+          "Could not inspect referrer."
         );
       }
     }
-  );
 
-  // =========================================
-  // PROFILE NAVIGATION
-  // =========================================
+    window.location.href =
+      "buyer-dashboard.html";
+  }
 
-  if (myOrdersButton) {
 
-    myOrdersButton.addEventListener(
+  // =========================================================
+  // EVENTS
+  // =========================================================
+
+  if (retryButton) {
+
+    retryButton.addEventListener(
       "click",
-      () => {
-        window.location.href =
-          "orders.html";
-      }
+      loadWishlist
     );
   }
 
-  if (wishlistButton) {
+  if (backButton) {
 
-    wishlistButton.addEventListener(
+    backButton.addEventListener(
       "click",
-      () => {
-        window.location.href =
-          "wishlist.html";
-      }
+      goBack
     );
   }
 
-  if (settingsButton) {
 
-    settingsButton.addEventListener(
-      "click",
-      () => {
-        window.location.href =
-          "account-settings.html";
-      }
-    );
+  // =========================================================
+  // INITIALIZE
+  // =========================================================
+
+  async function initialize() {
+
+    await updateCartCount();
+
+    await loadWishlist();
+
   }
 
-  // =========================================
-  // LOGOUT
-  // =========================================
+  initialize();
 
-  if (logoutButton) {
 
-    logoutButton.addEventListener(
-      "click",
-      async () => {
-
-        logoutButton.disabled =
-          true;
-
-        logoutButton.innerHTML =
-          "<span>↪</span> Signing out...";
-
-        try {
-
-          const {
-            error
-          } =
-            await supabaseClient.auth
-              .signOut();
-
-          if (error) {
-            throw error;
-          }
-
-          window.location.href =
-            "login.html";
-
- 
+ });
