@@ -65,10 +65,6 @@ document.addEventListener("DOMContentLoaded", () => {
       "Supabase client is not available."
     );
 
-    showError(
-      "The connection to SMH Collection could not be established."
-    );
-
     return;
   }
 
@@ -236,7 +232,9 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    await loadCurrentUser();
+    if (!currentUser) {
+      await loadCurrentUser();
+    }
 
     if (!currentUser) {
 
@@ -276,7 +274,8 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      currentCart = data || null;
+      currentCart =
+        data || null;
 
       if (
         !currentCart ||
@@ -334,31 +333,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
 
+      // -----------------------------------------------------
+      // STEP 1 — LOAD WISHLIST RECORDS ONLY
+      // -----------------------------------------------------
+
       const {
-        data,
-        error
+        data: wishlistData,
+        error: wishlistError
       } = await supabaseClient
         .from("wishlists")
-        .select(`
-          id,
-          product_id,
-          created_at,
-          products (
-            id,
-            category_id,
-            name,
-            slug,
-            description,
-            price,
-            stock,
-            image_url,
-            is_active,
-            categories (
-              id,
-              name
-            )
-          )
-        `)
+        .select(
+          "id, product_id, created_at"
+        )
         .eq(
           "buyer_id",
           currentUser.id
@@ -370,11 +356,11 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         );
 
-      if (error) {
+      if (wishlistError) {
 
         console.error(
-          "Wishlist loading error:",
-          error
+          "Wishlist records error:",
+          wishlistError
         );
 
         showError(
@@ -384,10 +370,175 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
+      if (
+        !Array.isArray(wishlistData) ||
+        wishlistData.length === 0
+      ) {
+
+        wishlistItems = [];
+
+        updateWishlistCount();
+
+        showEmpty();
+
+        return;
+      }
+
+
+      // -----------------------------------------------------
+      // STEP 2 — GET PRODUCT IDS
+      // -----------------------------------------------------
+
+      const productIds =
+        wishlistData
+          .map(
+            item => item.product_id
+          )
+          .filter(Boolean);
+
+
+      if (productIds.length === 0) {
+
+        wishlistItems = [];
+
+        updateWishlistCount();
+
+        showEmpty();
+
+        return;
+      }
+
+
+      // -----------------------------------------------------
+      // STEP 3 — LOAD PRODUCTS DIRECTLY
+      // -----------------------------------------------------
+
+      const {
+        data: products,
+        error: productsError
+      } = await supabaseClient
+        .from("products")
+        .select(`
+          id,
+          category_id,
+          name,
+          slug,
+          description,
+          price,
+          stock,
+          image_url,
+          is_active
+        `)
+        .in(
+          "id",
+          productIds
+        );
+
+      if (productsError) {
+
+        console.error(
+          "Wishlist products error:",
+          productsError
+        );
+
+        showError(
+          "Your wishlist was found, but the products could not be loaded."
+        );
+
+        return;
+      }
+
+
+      // -----------------------------------------------------
+      // STEP 4 — LOAD CATEGORIES
+      // -----------------------------------------------------
+
+      const categoryIds =
+        (products || [])
+          .map(
+            product =>
+              product.category_id
+          )
+          .filter(Boolean);
+
+      let categories = [];
+
+      if (categoryIds.length > 0) {
+
+        const {
+          data: categoryData,
+          error: categoryError
+        } = await supabaseClient
+          .from("categories")
+          .select(
+            "id, name"
+          )
+          .in(
+            "id",
+            categoryIds
+          );
+
+        if (categoryError) {
+
+          console.warn(
+            "Category loading warning:",
+            categoryError
+          );
+
+        } else {
+
+          categories =
+            categoryData || [];
+        }
+      }
+
+
+      // -----------------------------------------------------
+      // STEP 5 — COMBINE WISHLIST + PRODUCTS
+      // -----------------------------------------------------
+
       wishlistItems =
-        Array.isArray(data)
-          ? data
-          : [];
+        wishlistData
+          .map(
+            wishlistItem => {
+
+              const product =
+                (products || []).find(
+                  item =>
+                    item.id ===
+                    wishlistItem.product_id
+                );
+
+              if (!product) {
+                return null;
+              }
+
+              const category =
+                categories.find(
+                  item =>
+                    item.id ===
+                    product.category_id
+                );
+
+              return {
+                ...wishlistItem,
+
+                products: {
+                  ...product,
+
+                  categories:
+                    category || null
+                }
+              };
+
+            }
+          )
+          .filter(Boolean);
+
+
+      // -----------------------------------------------------
+      // STEP 6 — UPDATE PAGE
+      // -----------------------------------------------------
 
       updateWishlistCount();
 
@@ -522,7 +673,7 @@ document.addEventListener("DOMContentLoaded", () => {
     wishlistGrid.innerHTML = "";
 
     wishlistItems.forEach(
-      (wishlistItem) => {
+      wishlistItem => {
 
         const product =
           wishlistItem.products;
@@ -633,7 +784,6 @@ document.addEventListener("DOMContentLoaded", () => {
           <button
             type="button"
             class="add-cart-button"
-            data-product-id="${escapeHtml(product.id)}"
             ${
               isInStock
                 ? ""
@@ -650,8 +800,6 @@ document.addEventListener("DOMContentLoaded", () => {
           <button
             type="button"
             class="remove-wishlist-button"
-            data-wishlist-id="${escapeHtml(wishlistItem.id)}"
-            data-product-id="${escapeHtml(product.id)}"
           >
             ♡ Remove from Wishlist
           </button>
@@ -663,7 +811,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     // =======================================================
-    // IMAGE ERROR FALLBACK
+    // IMAGE FALLBACK
     // =======================================================
 
     const image =
@@ -761,7 +909,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
       button.textContent =
         "Removing...";
-
     }
 
     try {
@@ -798,7 +945,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       wishlistItems =
         wishlistItems.filter(
-          (item) =>
+          item =>
             item.id !== wishlistId
         );
 
@@ -862,7 +1009,9 @@ document.addEventListener("DOMContentLoaded", () => {
       error: cartError
     } = await supabaseClient
       .from("carts")
-      .select("id, buyer_id")
+      .select(
+        "id, buyer_id"
+      )
       .eq(
         "buyer_id",
         currentUser.id
@@ -870,12 +1019,10 @@ document.addEventListener("DOMContentLoaded", () => {
       .maybeSingle();
 
     if (cartError) {
-
       throw cartError;
     }
 
     if (existingCart) {
-
       return existingCart;
     }
 
@@ -888,11 +1035,12 @@ document.addEventListener("DOMContentLoaded", () => {
         buyer_id:
           currentUser.id
       })
-      .select("id, buyer_id")
+      .select(
+        "id, buyer_id"
+      )
       .single();
 
     if (createError) {
-
       throw createError;
     }
 
@@ -913,19 +1061,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
       showMessage(
         "Please log in to add products to your cart.",
-        "error"
-      );
-
-      return;
-    }
-
-    if (
-      !product ||
-      !product.id
-    ) {
-
-      showMessage(
-        "Product information is unavailable.",
         "error"
       );
 
@@ -968,6 +1103,14 @@ document.addEventListener("DOMContentLoaded", () => {
         .from("cart_items")
         .select(
           "id, quantity"
+    
+      const {
+        data: existingItem,
+        error: existingError
+      } = await supabaseClient
+        .from("cart_items")
+        .select(
+          "id, quantity"
         )
         .eq(
           "cart_id",
@@ -980,21 +1123,16 @@ document.addEventListener("DOMContentLoaded", () => {
         .maybeSingle();
 
       if (existingError) {
-
         throw existingError;
       }
 
       if (existingItem) {
-
         const newQuantity =
-          Number(
-            existingItem.quantity
-          ) + 1;
+          Number(existingItem.quantity) + 1;
 
         if (
           newQuantity > stock
         ) {
-
           throw new Error(
             `Only ${stock} item${stock === 1 ? "" : "s"} available in stock.`
           );
@@ -1014,12 +1152,10 @@ document.addEventListener("DOMContentLoaded", () => {
           );
 
         if (updateError) {
-
           throw updateError;
         }
 
       } else {
-
         const {
           error: insertError
         } = await supabaseClient
@@ -1027,15 +1163,12 @@ document.addEventListener("DOMContentLoaded", () => {
           .insert({
             cart_id:
               cart.id,
-
             product_id:
               product.id,
-
             quantity: 1
           });
 
         if (insertError) {
-
           throw insertError;
         }
       }
@@ -1048,7 +1181,6 @@ document.addEventListener("DOMContentLoaded", () => {
       await updateCartCount();
 
     } catch (error) {
-
       console.error(
         "Add to cart error:",
         error
@@ -1061,28 +1193,17 @@ document.addEventListener("DOMContentLoaded", () => {
       );
 
     } finally {
-
       if (button) {
-
         button.disabled = false;
-
         button.textContent =
           "Add to Cart";
       }
     }
   }
 
-
-  // =========================================================
-  // BACK BUTTON
-  // =========================================================
-
   function goBack() {
-
     if (document.referrer) {
-
       try {
-
         const referrerUrl =
           new URL(
             document.referrer
@@ -1092,14 +1213,11 @@ document.addEventListener("DOMContentLoaded", () => {
           referrerUrl.origin ===
           window.location.origin
         ) {
-
           window.history.back();
-
           return;
         }
 
       } catch (error) {
-
         console.warn(
           "Could not inspect referrer."
         );
@@ -1110,13 +1228,7 @@ document.addEventListener("DOMContentLoaded", () => {
       "buyer-dashboard.html";
   }
 
-
-  // =========================================================
-  // EVENTS
-  // =========================================================
-
   if (retryButton) {
-
     retryButton.addEventListener(
       "click",
       loadWishlist
@@ -1124,27 +1236,18 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   if (backButton) {
-
     backButton.addEventListener(
       "click",
       goBack
     );
   }
 
-
-  // =========================================================
-  // INITIALIZE
-  // =========================================================
-
   async function initialize() {
-
+    await loadCurrentUser();
     await updateCartCount();
-
     await loadWishlist();
-
   }
 
   initialize();
 
-
- });
+});
