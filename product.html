@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <meta
+    name="description"
+    content="View product details, pricing, availability and purchase options on SMH Collection."
+  >
+
+  <title>Product | SMH Collection</title>
+
+  <link
+    rel="stylesheet"
+    href="assets/css/product.css"
+  >
+</head>
+
+<body>
+
+  <!-- TOP MARQUEE -->
+  <div class="top-marquee">
+    <div class="marquee-track">
+      <span>WELCOME TO SMH COLLECTION</span>
+      <span>WORLDWIDE MARKETPLACE</span>
+      <span>FREE DELIVERY</span>
+      <span>CASH ON DELIVERY</span>
+      <span>SHOP EVERYTHING</span>
+      <span>WELCOME TO SMH COLLECTION</span>
+      <span>WORLDWIDE MARKETPLACE</span>
+      <span>FREE DELIVERY</span>
+      <span>CASH ON DELIVERY</span>
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <header class="product-header">
+
+    <button
+      type="button"
+      class="back-button"
+      id="backButton"
+    >
+      ← Back
+    </button>
+
+    <a href="index.html" class="brand">
+      SMH Collection
+    </a>
+
+    <a
+      href="cart.html"
+      class="cart-link"
+      aria-label="Shopping cart"
+    >
+      🛒
+      <span id="cartCount">0</span>
+    </a>
+
+  </header>
+
+  <!-- MAIN -->
+  <main class="product-page">
+
+    <!-- LOADING -->
+    <section
+      id="productLoading"
+      class="state-container"
+    >
+      <div class="loader"></div>
+      <p>Loading product...</p>
+    </section>
+
+    <!-- ERROR -->
+    <section
+      id="productError"
+      class="state-container error-state hidden"
+    >
+      <div class="state-icon">⚠️</div>
+
+      <h2>Unable to load product</h2>
+
+      <p id="productErrorMessage">
+        Something went wrong while loading this product.
+      </p>
+
+      <button
+        type="button"
+        id="retryButton"
+        class="primary-button"
+      >
+        Try Again
+      </button>
+    </section>
+
+    <!-- NOT FOUND -->
+    <section
+      id="productNotFound"
+      class="state-container hidden"
+    >
+      <div class="state-icon">📦</div>
+
+      <h2>Product Not Found</h2>
+
+      <p>
+        This product may have been removed or is no longer available.
+      </p>
+
+      <a
+        href="buyer-dashboard.html"
+        class="primary-button"
+      >
+        Continue Shopping
+      </a>
+    </section>
+
+    <!-- PRODUCT -->
+    <section
+      id="productContent"
+      class="product-content hidden"
+    >
+
+      <div class="product-image-section">
+
+        <div class="product-image-wrapper">
+          <img
+            id="productImage"
+            src=""
+            alt=""
+          >
+        </div>
+
+      </div>
+
+      <div class="product-info">
+
+        <div class="product-category" id="productCategory">
+          Category
+        </div>
+
+        <h1 id="productName">
+          Product Name
+        </h1>
+
+        <div class="product-rating">
+          <span>★★★★★</span>
+          <span class="rating-text">
+            New product
+          </span>
+        </div>
+
+        <div
+          class="product-price"
+          id="productPrice"
+        >
+          $0.00
+        </div>
+
+        <div
+          class="stock-status"
+          id="stockStatus"
+        >
+          Checking stock...
+        </div>
+
+        <div class="product-description">
+
+          <h2>Description</h2>
+
+          <p id="productDescription">
+            No description available.
+          </p>
+
+        </div>
+
+        <div class="purchase-section">
+
+          <label for="quantity">
+            Quantity
+          </label>
+
+          <div class="quantity-control">
+
+            <button
+              type="button"
+              id="decreaseQuantity"
+              aria-label="Decrease quantity"
+            >
+              −
+            </button>
+
+            <input
+              type="number"
+              id="quantity"
+              value="1"
+              min="1"
+              step="1"
+            >
+
+            <button
+              type="button"
+              id="increaseQuantity"
+              aria-label="Increase quantity"
+            >
+              +
+            </button>
+
+          </div>
+
+          <button
+            type="button"
+            id="addToCartButton"
+            class="primary-button full-button"
+          >
+            🛒 Add to Cart
+          </button>
+
+          <button
+            type="button"
+            id="buyNowButton"
+            class="secondary-button full-button"
+          >
+            Buy Now
+          </button>
+
+        </div>
+
+        <div
+          id="productMessage"
+          class="product-message"
+          aria-live="polite"
+        ></div>
+
+        <div class="product-features">
+
+          <div class="feature">
+            <span>🚚</span>
+            <div>
+              <strong>Free Delivery</strong>
+              <small>No delivery charge</small>
+            </div>
+          </div>
+
+          <div class="feature">
+            <span>💵</span>
+            <div>
+              <strong>Cash on Delivery</strong>
+              <small>Pay when your order arrives</small>
+            </div>
+          </div>
+
+          <div class="feature">
+            <span>🛍️</span>
+            <div>
+              <strong>SMH Marketplace</strong>
+              <small>Shop from multiple sellers</small>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- SUPABASE -->
+  <script
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+  ></script>
+
+  <script src="assets/js/supabase.js"></script>
+  <script src="assets/js/product.js"></script>
+
+</body>
+</html>
