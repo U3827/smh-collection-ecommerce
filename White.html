@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <meta
+    name="description"
+    content="View and manage your saved products on SMH Collection."
+  >
+
+  <meta
+    name="theme-color"
+    content="#0b0b0b"
+  >
+
+  <title>My Wishlist | SMH Collection</title>
+
+  <link
+    rel="stylesheet"
+    href="assets/css/wishlist.css"
+  >
+
+</head>
+
+<body>
+
+  <!-- =====================================================
+       TOP MARQUEE
+  ====================================================== -->
+
+  <div class="top-marquee">
+
+    <div class="marquee-track">
+
+      <span>WELCOME TO SMH COLLECTION</span>
+      <span>WORLDWIDE MARKETPLACE</span>
+      <span>FREE DELIVERY</span>
+      <span>CASH ON DELIVERY</span>
+      <span>SHOP EVERYTHING</span>
+
+      <span>WELCOME TO SMH COLLECTION</span>
+      <span>WORLDWIDE MARKETPLACE</span>
+      <span>FREE DELIVERY</span>
+      <span>CASH ON DELIVERY</span>
+      <span>SHOP EVERYTHING</span>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       HEADER
+  ====================================================== -->
+
+  <header class="wishlist-header">
+
+    <button
+      type="button"
+      id="backButton"
+      class="back-button"
+    >
+      ← Back
+    </button>
+
+    <a
+      href="index.html"
+      class="brand"
+    >
+      SMH Collection
+    </a>
+
+    <a
+      href="cart.html"
+      class="cart-link"
+      aria-label="Shopping cart"
+    >
+      🛒
+
+      <span id="cartCount">
+        0
+      </span>
+
+    </a>
+
+  </header>
+
+
+  <!-- =====================================================
+       MAIN
+  ====================================================== -->
+
+  <main class="wishlist-page">
+
+    <!-- PAGE HEADING -->
+
+    <section class="wishlist-heading">
+
+      <div>
+
+        <p class="page-label">
+          SAVED PRODUCTS
+        </p>
+
+        <h1>
+          My Wishlist
+        </h1>
+
+        <p class="page-description">
+          Products you saved for later.
+        </p>
+
+      </div>
+
+      <span
+        id="wishlistCount"
+        class="wishlist-count"
+      >
+        0 items
+      </span>
+
+    </section>
+
+
+    <!-- ===================================================
+         LOADING STATE
+    ==================================================== -->
+
+    <section
+      id="wishlistLoading"
+      class="state-container"
+    >
+
+      <div class="loader"></div>
+
+      <p>
+        Loading your wishlist...
+      </p>
+
+    </section>
+
+
+    <!-- ===================================================
+         LOGIN STATE
+    ==================================================== -->
+
+    <section
+      id="wishlistLogin"
+      class="state-container hidden"
+    >
+
+      <div class="state-icon">
+        🔐
+      </div>
+
+      <h2>
+        Login Required
+      </h2>
+
+      <p>
+        Please log in to view and manage your wishlist.
+      </p>
+
+      <a
+        href="login.html"
+        id="loginButton"
+        class="primary-button"
+      >
+        Login
+      </a>
+
+    </section>
+
+
+    <!-- ===================================================
+         ERROR STATE
+    ==================================================== -->
+
+    <section
+      id="wishlistError"
+      class="state-container error-state hidden"
+    >
+
+      <div class="state-icon">
+        ⚠️
+      </div>
+
+      <h2>
+        Unable to Load Wishlist
+      </h2>
+
+      <p id="wishlistErrorMessage">
+        Something went wrong while loading your wishlist.
+      </p>
+
+      <button
+        type="button"
+        id="retryButton"
+        class="primary-button"
+      >
+        Try Again
+      </button>
+
+    </section>
+
+
+    <!-- ===================================================
+         EMPTY STATE
+    ==================================================== -->
+
+    <section
+      id="wishlistEmpty"
+      class="state-container hidden"
+    >
+
+      <div class="state-icon">
+        ♡
+      </div>
+
+      <h2>
+        Your Wishlist Is Empty
+      </h2>
+
+      <p>
+        Save products you love and come back to them later.
+      </p>
+
+      <a
+        href="buyer-dashboard.html"
+        class="primary-button"
+      >
+        Continue Shopping
+      </a>
+
+    </section>
+
+
+    <!-- ===================================================
+         WISHLIST CONTENT
+    ==================================================== -->
+
+    <section
+      id="wishlistContent"
+      class="wishlist-content hidden"
+    >
+
+      <div
+        id="wishlistGrid"
+        class="wishlist-grid"
+      ></div>
+
+    </section>
+
+  </main>
+
+
+  <!-- =====================================================
+       SUPABASE
+  ====================================================== -->
+
+  <script
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+  ></script>
+
+  <script
+    src="assets/js/supabase.js"
+  ></script>
+
+  <script
+    src="assets/js/wishlist.js"
+  ></script>
+
+</body>
+
+</html>
