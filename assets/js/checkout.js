@@ -1,182 +1,70 @@
-// =========================================
-// SMH COLLECTION
-// REAL CHECKOUT + CASH ON DELIVERY
-// FIXED CHECKOUT FLOW
-// PART 1 OF 4
-// =========================================
-
 document.addEventListener("DOMContentLoaded", () => {
+  "use strict";
 
-  console.log("SMH Collection Checkout loaded.");
-
-  // =========================================
-  // BASIC ELEMENTS
-  // =========================================
-
-  const currentYear =
-    document.getElementById("currentYear");
-
-  const loadingState =
-    document.getElementById("checkoutLoading");
-
-  const checkoutLayout =
-    document.getElementById("checkoutLayout");
-
-  const emptyCheckout =
-    document.getElementById("emptyCheckout");
-
-  const checkoutError =
-    document.getElementById("checkoutError");
-
-  const checkoutErrorMessage =
-    document.getElementById(
-      "checkoutErrorMessage"
-    );
-
-  const retryButton =
-    document.getElementById("retryButton");
-
-  const checkoutForm =
-    document.getElementById("checkoutForm");
-
-  const placeOrderButton =
-    document.getElementById(
-      "placeOrderButton"
-    );
-
-  const checkoutMessage =
-    document.getElementById(
-      "checkoutMessage"
-    );
-
-  const checkoutItems =
-    document.getElementById("checkoutItems");
-
-  const subtotalElement =
-    document.getElementById("subtotal");
-
-  const totalElement =
-    document.getElementById(
-      "totalAmount"
-    );
-
-  const shippingName =
-    document.getElementById(
-      "shippingName"
-    );
-
-  const shippingPhone =
-    document.getElementById(
-      "shippingPhone"
-    );
-
-  const shippingAddress =
-    document.getElementById(
-      "shippingAddress"
-    );
-
-  const shippingCity =
-    document.getElementById(
-      "shippingCity"
-    );
-
-  const shippingState =
-    document.getElementById(
-      "shippingState"
-    );
-
-  const shippingCountry =
-    document.getElementById(
-      "shippingCountry"
-    );
-
-  const orderNotes =
-    document.getElementById(
-      "orderNotes"
-    );
-
-
-  // =========================================
-  // YEAR
-  // =========================================
-
-  if (currentYear) {
-    currentYear.textContent =
-      new Date().getFullYear();
-  }
-
-
-  // =========================================
-  // APPLICATION STATE
-  // =========================================
+  // =========================================================
+  // SMH COLLECTION — CHECKOUT
+  // =========================================================
 
   let currentUser = null;
   let currentProfile = null;
   let currentCart = null;
-  let currentCartItems = [];
-  let currentSubtotal = 0;
+  let checkoutItems = [];
+  let isSubmitting = false;
 
+  // ---------------------------------------------------------
+  // DOM HELPERS
+  // ---------------------------------------------------------
 
-  // =========================================
-  // HELPERS
-  // =========================================
+  const $ = (id) => document.getElementById(id);
 
-  function escapeHTML(value) {
+  const checkoutForm = $("checkoutForm");
+  const placeOrderButton = $("placeOrderButton");
 
-    return String(value ?? "")
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
+  const checkoutLayout = $("checkoutLayout");
+  const emptyCheckout = $("emptyCheckout");
+
+  const checkoutLoading = $("checkoutLoading");
+  const checkoutMessage = $("checkoutMessage");
+
+  const checkoutError = $("checkoutError");
+  const checkoutErrorMessage = $("checkoutErrorMessage");
+  const retryButton = $("retryButton");
+
+  const checkoutItemsContainer = $("checkoutItems");
+
+  const subtotalElement = $("subtotal");
+  const totalElement = $("totalAmount");
+
+  const shippingNameInput = $("shippingName");
+  const shippingPhoneInput = $("shippingPhone");
+  const shippingAddressInput = $("shippingAddress");
+  const shippingCityInput = $("shippingCity");
+  const shippingStateInput = $("shippingState");
+  const shippingCountryInput = $("shippingCountry");
+  const orderNotesInput = $("orderNotes");
+
+  // ---------------------------------------------------------
+  // MONEY
+  // ---------------------------------------------------------
+
+  function formatMoney(amount) {
+    const value = Number(amount || 0);
+
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(value);
   }
 
-
-  function formatCurrency(amount) {
-
-    return new Intl.NumberFormat(
-      "en-US",
-      {
-        style: "currency",
-        currency: "USD"
-      }
-    ).format(
-      Number(amount) || 0
-    );
-  }
-
-
-  function showMessage(
-    message,
-    type = "error"
-  ) {
-
-    if (!checkoutMessage) {
-      return;
-    }
-
-    checkoutMessage.textContent =
-      message || "";
-
-    checkoutMessage.className =
-      "checkout-message";
-
-    if (message) {
-      checkoutMessage.classList.add(
-        type
-      );
-    }
-  }
-
-
-  // =========================================
-  // UI STATES
-  // =========================================
+  // ---------------------------------------------------------
+  // UI HELPERS
+  // ---------------------------------------------------------
 
   function showLoading() {
-
-    if (loadingState) {
-      loadingState.hidden = false;
+    if (checkoutLoading) {
+      checkoutLoading.hidden = false;
     }
 
     if (checkoutLayout) {
@@ -192,12 +80,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  function hideLoading() {
+    if (checkoutLoading) {
+      checkoutLoading.hidden = true;
+    }
+  }
 
   function showCheckout() {
-
-    if (loadingState) {
-      loadingState.hidden = true;
-    }
+    hideLoading();
 
     if (checkoutLayout) {
       checkoutLayout.hidden = false;
@@ -212,12 +102,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-
   function showEmptyCheckout() {
-
-    if (loadingState) {
-      loadingState.hidden = true;
-    }
+    hideLoading();
 
     if (checkoutLayout) {
       checkoutLayout.hidden = true;
@@ -232,12 +118,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-
   function showError(message) {
-
-    if (loadingState) {
-      loadingState.hidden = true;
-    }
+    hideLoading();
 
     if (checkoutLayout) {
       checkoutLayout.hidden = true;
@@ -253,542 +135,229 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (checkoutErrorMessage) {
       checkoutErrorMessage.textContent =
-        message ||
-        "Unable to load checkout.";
+        message || "Something went wrong. Please try again.";
     }
   }
 
+  function showMessage(message, type = "info") {
+    if (!checkoutMessage) {
+      return;
+    }
 
-  function setButtonLoading(
-    loading
-  ) {
+    checkoutMessage.textContent = message || "";
+    checkoutMessage.hidden = !message;
+
+    checkoutMessage.className = "checkout-message";
+
+    if (message) {
+      checkoutMessage.classList.add(`is-${type}`);
+    }
+  }
+
+  function clearMessage() {
+    showMessage("");
+  }
+
+  function setSubmittingState(submitting) {
+    isSubmitting = submitting;
 
     if (!placeOrderButton) {
       return;
     }
 
-    placeOrderButton.disabled =
-      loading;
+    placeOrderButton.disabled = submitting;
 
-    placeOrderButton.textContent =
-      loading
-        ? "Placing Order..."
-        : "Place Order";
-  }
+    if (submitting) {
+      placeOrderButton.dataset.originalText =
+        placeOrderButton.textContent || "Place Order";
 
-
-  // =========================================
-  // SUPABASE CHECK
-  // =========================================
-
-  if (
-    typeof window.supabase ===
-    "undefined"
-  ) {
-
-    console.error(
-      "Supabase library is missing."
-    );
-
-    showError(
-      "Checkout service could not load. Please refresh the page."
-    );
-
-    return;
-  }
-
-
-  if (
-    typeof supabaseClient ===
-    "undefined"
-  ) {
-
-    console.error(
-      "supabaseClient is missing."
-    );
-
-    showError(
-      "Supabase connection could not be initialized."
-    );
-
-    return;
-  }
-
-
-  // =========================================
-  // PROFILE MENU
-  // =========================================
-
-  const profileButton =
-    document.getElementById(
-      "profileButton"
-    );
-
-  const profileMenu =
-    document.getElementById(
-      "profileMenu"
-    );
-
-  const profileAvatar =
-    document.getElementById(
-      "profileAvatar"
-    );
-
-  const profileName =
-    document.getElementById(
-      "profileName"
-    );
-
-  const menuAvatar =
-    document.getElementById(
-      "menuAvatar"
-    );
-
-  const menuName =
-    document.getElementById(
-      "menuName"
-    );
-
-  const menuEmail =
-    document.getElementById(
-      "menuEmail"
-    );
-
-  const myOrdersButton =
-    document.getElementById(
-      "myOrdersButton"
-    );
-
-  const wishlistButton =
-    document.getElementById(
-      "wishlistButton"
-    );
-
-  const settingsButton =
-    document.getElementById(
-      "settingsButton"
-    );
-
-  const logoutButton =
-    document.getElementById(
-      "logoutButton"
-    );
-
-
-  function getInitial(name) {
-
-    const cleanName =
-      String(name || "").trim();
-
-    if (!cleanName) {
-      return "U";
-    }
-
-    return cleanName
-      .charAt(0)
-      .toUpperCase();
-  }
-
-
-  function openProfileMenu() {
-
-    if (
-      !profileMenu ||
-      !profileButton
-    ) {
-      return;
-    }
-
-    profileMenu.classList.add(
-      "open"
-    );
-
-    profileButton.setAttribute(
-      "aria-expanded",
-      "true"
-    );
-
-    profileMenu.setAttribute(
-      "aria-hidden",
-      "false"
-    );
-  }
-
-
-  function closeProfileMenu() {
-
-    if (
-      !profileMenu ||
-      !profileButton
-    ) {
-      return;
-    }
-
-    profileMenu.classList.remove(
-      "open"
-    );
-
-    profileButton.setAttribute(
-      "aria-expanded",
-      "false"
-    );
-
-    profileMenu.setAttribute(
-      "aria-hidden",
-      "true"
-    );
-  }
-
-
-  function toggleProfileMenu() {
-
-    if (!profileMenu) {
-      return;
-    }
-
-    const isOpen =
-      profileMenu.classList.contains(
-        "open"
-      );
-
-    if (isOpen) {
-      closeProfileMenu();
+      placeOrderButton.textContent = "Placing Order...";
     } else {
-      openProfileMenu();
+      placeOrderButton.textContent =
+        placeOrderButton.dataset.originalText || "Place Order";
     }
   }
 
-
-  function populateProfileMenu(
-    profile
-  ) {
-
-    if (!profile) {
-      return;
-    }
-
-    const name =
-      profile.full_name ||
-      "Account";
-
-    const email =
-      profile.email ||
-      currentUser?.email ||
-      "";
-
-    if (profileAvatar) {
-      profileAvatar.textContent =
-        getInitial(name);
-    }
-
-    if (profileName) {
-      profileName.textContent =
-        name;
-    }
-
-    if (menuAvatar) {
-      menuAvatar.textContent =
-        getInitial(name);
-    }
-
-    if (menuName) {
-      menuName.textContent =
-        name;
-    }
-
-    if (menuEmail) {
-      menuEmail.textContent =
-        email;
-    }
-  }
-
-
-  if (profileButton) {
-
-    profileButton.addEventListener(
-      "click",
-      (event) => {
-
-        event.stopPropagation();
-
-        toggleProfileMenu();
-      }
-    );
-  }
-
-
-  document.addEventListener(
-    "click",
-    (event) => {
-
-      if (
-        profileMenu &&
-        profileButton &&
-        !profileMenu.contains(
-          event.target
-        ) &&
-        !profileButton.contains(
-          event.target
-        )
-      ) {
-
-        closeProfileMenu();
-      }
-    }
-  );
-
-
-  // =========================================
-  // PROFILE LOADING
-  // =========================================
-
-  async function loadProfile() {
-
-    const {
-      data: { user },
-      error: userError
-    } =
-      await supabaseClient.auth.getUser();
-
-
-    if (userError) {
-      throw userError;
-    }
-
-
-    if (!user) {
-
-      window.location.href =
-        "login.html";
-
-      return false;
-    }
-
-
-    currentUser =
-      user;
-
-
-    const {
-      data: profile,
-      error: profileError
-    } =
-      await supabaseClient
-        .from("profiles")
-        .select(
-          "id, full_name, email, role, is_active, avatar_url"
-        )
-        .eq(
-          "id",
-          user.id
-        )
-        .single();
-
-
-    if (profileError) {
-      throw profileError;
-    }
-
-
-    if (!profile) {
-
-      throw new Error(
-        "Your account profile could not be found."
-      );
-    }
-
-
-    currentProfile =
-      profile;
-
-
-    if (!profile.is_active) {
-
-      await supabaseClient.auth.signOut();
-
-      window.location.href =
-        "login.html";
-
-      return false;
-    }
-
-
-    if (
-      profile.role === "admin"
-    ) {
-
-      window.location.href =
-        "admin-dashboard.html";
-
-      return false;
-    }
-
-
-    if (
-      profile.role === "seller"
-    ) {
-
-      window.location.href =
-        "seller-dashboard.html";
-
-      return false;
-    }
-
-
-    if (
-      profile.role !== "buyer"
-    ) {
-
-      throw new Error(
-        "Your account has an invalid account role."
-      );
-    }
-
-
-    populateProfileMenu(
-      profile
-    );
-
-
-    return true;
-  }
-
-
-  // =========================================
-  // CART
-  // =========================================
-
-  async function getOrCreateCart() {
-
-    if (!currentUser) {
-
-      throw new Error(
-        "Your session has expired. Please sign in again."
-      );
-    }
-
-
-    const {
-      data: existingCart,
-      error: cartError
-    } =
-      await supabaseClient
-        .from("carts")
-        .select(
-          "id, buyer_id, created_at, updated_at"
-        )
-        .eq(
-          "buyer_id",
-          currentUser.id
-        )
-        .maybeSingle();
-
-
-    if (cartError) {
-      throw cartError;
-    }
-
-
-    if (existingCart) {
-      return existingCart;
-    }
-
-
-    const {
-      data: newCart,
-      error: createError
-    } =
-      await supabaseClient
-        .from("carts")
-        .insert({
-          buyer_id:
-            currentUser.id
-        })
-        .select(
-          "id, buyer_id, created_at, updated_at"
-        )
-        .single();
-
-
-    if (createError) {
-      throw createError;
-    }
-
-
-    return newCart;
-  }
-
-
-  // =========================================
-  // LOAD CART ITEMS
-  // =========================================
-
-  async function loadCartItems() {
-
-    currentCart =
-      await getOrCreateCart();
-
-
-    const {
-      data,
-      error
-    } =
-      await supabaseClient
-        .from("cart_items")
-        .select(`
-          id,
-          cart_id,
-          product_id,
-          quantity,
-          created_at,
-          products (
-            id,
-            seller_id,
-            category_id,
-            name,
-            slug,
-            description,
-            price,
-            stock,
-            image_url,
-            is_active,
-            categories (
-              id,
-              name,
-              slug
-            )
-          )
-        `)
-        .eq(
-          "cart_id",
-          currentCart.id
-        )
-        .order(
-          "created_at",
-          {
-            ascending: true
-          }
-        );
-
+  // ---------------------------------------------------------
+  // AUTHENTICATION
+  // ---------------------------------------------------------
+
+  async function getCurrentUser() {
+    const { data, error } = await supabaseClient.auth.getSession();
 
     if (error) {
       throw error;
     }
 
+    const session = data?.session;
 
-    currentCartItems =
-      (data || []).filter(
-        (item) =>
-          item.products &&
-          item.products.is_active === true
-      );
+    if (!session || !session.user) {
+      window.location.href = "login.html";
+      return null;
+    }
 
-
-    return currentCartItems;
+    return session.user;
   }
-  async function refreshCartProducts() {
+
+  // ---------------------------------------------------------
+  // PROFILE
+  // ---------------------------------------------------------
+
+  async function loadProfile() {
+    const { data, error } = await supabaseClient
+      .from("profiles")
+      .select(`
+        id,
+        full_name,
+        email,
+        role,
+        avatar_url,
+        is_active
+      `)
+      .eq("id", currentUser.id)
+      .single();
+
+    if (error) {
+      throw new Error(
+        `Unable to load your profile: ${error.message}`
+      );
+    }
+
+    if (!data) {
+      throw new Error("Your profile could not be found.");
+    }
+
+    if (data.is_active === false) {
+      await supabaseClient.auth.signOut();
+
+      window.location.href = "login.html";
+      return null;
+    }
+
+    currentProfile = data;
+
+    if (data.role !== "buyer") {
+      if (data.role === "admin") {
+        window.location.href = "admin-dashboard.html";
+        return null;
+      }
+
+      if (data.role === "seller" || data.role === "staff") {
+        window.location.href = "seller-dashboard.html";
+        return null;
+      }
+
+      throw new Error(
+        "Your account does not have permission to place buyer orders."
+      );
+    }
+
+    updateProfileUI();
+
+    return data;
+  }
+
+  function updateProfileUI() {
+    if (!currentProfile) {
+      return;
+    }
+
+    const possibleNameElements = [
+      "profileName",
+      "userName",
+      "accountName",
+      "headerUserName"
+    ];
+
+    possibleNameElements.forEach((id) => {
+      const element = $(id);
+
+      if (element) {
+        element.textContent =
+          currentProfile.full_name ||
+          currentProfile.email ||
+          "Account";
+      }
+    });
+
+    const possibleEmailElements = [
+      "profileEmail",
+      "userEmail",
+      "accountEmail"
+    ];
+
+    possibleEmailElements.forEach((id) => {
+      const element = $(id);
+
+      if (element) {
+        element.textContent = currentProfile.email || "";
+      }
+    });
+
+    const avatarElements = [
+      "profileAvatar",
+      "userAvatar",
+      "accountAvatar"
+    ];
+
+    avatarElements.forEach((id) => {
+      const element = $(id);
+
+      if (
+        element &&
+        element.tagName === "IMG" &&
+        currentProfile.avatar_url
+      ) {
+        element.src = currentProfile.avatar_url;
+      }
+    });
+  }
+
+  // ---------------------------------------------------------
+  // CART
+  // ---------------------------------------------------------
+
+  async function getOrCreateCart() {
+    const { data, error } = await supabaseClient
+      .from("carts")
+      .select("id, buyer_id")
+      .eq("buyer_id", currentUser.id)
+      .maybeSingle();
+
+    if (error) {
+      throw new Error(
+        `Unable to load your cart: ${error.message}`
+      );
+    }
+
+    if (data) {
+      currentCart = data;
+      return data;
+    }
+
+    const { data: newCart, error: createError } =
+      await supabaseClient
+        .from("carts")
+        .insert({
+          buyer_id: currentUser.id
+        })
+        .select("id, buyer_id")
+        .single();
+
+    if (createError) {
+      throw new Error(
+        `Unable to create your cart: ${createError.message}`
+      );
+    }
+
+    currentCart = newCart;
+
+    return newCart;
+  }
+
+  async function loadCheckoutItems() {
     if (!currentCart) {
-      await getOrCreateCart();
+      throw new Error("Your cart could not be loaded.");
     }
 
     const { data, error } = await supabaseClient
@@ -798,194 +367,163 @@ document.addEventListener("DOMContentLoaded", () => {
         cart_id,
         product_id,
         quantity,
-        created_at,
-        products (
+        product:products (
           id,
           seller_id,
-          category_id,
           name,
           slug,
           description,
           price,
           stock,
           image_url,
-          is_active,
-          categories (
-            id,
-            name,
-            slug
-          )
+          is_active
         )
       `)
-      .eq("cart_id", currentCart.id)
-      .order("created_at", { ascending: true });
+      .eq("cart_id", currentCart.id);
 
     if (error) {
-      console.error("Refresh cart error:", error);
-      throw new Error(error.message || "Unable to refresh your cart.");
+      throw new Error(
+        `Unable to load your cart items: ${error.message}`
+      );
     }
 
-    currentCartItems = data || [];
-
-    return currentCartItems;
-  }
-
-
-  function validateCartStock(items) {
-    if (!items || items.length === 0) {
-      return {
-        valid: false,
-        message: "Your cart is empty. Please add a product before checkout."
-      };
+    if (!data || data.length === 0) {
+      checkoutItems = [];
+      return [];
     }
 
-    for (const item of items) {
-      const product = item.products;
+    const validItems = [];
+
+    for (const item of data) {
+      const product = item.product;
 
       if (!product) {
-        return {
-          valid: false,
-          message: "One of the products in your cart is no longer available."
-        };
+        continue;
       }
 
-      if (!product.is_active) {
-        return {
-          valid: false,
-          message: `"${product.name}" is no longer available. Please remove it from your cart.`
-        };
+      if (product.is_active !== true) {
+        continue;
       }
 
-      if (product.stock <= 0) {
-        return {
-          valid: false,
-          message: `"${product.name}" is out of stock.`
-        };
+      const quantity = Number(item.quantity || 0);
+      const stock = Number(product.stock || 0);
+
+      if (quantity <= 0) {
+        continue;
       }
 
-      if (item.quantity > product.stock) {
-        return {
-          valid: false,
-          message:
-            `"${product.name}" only has ${product.stock} item(s) available, ` +
-            `but your cart contains ${item.quantity}.`
-        };
+      if (stock <= 0) {
+        continue;
       }
+
+      validItems.push({
+        id: item.id,
+        cart_id: item.cart_id,
+        product_id: item.product_id,
+        quantity,
+        product
+      });
     }
 
-    return {
-      valid: true,
-      message: ""
-    };
+    checkoutItems = validItems;
+
+    return validItems;
   }
 
+  // ---------------------------------------------------------
+  // RENDER CART ITEMS
+  // ---------------------------------------------------------
 
-  function calculateSubtotal(items) {
-    return items.reduce((total, item) => {
-      const product = item.products;
+  function renderCheckoutItems() {
+    if (!checkoutItemsContainer) {
+      return;
+    }
 
-      if (!product) {
-        return total;
-      }
+    if (checkoutItems.length === 0) {
+      checkoutItemsContainer.innerHTML = "";
+      return;
+    }
 
-      const price = Number(product.price) || 0;
-      const quantity = Number(item.quantity) || 0;
+    checkoutItemsContainer.innerHTML = checkoutItems
+      .map((item) => {
+        const product = item.product;
 
-      return total + (price * quantity);
+        const name = escapeHTML(product.name || "Product");
+        const image = escapeAttribute(
+          product.image_url || "assets/images/placeholder.png"
+        );
+
+        const quantity = Number(item.quantity);
+        const price = Number(product.price || 0);
+        const itemTotal = price * quantity;
+
+        return `
+          <div class="checkout-item" data-item-id="${escapeAttribute(
+            item.id
+          )}">
+            <div class="checkout-item-image">
+              <img
+                src="${image}"
+                alt="${escapeAttribute(product.name || "Product")}"
+                loading="lazy"
+                onerror="this.src='assets/images/placeholder.png'"
+              >
+            </div>
+
+            <div class="checkout-item-info">
+              <h3>${name}</h3>
+
+              <div class="checkout-item-meta">
+                <span>Qty: ${quantity}</span>
+                <span>${formatMoney(price)} each</span>
+              </div>
+            </div>
+
+            <div class="checkout-item-total">
+              ${formatMoney(itemTotal)}
+            </div>
+          </div>
+        `;
+      })
+      .join("");
+  }
+
+  // ---------------------------------------------------------
+  // TOTALS
+  // ---------------------------------------------------------
+
+  function calculateSubtotal() {
+    return checkoutItems.reduce((total, item) => {
+      const price = Number(item.product?.price || 0);
+      const quantity = Number(item.quantity || 0);
+
+      return total + price * quantity;
     }, 0);
   }
 
+  function renderTotals() {
+    const subtotal = calculateSubtotal();
 
-  function formatMoney(amount) {
-    return `$${Number(amount || 0).toFixed(2)}`;
-  }
-
-
-  function renderCheckoutItems(items) {
-    if (!checkoutItems) {
-      return;
-    }
-
-    checkoutItems.innerHTML = "";
-
-    if (!items || items.length === 0) {
-      checkoutItems.innerHTML = `
-        <div class="checkout-empty-message">
-          <p>Your cart is empty.</p>
-        </div>
-      `;
-
-      return;
-    }
-
-    items.forEach((item) => {
-      const product = item.products;
-
-      if (!product) {
-        return;
-      }
-
-      const price = Number(product.price) || 0;
-      const quantity = Number(item.quantity) || 0;
-      const itemTotal = price * quantity;
-
-      const itemElement = document.createElement("div");
-
-      itemElement.className = "checkout-item";
-
-      itemElement.innerHTML = `
-        <div class="checkout-item-image">
-          ${
-            product.image_url
-              ? `<img
-                  src="${escapeHtml(product.image_url)}"
-                  alt="${escapeHtml(product.name)}"
-                >`
-              : `
-                <div class="checkout-item-placeholder">
-                  SMH
-                </div>
-              `
-          }
-        </div>
-
-        <div class="checkout-item-details">
-          <h3>${escapeHtml(product.name)}</h3>
-
-          ${
-            product.categories?.name
-              ? `<p class="checkout-item-category">
-                  ${escapeHtml(product.categories.name)}
-                </p>`
-              : ""
-          }
-
-          <p class="checkout-item-price">
-            ${formatMoney(price)} × ${quantity}
-          </p>
-        </div>
-
-        <div class="checkout-item-total">
-          ${formatMoney(itemTotal)}
-        </div>
-      `;
-
-      checkoutItems.appendChild(itemElement);
-    });
-  }
-
-
-  function renderTotals(items) {
-    const subtotal = calculateSubtotal(items);
+    // SMH Collection currently uses free delivery.
     const deliveryFee = 0;
+
     const total = subtotal + deliveryFee;
 
     if (subtotalElement) {
       subtotalElement.textContent = formatMoney(subtotal);
     }
 
-    if (totalAmountElement) {
-      totalAmountElement.textContent = formatMoney(total);
+    const deliveryElement =
+      $("deliveryFee") ||
+      $("shippingFee") ||
+      $("deliveryAmount");
+
+    if (deliveryElement) {
+      deliveryElement.textContent = formatMoney(deliveryFee);
+    }
+
+    if (totalElement) {
+      totalElement.textContent = formatMoney(total);
     }
 
     return {
@@ -995,162 +533,255 @@ document.addEventListener("DOMContentLoaded", () => {
     };
   }
 
+  // ---------------------------------------------------------
+  // VALIDATION
+  // ---------------------------------------------------------
 
-  async function prefillShippingInformation() {
-    if (!currentUser) {
-      return;
-    }
-
-    try {
-      const { data: profile, error } = await supabaseClient
-        .from("profiles")
-        .select(`
-          id,
-          full_name,
-          email
-        `)
-        .eq("id", currentUser.id)
-        .single();
-
-      if (error) {
-        console.warn("Unable to load profile for checkout:", error);
-        return;
-      }
-
-      if (profile?.full_name && shippingName && !shippingName.value) {
-        shippingName.value = profile.full_name;
-      }
-    } catch (error) {
-      console.warn("Shipping prefill error:", error);
-    }
-  }
-
-
-  function generateOrderNumber() {
-    const now = new Date();
-
-    const year = now.getFullYear();
-
-    const month = String(now.getMonth() + 1).padStart(2, "0");
-
-    const day = String(now.getDate()).padStart(2, "0");
-
-    const randomPart = Math.floor(
-      100000 + Math.random() * 900000
-    );
-
-    return `SMH-${year}${month}${day}-${randomPart}`;
-  }
-
-
-  function validateShippingForm() {
-    const fields = [
-      {
-        element: shippingName,
-        name: "Full name"
-      },
-      {
-        element: shippingPhone,
-        name: "Phone number"
-      },
-      {
-        element: shippingAddress,
-        name: "Delivery address"
-      },
-      {
-        element: shippingCity,
-        name: "City"
-      },
-      {
-        element: shippingState,
-        name: "State"
-      },
-      {
-        element: shippingCountry,
-        name: "Country"
-      }
-    ];
-
-    for (const field of fields) {
-      if (!field.element || !field.element.value.trim()) {
-        return {
-          valid: false,
-          message: `${field.name} is required.`
-        };
-      }
-    }
-
-    const phone = shippingPhone.value.trim();
-
-    if (phone.length < 7) {
-      return {
-        valid: false,
-        message: "Please enter a valid phone number."
-      };
-    }
-
+  function getShippingData() {
     return {
-      valid: true,
-      message: ""
+      shipping_name: cleanValue(
+        shippingNameInput?.value
+      ),
+
+      shipping_phone: cleanValue(
+        shippingPhoneInput?.value
+      ),
+
+      shipping_address: cleanValue(
+        shippingAddressInput?.value
+      ),
+
+      shipping_city: cleanValue(
+        shippingCityInput?.value
+      ),
+
+      shipping_state: cleanValue(
+        shippingStateInput?.value
+      ),
+
+      shipping_country: cleanValue(
+        shippingCountryInput?.value
+      ),
+
+      notes: cleanValue(
+        orderNotesInput?.value
+      )
     };
   }
-  async function createOrder() {
+
+  function validateShippingData(shipping) {
+    if (!shipping.shipping_name) {
+      return "Please enter the recipient's full name.";
+    }
+
+    if (shipping.shipping_name.length < 2) {
+      return "Please enter a valid recipient name.";
+    }
+
+    if (!shipping.shipping_phone) {
+      return "Please enter your phone number.";
+    }
+
+    if (shipping.shipping_phone.length < 7) {
+      return "Please enter a valid phone number.";
+    }
+
+    if (!shipping.shipping_address) {
+      return "Please enter your delivery address.";
+    }
+
+    if (shipping.shipping_address.length < 5) {
+      return "Please enter a complete delivery address.";
+    }
+
+    if (!shipping.shipping_city) {
+      return "Please enter your city.";
+    }
+
+    if (!shipping.shipping_state) {
+      return "Please enter your state.";
+    }
+
+    if (!shipping.shipping_country) {
+      return "Please enter your country.";
+    }
+
+    return null;
+  }
+
+  async function validateCartBeforeOrder() {
+    if (!currentCart) {
+      throw new Error("Your cart is not available.");
+    }
+
+    /*
+     * We reload the cart immediately before checkout.
+     * This prevents submitting stale product prices or stock values.
+     */
+
+    const { data, error } = await supabaseClient
+      .from("cart_items")
+      .select(`
+        id,
+        cart_id,
+        product_id,
+        quantity,
+        product:products (
+          id,
+          seller_id,
+          name,
+          slug,
+          price,
+          stock,
+          image_url,
+          is_active
+        )
+      `)
+      .eq("cart_id", currentCart.id);
+
+    if (error) {
+      throw new Error(
+        `Unable to verify your cart: ${error.message}`
+      );
+    }
+
+    if (!data || data.length === 0) {
+      throw new Error(
+        "Your cart is empty. Please add a product before checkout."
+      );
+    }
+
+    const freshItems = [];
+
+    for (const item of data) {
+      const product = item.product;
+
+      if (!product) {
+        throw new Error(
+          "One of the products in your cart is no longer available."
+        );
+      }
+
+      if (product.is_active !== true) {
+        throw new Error(
+          `"${product.name}" is no longer available. Please remove it from your cart.`
+        );
+      }
+
+      const quantity = Number(item.quantity || 0);
+      const stock = Number(product.stock || 0);
+
+      if (quantity <= 0) {
+        throw new Error(
+          `"${product.name}" has an invalid quantity in your cart.`
+        );
+      }
+
+      if (stock < quantity) {
+        throw new Error(
+          `"${product.name}" does not have enough stock. Available: ${stock}.`
+        );
+      }
+
+      freshItems.push({
+        id: item.id,
+        cart_id: item.cart_id,
+        product_id: item.product_id,
+        quantity,
+        product
+      });
+    }
+
+    return freshItems;
+  }
+
+  // ---------------------------------------------------------
+  // ORDER NUMBER
+  // ---------------------------------------------------------
+
+  function generateOrderNumber() {
+    const timestamp = Date.now().toString(36).toUpperCase();
+
+    const randomPart = Math.random()
+      .toString(36)
+      .substring(2, 7)
+      .toUpperCase();
+
+    return `SMH-${timestamp}-${randomPart}`;
+  }
+
+  // ---------------------------------------------------------
+  // CREATE ORDER
+  // ---------------------------------------------------------
+
+  async function createOrder(shipping, freshItems) {
     if (!currentUser) {
-      throw new Error("You must be logged in to place an order.");
+      throw new Error(
+        "Your session has expired. Please log in again."
+      );
     }
 
-    const shippingValidation = validateShippingForm();
-
-    if (!shippingValidation.valid) {
-      throw new Error(shippingValidation.message);
+    if (!currentCart) {
+      throw new Error("Your cart could not be found.");
     }
 
-    const freshItems = await refreshCartProducts();
-
-    const stockValidation = validateCartStock(freshItems);
-
-    if (!stockValidation.valid) {
-      throw new Error(stockValidation.message);
+    if (!freshItems || freshItems.length === 0) {
+      throw new Error("Your cart is empty.");
     }
 
-    const subtotal = calculateSubtotal(freshItems);
+    /*
+     * Recalculate the subtotal from the current database prices.
+     * We do not trust totals supplied by the browser.
+     */
+    const subtotal = freshItems.reduce((sum, item) => {
+      const price = Number(item.product.price || 0);
+      const quantity = Number(item.quantity || 0);
 
-    if (subtotal <= 0) {
-      throw new Error("Your order total must be greater than zero.");
-    }
+      return sum + price * quantity;
+    }, 0);
+
+    // Free delivery.
+    const deliveryFee = 0;
+    const totalAmount = subtotal + deliveryFee;
 
     const orderNumber = generateOrderNumber();
 
     const orderData = {
       buyer_id: currentUser.id,
+
       order_number: orderNumber,
+
       status: "pending",
+
       payment_method: "cash_on_delivery",
+
       payment_status: "unpaid",
 
-      subtotal: subtotal,
-      delivery_fee: 0,
-      total_amount: subtotal,
+      subtotal,
 
-      shipping_name: shippingName.value.trim(),
-      shipping_phone: shippingPhone.value.trim(),
-      shipping_address: shippingAddress.value.trim(),
-      shipping_city: shippingCity.value.trim(),
-      shipping_state: shippingState.value.trim(),
-      shipping_country: shippingCountry.value.trim(),
+      delivery_fee: deliveryFee,
 
-      notes: orderNotes
-        ? (orderNotes.value.trim() || null)
-        : null
+      total_amount: totalAmount,
+
+      shipping_name: shipping.shipping_name,
+
+      shipping_phone: shipping.shipping_phone,
+
+      shipping_address: shipping.shipping_address,
+
+      shipping_city: shipping.shipping_city,
+
+      shipping_state: shipping.shipping_state,
+
+      shipping_country: shipping.shipping_country,
+
+      notes: shipping.notes || null
     };
 
+    // -------------------------------------------------------
+    // STEP 1 — CREATE ORDER
+    // -------------------------------------------------------
 
-    /*
-     * STEP 1
-     * Create the actual order.
-     *
-     * This was missing from the old checkout.js.
-     */
     const {
       data: order,
       error: orderError
@@ -1160,53 +791,44 @@ document.addEventListener("DOMContentLoaded", () => {
       .select("id, order_number")
       .single();
 
-
     if (orderError) {
-      console.error("Create order error:", orderError);
-
       throw new Error(
-        orderError.message || "Unable to create your order."
+        `Unable to create your order: ${orderError.message}`
       );
     }
 
-
-    if (!order || !order.id) {
+    if (!order) {
       throw new Error(
-        "The order was created, but no order ID was returned."
+        "The order was not created successfully."
       );
     }
 
+    // -------------------------------------------------------
+    // STEP 2 — CREATE ORDER ITEMS
+    // -------------------------------------------------------
 
-    /*
-     * STEP 2
-     * Create the order items.
-     */
     const orderItems = freshItems.map((item) => {
-      const product = item.products;
+      const product = item.product;
 
-      const price = Number(product.price) || 0;
-      const quantity = Number(item.quantity) || 0;
+      const price = Number(product.price || 0);
+      const quantity = Number(item.quantity || 0);
 
       return {
         order_id: order.id,
+
         product_id: product.id,
+
         seller_id: product.seller_id,
 
         product_name: product.name,
+
         product_price: price,
 
-        quantity: quantity,
+        quantity,
+
         item_total: price * quantity
       };
     });
-
-
-    if (orderItems.length === 0) {
-      throw new Error(
-        "No products were found for this order."
-      );
-    }
-
 
     const {
       error: orderItemsError
@@ -1214,25 +836,26 @@ document.addEventListener("DOMContentLoaded", () => {
       .from("order_items")
       .insert(orderItems);
 
-
     if (orderItemsError) {
-      console.error(
-        "Create order items error:",
-        orderItemsError
-      );
-
+      /*
+       * We do not clear the cart here.
+       *
+       * This is intentional: if order_items creation fails,
+       * the customer should not lose the cart contents.
+       *
+       * We will later move the complete checkout operation
+       * into a database transaction/RPC for production-level
+       * atomicity.
+       */
       throw new Error(
-        orderItemsError.message ||
-        "Unable to save the products in your order."
+        `The order was created, but its items could not be saved: ${orderItemsError.message}`
       );
     }
 
+    // -------------------------------------------------------
+    // STEP 3 — CLEAR CART
+    // -------------------------------------------------------
 
-    /*
-     * STEP 3
-     * Clear the cart only AFTER the order and
-     * all order items have been successfully created.
-     */
     const {
       error: clearCartError
     } = await supabaseClient
@@ -1240,28 +863,26 @@ document.addEventListener("DOMContentLoaded", () => {
       .delete()
       .eq("cart_id", currentCart.id);
 
-
     if (clearCartError) {
       /*
-       * The order already exists, so we do NOT delete it here.
-       * The user has a valid order even if cart cleanup fails.
+       * The order already exists, so we do not report the
+       * checkout as completely failed.
+       *
+       * The customer can still see the order in Orders.
        */
       console.error(
-        "Cart cleanup error:",
+        "Order created but cart could not be cleared:",
         clearCartError
       );
     }
 
-
-    /*
-     * STEP 4
-     * Send the customer to Orders.
-     */
-    window.location.href =
-      `orders.html?order=${encodeURIComponent(
-        order.order_number
-      )}`;
+    return order;
   }
+
+   // ---------------------------------------------------------
+  // SUBMIT CHECKOUT
+  // ---------------------------------------------------------
+
   async function handleCheckoutSubmit(event) {
     event.preventDefault();
 
@@ -1269,137 +890,389 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    isSubmitting = true;
-
-    clearError();
-
-    if (placeOrderButton) {
-      placeOrderButton.disabled = true;
-
-      placeOrderButton.dataset.originalText =
-        placeOrderButton.textContent;
-
-      placeOrderButton.textContent =
-        "Placing Order...";
-    }
+    clearMessage();
 
     try {
-      const validation = validateShippingForm();
+      setSubmittingState(true);
 
-      if (!validation.valid) {
-        throw new Error(validation.message);
+      const shipping = getShippingData();
+
+      const validationError =
+        validateShippingData(shipping);
+
+      if (validationError) {
+        showMessage(validationError, "error");
+        setSubmittingState(false);
+        return;
       }
 
-      await createOrder();
-
-    } catch (error) {
-      console.error("Checkout submission error:", error);
-
-      showError(
-        error.message ||
-        "Something went wrong while placing your order."
-      );
-
-      if (placeOrderButton) {
-        placeOrderButton.disabled = false;
-
-        placeOrderButton.textContent =
-          placeOrderButton.dataset.originalText ||
-          "Place Order";
-      }
-
-      isSubmitting = false;
-
-      return;
-    }
-
-    /*
-     * createOrder() redirects after success.
-     * This is only a safety fallback.
-     */
-    isSubmitting = false;
-  }
-
-
-  async function initializeCheckout() {
-    showLoading();
-
-    try {
-      /*
-       * Make sure there is a valid authenticated buyer.
-       */
+      // Verify authentication again before creating the order.
       const {
-        data: {
-          session
-        },
+        data: sessionData,
         error: sessionError
       } = await supabaseClient.auth.getSession();
 
       if (sessionError) {
-        throw new Error(
-          sessionError.message ||
-          "Unable to verify your login session."
-        );
+        throw sessionError;
       }
 
-      if (!session || !session.user) {
+      if (!sessionData?.session?.user) {
         window.location.href = "login.html";
         return;
       }
 
-      currentUser = session.user;
+      currentUser = sessionData.session.user;
 
+      // Verify the latest cart contents, prices and stock.
+      const freshItems =
+        await validateCartBeforeOrder();
 
-      /*
-       * Make sure the user has a cart.
-       */
+      showMessage(
+        "Creating your order...",
+        "info"
+      );
+
+      const order =
+        await createOrder(
+          shipping,
+          freshItems
+        );
+
+      if (!order || !order.id) {
+        throw new Error(
+          "Your order could not be completed."
+        );
+      }
+
+      showMessage(
+        "Order placed successfully. Redirecting...",
+        "success"
+      );
+
+      setTimeout(() => {
+        const orderParam =
+          encodeURIComponent(order.order_number);
+
+        window.location.href =
+          `orders.html?order=${orderParam}`;
+      }, 700);
+
+    } catch (error) {
+      console.error(
+        "Checkout error:",
+        error
+      );
+
+      showMessage(
+        error?.message ||
+          "Unable to place your order. Please try again.",
+        "error"
+      );
+
+      setSubmittingState(false);
+    }
+  }
+
+  // ---------------------------------------------------------
+  // RETRY
+  // ---------------------------------------------------------
+
+  async function retryCheckout() {
+    try {
+      clearMessage();
+
+      showLoading();
+
+      await initializeCheckout();
+
+    } catch (error) {
+      console.error(
+        "Checkout retry error:",
+        error
+      );
+
+      showError(
+        error?.message ||
+          "Unable to reload checkout."
+      );
+    }
+  }
+
+  // ---------------------------------------------------------
+  // NAVIGATION
+  // ---------------------------------------------------------
+
+  function setupNavigation() {
+    const cartLinks =
+      document.querySelectorAll(
+        '[href="cart.html"]'
+      );
+
+    cartLinks.forEach((link) => {
+      link.addEventListener("click", () => {
+        window.location.href =
+          "cart.html";
+      });
+    });
+
+    const ordersLinks =
+      document.querySelectorAll(
+        '[href="orders.html"]'
+      );
+
+    ordersLinks.forEach((link) => {
+      link.addEventListener("click", () => {
+        window.location.href =
+          "orders.html";
+      });
+    });
+
+    const dashboardLinks =
+      document.querySelectorAll(
+        '[href="buyer-dashboard.html"]'
+      );
+
+    dashboardLinks.forEach((link) => {
+      link.addEventListener("click", () => {
+        window.location.href =
+          "buyer-dashboard.html";
+      });
+    });
+  }
+
+  // ---------------------------------------------------------
+  // LOGOUT
+  // ---------------------------------------------------------
+
+  function setupLogout() {
+    const logoutButtons = [
+      $("logoutButton"),
+      $("logoutBtn"),
+      $("signOutButton"),
+      $("signOutBtn")
+    ].filter(Boolean);
+
+    logoutButtons.forEach((button) => {
+      button.addEventListener(
+        "click",
+        async (event) => {
+          event.preventDefault();
+
+          try {
+            button.disabled = true;
+
+            const {
+              error
+            } = await supabaseClient.auth.signOut();
+
+            if (error) {
+              throw error;
+            }
+
+            window.location.href =
+              "login.html";
+
+          } catch (error) {
+            console.error(
+              "Logout error:",
+              error
+            );
+
+            button.disabled = false;
+
+            alert(
+              "Unable to log out right now. Please try again."
+            );
+          }
+        }
+      );
+    });
+  }
+
+  // ---------------------------------------------------------
+  // CART COUNT
+  // ---------------------------------------------------------
+
+  async function updateCartCount() {
+    const cartCountElements =
+      document.querySelectorAll(
+        "#cartCount, .cart-count, [data-cart-count]"
+      );
+
+    if (!cartCountElements.length) {
+      return;
+    }
+
+    if (!currentCart) {
+      cartCountElements.forEach(
+        (element) => {
+          element.textContent = "0";
+        }
+      );
+
+      return;
+    }
+
+    const {
+      data,
+      error
+    } = await supabaseClient
+      .from("cart_items")
+      .select("quantity")
+      .eq("cart_id", currentCart.id);
+
+    if (error) {
+      console.warn(
+        "Unable to update cart count:",
+        error
+      );
+
+      return;
+    }
+
+    const count = (data || []).reduce(
+      (total, item) =>
+        total + Number(item.quantity || 0),
+      0
+    );
+
+    cartCountElements.forEach(
+      (element) => {
+        element.textContent =
+          String(count);
+      }
+    );
+  }
+
+  // ---------------------------------------------------------
+  // ESCAPE HTML
+  // ---------------------------------------------------------
+
+  function escapeHTML(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function escapeAttribute(value) {
+    return escapeHTML(value);
+  }
+
+  // ---------------------------------------------------------
+  // CLEAN INPUT
+  // ---------------------------------------------------------
+
+  function cleanValue(value) {
+    return String(value ?? "").trim();
+  }
+
+  // ---------------------------------------------------------
+  // FORM EVENTS
+  // ---------------------------------------------------------
+
+  function setupForm() {
+    if (!checkoutForm) {
+      console.warn(
+        "Checkout form #checkoutForm was not found."
+      );
+
+      return;
+    }
+
+    checkoutForm.addEventListener(
+      "submit",
+      handleCheckoutSubmit
+    );
+  }
+
+  // ---------------------------------------------------------
+  // AUTH STATE
+  // ---------------------------------------------------------
+
+  function setupAuthListener() {
+    supabaseClient.auth.onAuthStateChange(
+      (event) => {
+        if (event === "SIGNED_OUT") {
+          window.location.href =
+            "login.html";
+        }
+      }
+    );
+  }
+
+  // ---------------------------------------------------------
+  // INITIALIZE
+  // ---------------------------------------------------------
+
+  async function initializeCheckout() {
+    try {
+      showLoading();
+
+      clearMessage();
+
+      // -----------------------------------------------
+      // AUTH
+      // -----------------------------------------------
+
+      currentUser =
+        await getCurrentUser();
+
+      if (!currentUser) {
+        return;
+      }
+
+      // -----------------------------------------------
+      // PROFILE / ROLE
+      // -----------------------------------------------
+
+      currentProfile =
+        await loadProfile();
+
+      if (!currentProfile) {
+        return;
+      }
+
+      // -----------------------------------------------
+      // CART
+      // -----------------------------------------------
+
       await getOrCreateCart();
 
+      // -----------------------------------------------
+      // CART ITEMS
+      // -----------------------------------------------
 
-      /*
-       * Load the latest products and quantities.
-       */
-      const items = await loadCartItems();
+      await loadCheckoutItems();
 
+      if (
+        !checkoutItems ||
+        checkoutItems.length === 0
+      ) {
+        showEmptyCheckout();
 
-      /*
-       * If the cart is empty, show the empty state.
-       */
-      if (!items || items.length === 0) {
-        showEmpty();
+        await updateCartCount();
 
         return;
       }
 
+      // -----------------------------------------------
+      // RENDER
+      // -----------------------------------------------
 
-      /*
-       * Check current product availability and stock.
-       */
-      const stockValidation = validateCartStock(items);
+      renderCheckoutItems();
 
-      if (!stockValidation.valid) {
-        throw new Error(stockValidation.message);
-      }
+      renderTotals();
 
+      await updateCartCount();
 
-      /*
-       * Display products and totals.
-       */
-      renderCheckoutItems(items);
+      // -----------------------------------------------
+      // SHOW CHECKOUT
+      // -----------------------------------------------
 
-      renderTotals(items);
-
-
-      /*
-       * Pre-fill the customer's name when available.
-       */
-      await prefillShippingInformation();
-
-
-      /*
-       * Everything is ready.
-       */
-      showContent();
+      showCheckout();
 
     } catch (error) {
       console.error(
@@ -1408,126 +1281,27 @@ document.addEventListener("DOMContentLoaded", () => {
       );
 
       showError(
-        error.message ||
-        "Unable to load your checkout."
+        error?.message ||
+          "Unable to load checkout. Please try again."
       );
     }
   }
 
+  // ---------------------------------------------------------
+  // START
+  // ---------------------------------------------------------
 
-  /*
-   * Checkout form submission.
-   */
-  if (checkoutForm) {
-    checkoutForm.addEventListener(
-      "submit",
-      handleCheckoutSubmit
-    );
-  }
+  setupForm();
+  setupNavigation();
+  setupLogout();
+  setupAuthListener();
 
-
-  /*
-   * Retry button.
-   */
   if (retryButton) {
     retryButton.addEventListener(
       "click",
-      () => {
-        initializeCheckout();
-      }
+      retryCheckout
     );
   }
 
-
-  /*
-   * Continue shopping.
-   */
-  if (continueShoppingButton) {
-    continueShoppingButton.addEventListener(
-      "click",
-      () => {
-        window.location.href = "index.html";
-      }
-    );
-  }
-
-
-  /*
-   * My Orders navigation.
-   */
-  if (myOrdersButton) {
-    myOrdersButton.addEventListener(
-      "click",
-      () => {
-        window.location.href = "orders.html";
-      }
-    );
-  }
-
-
-  /*
-   * Wishlist navigation.
-   */
-  if (wishlistButton) {
-    wishlistButton.addEventListener(
-      "click",
-      () => {
-        window.location.href = "wishlist.html";
-      }
-    );
-  }
-
-
-  /*
-   * Settings navigation.
-   */
-  if (settingsButton) {
-    settingsButton.addEventListener(
-      "click",
-      () => {
-        window.location.href = "settings.html";
-      }
-    );
-  }
-
-
-  /*
-   * Logout.
-   */
-  if (logoutButton) {
-    logoutButton.addEventListener(
-      "click",
-      async () => {
-        try {
-          const {
-            error
-          } = await supabaseClient.auth.signOut();
-
-          if (error) {
-            throw error;
-          }
-
-          window.location.href = "login.html";
-
-        } catch (error) {
-          console.error(
-            "Logout error:",
-            error
-          );
-
-          showError(
-            error.message ||
-            "Unable to log out."
-          );
-        }
-      }
-    );
-  }
-
-
-  /*
-   * Start checkout.
-   */
   initializeCheckout();
-
 });
