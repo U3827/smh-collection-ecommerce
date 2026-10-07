@@ -25,16 +25,29 @@ document.addEventListener("DOMContentLoaded", () => {
   const productName = document.getElementById("productName");
   const productPrice = document.getElementById("productPrice");
   const stockStatus = document.getElementById("stockStatus");
-  const productDescription = document.getElementById("productDescription");
+  const productDescription =
+    document.getElementById("productDescription");
 
-  const decreaseQuantity = document.getElementById("decreaseQuantity");
-  const increaseQuantity = document.getElementById("increaseQuantity");
-  const quantityInput = document.getElementById("quantity");
+  const decreaseQuantity =
+    document.getElementById("decreaseQuantity");
 
-  const addToCartButton = document.getElementById("addToCartButton");
-  const buyNowButton = document.getElementById("buyNowButton");
+  const increaseQuantity =
+    document.getElementById("increaseQuantity");
 
-  const productMessage = document.getElementById("productMessage");
+  const quantityInput =
+    document.getElementById("quantity");
+
+  const addToCartButton =
+    document.getElementById("addToCartButton");
+
+  const buyNowButton =
+    document.getElementById("buyNowButton");
+
+  const wishlistButton =
+    document.getElementById("wishlistButton");
+
+  const productMessage =
+    document.getElementById("productMessage");
 
   // =========================================================
   // STATE
@@ -52,6 +65,7 @@ document.addEventListener("DOMContentLoaded", () => {
     showError(
       "Supabase could not be initialized. Please refresh the page and try again."
     );
+
     return;
   }
 
@@ -60,7 +74,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // =========================================================
 
   function getProductId() {
-    const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(
+      window.location.search
+    );
 
     return (
       params.get("id") ||
@@ -70,7 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // =========================================================
-  // HELPERS
+  // PAGE STATES
   // =========================================================
 
   function showLoading() {
@@ -87,7 +103,8 @@ document.addEventListener("DOMContentLoaded", () => {
     productContent.classList.add("hidden");
 
     errorMessage.textContent =
-      message || "Something went wrong while loading this product.";
+      message ||
+      "Something went wrong while loading this product.";
   }
 
   function showNotFound() {
@@ -104,6 +121,10 @@ document.addEventListener("DOMContentLoaded", () => {
     productContent.classList.remove("hidden");
   }
 
+  // =========================================================
+  // MESSAGE
+  // =========================================================
+
   function showMessage(message, type = "") {
     productMessage.textContent = message;
     productMessage.className = "product-message";
@@ -117,6 +138,10 @@ document.addEventListener("DOMContentLoaded", () => {
     productMessage.textContent = "";
     productMessage.className = "product-message";
   }
+
+  // =========================================================
+  // FORMAT PRICE
+  // =========================================================
 
   function formatPrice(price) {
     const amount = Number(price);
@@ -133,6 +158,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }).format(amount);
   }
 
+  // =========================================================
+  // STOCK
+  // =========================================================
+
   function getStock(product) {
     const stock = Number(product?.stock);
 
@@ -143,8 +172,13 @@ document.addEventListener("DOMContentLoaded", () => {
     return Math.floor(stock);
   }
 
+  // =========================================================
+  // QUANTITY
+  // =========================================================
+
   function getQuantity() {
-    let quantity = parseInt(quantityInput.value, 10);
+    let quantity =
+      parseInt(quantityInput.value, 10);
 
     if (!Number.isFinite(quantity) || quantity < 1) {
       quantity = 1;
@@ -162,15 +196,21 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // =========================================================
-  // LOAD CURRENT USER
+  // CURRENT USER
   // =========================================================
 
   async function loadCurrentUser() {
-    const { data, error } = await supabaseClient.auth.getUser();
+    const { data, error } =
+      await supabaseClient.auth.getUser();
 
     if (error) {
-      console.warn("Could not get current user:", error.message);
+      console.warn(
+        "Could not get current user:",
+        error.message
+      );
+
       currentUser = null;
+
       return null;
     }
 
@@ -195,30 +235,38 @@ document.addEventListener("DOMContentLoaded", () => {
     clearMessage();
 
     try {
-      const { data, error } = await supabaseClient
-        .from("products")
-        .select(`
-          id,
-          category_id,
-          name,
-          slug,
-          description,
-          price,
-          stock,
-          image_url,
-          is_active,
-          categories (
+      const { data, error } =
+        await supabaseClient
+          .from("products")
+          .select(`
             id,
-            name
-          )
-        `)
-        .eq("id", productId)
-        .eq("is_active", true)
-        .maybeSingle();
+            category_id,
+            name,
+            slug,
+            description,
+            price,
+            stock,
+            image_url,
+            is_active,
+            categories (
+              id,
+              name
+            )
+          `)
+          .eq("id", productId)
+          .eq("is_active", true)
+          .maybeSingle();
 
       if (error) {
-        console.error("Product loading error:", error);
-        showError("We could not load this product. Please try again.");
+        console.error(
+          "Product loading error:",
+          error
+        );
+
+        showError(
+          "We could not load this product. Please try again."
+        );
+
         return;
       }
 
@@ -229,13 +277,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
       currentProduct = data;
 
+      // Render product information
       renderProduct(data);
+
+      // Update cart number
       updateCartCount();
 
+      // Check wishlist
+      checkWishlistStatus();
+
+      // Show product
       showProduct();
+
     } catch (error) {
-      console.error("Unexpected product error:", error);
-      showError("Something went wrong while loading this product.");
+      console.error(
+        "Unexpected product error:",
+        error
+      );
+
+      showError(
+        "Something went wrong while loading this product."
+      );
     }
   }
 
@@ -266,15 +328,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (product.image_url) {
       productImage.src = product.image_url;
-      productImage.alt = product.name || "Product image";
+
+      productImage.alt =
+        product.name || "Product image";
     } else {
       productImage.removeAttribute("src");
-      productImage.alt = "No product image available";
+
+      productImage.alt =
+        "No product image available";
     }
 
     productImage.onerror = () => {
       productImage.removeAttribute("src");
-      productImage.alt = "Image unavailable";
+
+      productImage.alt =
+        "Image unavailable";
     };
 
     // -----------------------------------------
@@ -287,20 +355,27 @@ document.addEventListener("DOMContentLoaded", () => {
           ? "1 item available"
           : `${stock} items available`;
 
-      stockStatus.classList.remove("out-of-stock");
+      stockStatus.classList.remove(
+        "out-of-stock"
+      );
 
       addToCartButton.disabled = false;
       buyNowButton.disabled = false;
+      wishlistButton.disabled = false;
 
       quantityInput.disabled = false;
       decreaseQuantity.disabled = false;
       increaseQuantity.disabled = false;
 
       quantityInput.max = stock;
-    } else {
-      stockStatus.textContent = "Out of stock";
 
-      stockStatus.classList.add("out-of-stock");
+    } else {
+      stockStatus.textContent =
+        "Out of stock";
+
+      stockStatus.classList.add(
+        "out-of-stock"
+      );
 
       addToCartButton.disabled = true;
       buyNowButton.disabled = true;
@@ -310,16 +385,19 @@ document.addEventListener("DOMContentLoaded", () => {
       increaseQuantity.disabled = true;
 
       quantityInput.value = 1;
+
       quantityInput.removeAttribute("max");
     }
   }
 
   // =========================================================
-  // QUANTITY
+  // QUANTITY — DECREASE
   // =========================================================
 
   function decreaseQty() {
-    if (!currentProduct) return;
+    if (!currentProduct) {
+      return;
+    }
 
     let quantity = getQuantity();
 
@@ -334,21 +412,35 @@ document.addEventListener("DOMContentLoaded", () => {
     clearMessage();
   }
 
+  // =========================================================
+  // QUANTITY — INCREASE
+  // =========================================================
+
   function increaseQty() {
-    if (!currentProduct) return;
+    if (!currentProduct) {
+      return;
+    }
 
     let quantity = getQuantity();
-    const stock = getStock(currentProduct);
+
+    const stock =
+      getStock(currentProduct);
 
     quantity++;
 
-    if (stock > 0 && quantity > stock) {
+    if (
+      stock > 0 &&
+      quantity > stock
+    ) {
       quantity = stock;
 
       showMessage(
-        `Only ${stock} item${stock === 1 ? "" : "s"} available.`,
+        `Only ${stock} item${
+          stock === 1 ? "" : "s"
+        } available.`,
         "error"
       );
+
     } else {
       clearMessage();
     }
@@ -356,21 +448,34 @@ document.addEventListener("DOMContentLoaded", () => {
     quantityInput.value = quantity;
   }
 
+  // =========================================================
+  // VALIDATE QUANTITY
+  // =========================================================
+
   function validateQuantity() {
     if (!currentProduct) {
       return false;
     }
 
-    const stock = getStock(currentProduct);
+    const stock =
+      getStock(currentProduct);
 
     if (stock <= 0) {
-      showMessage("This product is out of stock.", "error");
+      showMessage(
+        "This product is out of stock.",
+        "error"
+      );
+
       return false;
     }
 
-    let quantity = parseInt(quantityInput.value, 10);
+    let quantity =
+      parseInt(quantityInput.value, 10);
 
-    if (!Number.isFinite(quantity) || quantity < 1) {
+    if (
+      !Number.isFinite(quantity) ||
+      quantity < 1
+    ) {
       quantity = 1;
     }
 
@@ -378,7 +483,9 @@ document.addEventListener("DOMContentLoaded", () => {
       quantity = stock;
 
       showMessage(
-        `Only ${stock} item${stock === 1 ? "" : "s"} available.`,
+        `Only ${stock} item${
+          stock === 1 ? "" : "s"
+        } available.`,
         "error"
       );
     }
@@ -397,43 +504,54 @@ document.addEventListener("DOMContentLoaded", () => {
       return null;
     }
 
-    // -----------------------------------------
     // Find existing cart
-    // -----------------------------------------
-
-    const { data: existingCart, error: findError } =
-      await supabaseClient
-        .from("carts")
-        .select("id, buyer_id")
-        .eq("buyer_id", currentUser.id)
-        .maybeSingle();
+    const {
+      data: existingCart,
+      error: findError
+    } = await supabaseClient
+      .from("carts")
+      .select("id, buyer_id")
+      .eq("buyer_id", currentUser.id)
+      .maybeSingle();
 
     if (findError) {
-      console.error("Cart lookup error:", findError);
-      throw new Error("Unable to access your cart.");
+      console.error(
+        "Cart lookup error:",
+        findError
+      );
+
+      throw new Error(
+        "Unable to access your cart."
+      );
     }
 
     if (existingCart) {
       currentCart = existingCart;
+
       return existingCart;
     }
 
-    // -----------------------------------------
     // Create cart
-    // -----------------------------------------
-
-    const { data: newCart, error: createError } =
-      await supabaseClient
-        .from("carts")
-        .insert({
-          buyer_id: currentUser.id
-        })
-        .select("id, buyer_id")
-        .single();
+    const {
+      data: newCart,
+      error: createError
+    } = await supabaseClient
+      .from("carts")
+      .insert({
+        buyer_id: currentUser.id
+      })
+      .select("id, buyer_id")
+      .single();
 
     if (createError) {
-      console.error("Cart creation error:", createError);
-      throw new Error("Unable to create your cart.");
+      console.error(
+        "Cart creation error:",
+        createError
+      );
+
+      throw new Error(
+        "Unable to create your cart."
+      );
     }
 
     currentCart = newCart;
@@ -442,17 +560,13 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // =========================================================
-  // ADD PRODUCT TO CART
+  // ADD TO CART
   // =========================================================
 
   async function addToCart(quantity = 1) {
     if (!currentProduct) {
       return false;
     }
-
-    // -----------------------------------------
-    // Authentication
-    // -----------------------------------------
 
     await loadCurrentUser();
 
@@ -465,106 +579,136 @@ document.addEventListener("DOMContentLoaded", () => {
       setTimeout(() => {
         window.location.href =
           "login.html?redirect=" +
-          encodeURIComponent(window.location.href);
+          encodeURIComponent(
+            window.location.href
+          );
       }, 900);
 
       return false;
     }
 
-    // -----------------------------------------
-    // Stock
-    // -----------------------------------------
-
-    const stock = getStock(currentProduct);
+    const stock =
+      getStock(currentProduct);
 
     if (stock <= 0) {
-      showMessage("This product is out of stock.", "error");
+      showMessage(
+        "This product is out of stock.",
+        "error"
+      );
+
       return false;
     }
 
     if (quantity > stock) {
       showMessage(
-        `Only ${stock} item${stock === 1 ? "" : "s"} available.`,
+        `Only ${stock} item${
+          stock === 1 ? "" : "s"
+        } available.`,
         "error"
       );
+
       return false;
     }
 
-    // -----------------------------------------
-    // Cart
-    // -----------------------------------------
-
-    const cart = await getOrCreateCart();
+    const cart =
+      await getOrCreateCart();
 
     if (!cart) {
-      throw new Error("Unable to access your cart.");
+      throw new Error(
+        "Unable to access your cart."
+      );
     }
 
-    // -----------------------------------------
     // Check existing cart item
-    // -----------------------------------------
-
-    const { data: existingItem, error: itemError } =
-      await supabaseClient
-        .from("cart_items")
-        .select("id, cart_id, product_id, quantity")
-        .eq("cart_id", cart.id)
-        .eq("product_id", currentProduct.id)
-        .maybeSingle();
+    const {
+      data: existingItem,
+      error: itemError
+    } = await supabaseClient
+      .from("cart_items")
+      .select(
+        "id, cart_id, product_id, quantity"
+      )
+      .eq("cart_id", cart.id)
+      .eq(
+        "product_id",
+        currentProduct.id
+      )
+      .maybeSingle();
 
     if (itemError) {
-      console.error("Cart item lookup error:", itemError);
-      throw new Error("Unable to check your cart.");
+      console.error(
+        "Cart item lookup error:",
+        itemError
+      );
+
+      throw new Error(
+        "Unable to check your cart."
+      );
     }
 
-    // -----------------------------------------
-    // Existing item → increase quantity
-    // -----------------------------------------
-
+    // Existing item
     if (existingItem) {
       const newQuantity =
-        Number(existingItem.quantity) + quantity;
+        Number(existingItem.quantity) +
+        quantity;
 
       if (newQuantity > stock) {
         showMessage(
-          `You can only add up to ${stock} item${stock === 1 ? "" : "s"} of this product.`,
+          `You can only add up to ${stock} item${
+            stock === 1 ? "" : "s"
+          } of this product.`,
           "error"
         );
 
         return false;
       }
 
-      const { error: updateError } =
-        await supabaseClient
-          .from("cart_items")
-          .update({
-            quantity: newQuantity
-          })
-          .eq("id", existingItem.id);
+      const {
+        error: updateError
+      } = await supabaseClient
+        .from("cart_items")
+        .update({
+          quantity: newQuantity
+        })
+        .eq(
+          "id",
+          existingItem.id
+        );
 
       if (updateError) {
-        console.error("Cart item update error:", updateError);
-        throw new Error("Unable to update your cart.");
+        console.error(
+          "Cart item update error:",
+          updateError
+        );
+
+        throw new Error(
+          "Unable to update your cart."
+        );
       }
-    }
 
-    // -----------------------------------------
-    // New item
-    // -----------------------------------------
+    } else {
 
-    else {
-      const { error: insertError } =
-        await supabaseClient
-          .from("cart_items")
-          .insert({
-            cart_id: cart.id,
-            product_id: currentProduct.id,
-            quantity: quantity
-          });
+      // New item
+      const {
+        error: insertError
+      } = await supabaseClient
+        .from("cart_items")
+        .insert({
+          cart_id: cart.id,
+          product_id:
+            currentProduct.id,
+          quantity: quantity
+        });
 
       if (insertError) {
-        console.error("Cart item insert error:", insertError);
-        throw new Error("Unable to add this product to your cart.");
+        console.error(
+          "Cart item insert error:",
+          insertError
+        );
+
+        throw new Error(
+          "Unable to add this product to your cart."
+        );
       }
     }
 
@@ -582,52 +726,76 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    const quantity = getQuantity();
+    const quantity =
+      getQuantity();
 
-    const originalText = addToCartButton.textContent;
+    const originalText =
+      addToCartButton.textContent;
 
     addToCartButton.disabled = true;
     buyNowButton.disabled = true;
 
-    addToCartButton.textContent = "Adding...";
+    addToCartButton.textContent =
+      "Adding...";
 
     clearMessage();
 
     try {
-      const success = await addToCart(quantity);
+      const success =
+        await addToCart(quantity);
 
       if (!success) {
         return;
       }
 
       showMessage(
-        `${quantity} item${quantity === 1 ? "" : "s"} added to your cart.`,
+        `${quantity} item${
+          quantity === 1 ? "" : "s"
+        } added to your cart.`,
         "success"
       );
 
-      addToCartButton.textContent = "✓ Added to Cart";
+      addToCartButton.textContent =
+        "✓ Added to Cart";
 
       setTimeout(() => {
-        addToCartButton.textContent = originalText;
+        addToCartButton.textContent =
+          originalText;
 
-        if (getStock(currentProduct) > 0) {
-          addToCartButton.disabled = false;
-          buyNowButton.disabled = false;
+        if (
+          getStock(currentProduct) > 0
+        ) {
+          addToCartButton.disabled =
+            false;
+
+          buyNowButton.disabled =
+            false;
         }
       }, 1200);
+
     } catch (error) {
-      console.error("Add to cart error:", error);
+      console.error(
+        "Add to cart error:",
+        error
+      );
 
       showMessage(
-        error.message || "Unable to add this product to your cart.",
+        error.message ||
+          "Unable to add this product to your cart.",
         "error"
       );
 
-      addToCartButton.textContent = originalText;
+      addToCartButton.textContent =
+        originalText;
 
-      if (getStock(currentProduct) > 0) {
-        addToCartButton.disabled = false;
-        buyNowButton.disabled = false;
+      if (
+        getStock(currentProduct) > 0
+      ) {
+        addToCartButton.disabled =
+          false;
+
+        buyNowButton.disabled =
+          false;
       }
     }
   }
@@ -641,45 +809,67 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    const quantity = getQuantity();
+    const quantity =
+      getQuantity();
 
-    const originalText = buyNowButton.textContent;
+    const originalText =
+      buyNowButton.textContent;
 
     buyNowButton.disabled = true;
     addToCartButton.disabled = true;
 
-    buyNowButton.textContent = "Preparing...";
+    buyNowButton.textContent =
+      "Preparing...";
 
     clearMessage();
 
     try {
-      const success = await addToCart(quantity);
+      const success =
+        await addToCart(quantity);
 
       if (!success) {
-        buyNowButton.textContent = originalText;
+        buyNowButton.textContent =
+          originalText;
 
-        if (getStock(currentProduct) > 0) {
-          buyNowButton.disabled = false;
-          addToCartButton.disabled = false;
+        if (
+          getStock(currentProduct) > 0
+        ) {
+          buyNowButton.disabled =
+            false;
+
+          addToCartButton.disabled =
+            false;
         }
 
         return;
       }
 
-      window.location.href = "checkout.html";
+      window.location.href =
+        "checkout.html";
+
     } catch (error) {
-      console.error("Buy now error:", error);
+      console.error(
+        "Buy now error:",
+        error
+      );
 
       showMessage(
-        error.message || "Unable to continue to checkout.",
+        error.message ||
+          "Unable to continue to checkout.",
         "error"
       );
 
-      buyNowButton.textContent = originalText;
+      buyNowButton.textContent =
+        originalText;
 
-      if (getStock(currentProduct) > 0) {
-        buyNowButton.disabled = false;
-        addToCartButton.disabled = false;
+      if (
+        getStock(currentProduct) > 0
+      ) {
+        buyNowButton.disabled =
+          false;
+
+        addToCartButton.disabled =
+          false;
       }
     }
   }
@@ -697,37 +887,310 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      const cart = await getOrCreateCart();
+      const cart =
+        await getOrCreateCart();
 
       if (!cart) {
         cartCount.textContent = "0";
         return;
       }
 
-      const { data, error } = await supabaseClient
+      const {
+        data,
+        error
+      } = await supabaseClient
         .from("cart_items")
         .select("quantity")
-        .eq("cart_id", cart.id);
+        .eq(
+          "cart_id",
+          cart.id
+        );
 
       if (error) {
-        console.warn("Cart count error:", error);
+        console.warn(
+          "Cart count error:",
+          error
+        );
+
         cartCount.textContent = "0";
+
         return;
       }
 
-      const totalItems = (data || []).reduce(
-        (total, item) =>
-          total + Number(item.quantity || 0),
-        0
-      );
+      const totalItems =
+        (data || []).reduce(
+          (total, item) =>
+            total +
+            Number(
+              item.quantity || 0
+            ),
+          0
+        );
 
       cartCount.textContent =
         totalItems > 99
           ? "99+"
           : String(totalItems);
+
     } catch (error) {
-      console.warn("Unable to update cart count:", error);
+      console.warn(
+        "Unable to update cart count:",
+        error
+      );
+
       cartCount.textContent = "0";
+    }
+  }
+
+  // =========================================================
+  // WISHLIST — CHECK STATUS
+  // =========================================================
+
+  async function checkWishlistStatus() {
+if (
+      !currentProduct ||
+      !wishlistButton
+    ) {
+      return false;
+    }
+
+    await loadCurrentUser();
+
+    if (!currentUser) {
+      setWishlistButton(false);
+      return false;
+    }
+
+    try {
+      const {
+        data,
+        error
+      } = await supabaseClient
+        .from("wishlists")
+        .select("id")
+        .eq(
+          "buyer_id",
+          currentUser.id
+        )
+        .eq(
+          "product_id",
+          currentProduct.id
+        )
+        .maybeSingle();
+
+      if (error) {
+        console.error(
+          "Wishlist status error:",
+          error
+        );
+
+        setWishlistButton(false);
+        return false;
+      }
+
+      const isWishlisted = !!data;
+
+      setWishlistButton(isWishlisted);
+
+      return isWishlisted;
+
+    } catch (error) {
+      console.error(
+        "Unexpected wishlist error:",
+        error
+      );
+
+      setWishlistButton(false);
+
+      return false;
+    }
+  }
+
+  // =========================================================
+  // WISHLIST — BUTTON
+  // =========================================================
+
+  function setWishlistButton(isWishlisted) {
+    if (!wishlistButton) {
+      return;
+    }
+
+    if (isWishlisted) {
+
+      wishlistButton.textContent =
+        "♥ Added to Wishlist";
+
+      wishlistButton.classList.add("active");
+
+      wishlistButton.setAttribute(
+        "aria-label",
+        "Remove product from wishlist"
+      );
+
+    } else {
+
+      wishlistButton.textContent =
+        "♡ Add to Wishlist";
+
+      wishlistButton.classList.remove("active");
+
+      wishlistButton.setAttribute(
+        "aria-label",
+        "Add product to wishlist"
+      );
+    }
+  }
+
+  // =========================================================
+  // WISHLIST — TOGGLE
+  // =========================================================
+
+  async function toggleWishlist() {
+
+    if (
+      !currentProduct ||
+      !wishlistButton
+    ) {
+      return;
+    }
+
+    await loadCurrentUser();
+
+    if (!currentUser) {
+
+      showMessage(
+        "Please log in to use your wishlist.",
+        "error"
+      );
+
+      setTimeout(() => {
+        window.location.href =
+          "login.html?redirect=" +
+          encodeURIComponent(
+            window.location.href
+          );
+      }, 900);
+
+      return;
+    }
+
+    const isWishlisted =
+      await checkWishlistStatus();
+
+    wishlistButton.disabled = true;
+
+    try {
+
+      // =====================================================
+      // REMOVE FROM WISHLIST
+      // =====================================================
+
+      if (isWishlisted) {
+
+        const {
+          error
+        } = await supabaseClient
+          .from("wishlists")
+          .delete()
+          .eq(
+            "buyer_id",
+            currentUser.id
+          )
+          .eq(
+            "product_id",
+            currentProduct.id
+          );
+
+        if (error) {
+
+          console.error(
+            "Wishlist removal error:",
+            error
+          );
+
+          throw new Error(
+            "Unable to remove this product from your wishlist."
+          );
+        }
+
+        setWishlistButton(false);
+
+        showMessage(
+          "Removed from your wishlist.",
+          "success"
+        );
+
+      }
+
+      // =====================================================
+      // ADD TO WISHLIST
+      // =====================================================
+
+      else {
+
+        const {
+          error
+        } = await supabaseClient
+          .from("wishlists")
+          .insert({
+            buyer_id:
+              currentUser.id,
+
+            product_id:
+              currentProduct.id
+          });
+
+        if (error) {
+
+          // Product already exists
+          if (
+            error.code === "23505"
+          ) {
+
+            setWishlistButton(true);
+
+            showMessage(
+              "This product is already in your wishlist.",
+              "success"
+            );
+
+            return;
+          }
+
+          console.error(
+            "Wishlist insert error:",
+            error
+          );
+
+          throw new Error(
+            "Unable to add this product to your wishlist."
+          );
+        }
+
+        setWishlistButton(true);
+
+        showMessage(
+          "Added to your wishlist.",
+          "success"
+        );
+      }
+
+    } catch (error) {
+
+      console.error(
+        "Wishlist toggle error:",
+        error
+      );
+
+      showMessage(
+        error.message ||
+          "Unable to update your wishlist.",
+        "error"
+      );
+
+    } finally {
+
+      wishlistButton.disabled = false;
     }
   }
 
@@ -736,20 +1199,36 @@ document.addEventListener("DOMContentLoaded", () => {
   // =========================================================
 
   function goBack() {
-    if (document.referrer) {
-      try {
-        const referrerUrl = new URL(document.referrer);
 
-        if (referrerUrl.origin === window.location.origin) {
+    if (document.referrer) {
+
+      try {
+
+        const referrerUrl =
+          new URL(
+            document.referrer
+          );
+
+        if (
+          referrerUrl.origin ===
+          window.location.origin
+        ) {
+
           window.history.back();
+
           return;
         }
+
       } catch (error) {
-        console.warn("Could not inspect referrer.");
+
+        console.warn(
+          "Could not inspect referrer."
+        );
       }
     }
 
-    window.location.href = "buyer-dashboard.html";
+    window.location.href =
+      "buyer-dashboard.html";
   }
 
   // =========================================================
@@ -790,6 +1269,11 @@ document.addEventListener("DOMContentLoaded", () => {
     handleBuyNow
   );
 
+  wishlistButton.addEventListener(
+    "click",
+    toggleWishlist
+  );
+
   backButton.addEventListener(
     "click",
     goBack
@@ -805,4 +1289,5 @@ document.addEventListener("DOMContentLoaded", () => {
   // =========================================================
 
   loadProduct();
+
 });
