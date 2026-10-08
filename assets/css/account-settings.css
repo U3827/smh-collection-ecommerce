@@ -1,0 +1,982 @@
+/* =========================================================
+   SMH COLLECTION — ACCOUNT SETTINGS
+   Professional responsive account settings page
+   ========================================================= */
+
+
+/* =========================================================
+   RESET
+   ========================================================= */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+
+html {
+  scroll-behavior: smooth;
+}
+
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+
+  overflow-x: hidden;
+
+  font-family:
+    Inter,
+    Arial,
+    Helvetica,
+    sans-serif;
+
+  background: #f6f7f9;
+  color: #111;
+}
+
+
+button,
+input {
+  font: inherit;
+}
+
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+
+button {
+  cursor: pointer;
+}
+
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+
+/* =========================================================
+   HIDDEN ATTRIBUTE
+   ========================================================= */
+
+[hidden] {
+  display: none !important;
+}
+
+
+/* =========================================================
+   TOP MARQUEE
+   ========================================================= */
+
+.top-marquee {
+  width: 100%;
+  overflow: hidden;
+
+  background: #111;
+  color: #fff;
+
+  border-bottom: 1px solid #222;
+}
+
+
+.marquee-track {
+  width: max-content;
+
+  display: flex;
+  align-items: center;
+
+  gap: 42px;
+
+  padding: 10px 0;
+
+  white-space: nowrap;
+
+  animation: marqueeMove 28s linear infinite;
+}
+
+
+.marquee-track span {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+
+  opacity: 0.9;
+}
+
+
+@keyframes marqueeMove {
+
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.settings-header {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 20px 6vw;
+
+  background: #fff;
+
+  border-bottom: 1px solid #e5e7eb;
+}
+
+
+.brand {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+
+  line-height: 1;
+}
+
+
+.brand-main {
+  font-size: 27px;
+  font-weight: 950;
+  letter-spacing: -1.5px;
+}
+
+
+.brand-sub {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 2.5px;
+  color: #777;
+}
+
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+
+.shop-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 42px;
+
+  padding: 0 18px;
+
+  border: 1px solid #d9dce1;
+  border-radius: 10px;
+
+  background: #fff;
+
+  color: #111;
+
+  font-size: 13px;
+  font-weight: 750;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+
+.shop-button:hover {
+  background: #f3f4f6;
+  border-color: #bbbfc6;
+}
+
+
+.shop-button:active {
+  transform: translateY(1px);
+}
+
+
+/* =========================================================
+   MAIN
+   ========================================================= */
+
+.settings-main {
+  width: min(1180px, 88%);
+
+  margin: 0 auto;
+
+  padding: 64px 0 80px;
+
+  flex: 1;
+}
+
+
+/* =========================================================
+   INTRO
+   ========================================================= */
+
+.settings-intro {
+  max-width: 720px;
+
+  margin-bottom: 42px;
+}
+
+
+.eyebrow {
+  margin-bottom: 10px;
+
+  color: #777;
+
+  font-size: 10px;
+  font-weight: 850;
+
+  letter-spacing: 2.2px;
+
+  text-transform: uppercase;
+}
+
+
+.settings-intro h1 {
+  margin-bottom: 14px;
+
+  font-size: clamp(34px, 5vw, 58px);
+
+  line-height: 0.98;
+
+  letter-spacing: -2.8px;
+
+  font-weight: 900;
+}
+
+
+.settings-intro > p:last-child {
+  max-width: 620px;
+
+  color: #666;
+
+  font-size: 15px;
+
+  line-height: 1.7;
+}
+
+
+/* =========================================================
+   SETTINGS LAYOUT
+   ========================================================= */
+
+.settings-layout {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1.45fr)
+    minmax(280px, 0.75fr);
+
+  gap: 20px;
+
+  align-items: start;
+}
+
+
+/* =========================================================
+   SETTINGS CARDS
+   ========================================================= */
+
+.settings-card {
+  min-width: 0;
+
+  padding: 30px;
+
+  background: #fff;
+
+  border: 1px solid #e4e6ea;
+
+  border-radius: 18px;
+
+  box-shadow:
+    0 8px 30px rgba(0, 0, 0, 0.035);
+}
+
+
+.profile-card {
+  grid-row: span 2;
+}
+
+
+.card-heading {
+  margin-bottom: 26px;
+}
+
+
+.card-heading .eyebrow {
+  margin-bottom: 8px;
+}
+
+
+.card-heading h2 {
+  margin-bottom: 8px;
+
+  font-size: 22px;
+
+  line-height: 1.15;
+
+  letter-spacing: -0.7px;
+
+  font-weight: 850;
+}
+
+
+.card-heading > p:last-child {
+  color: #777;
+
+  font-size: 13px;
+
+  line-height: 1.6;
+}
+
+
+/* =========================================================
+   PROFILE PREVIEW
+   ========================================================= */
+
+.profile-preview {
+  display: flex;
+  align-items: center;
+
+  gap: 15px;
+
+  margin-bottom: 30px;
+
+  padding: 18px;
+
+  background: #f7f7f8;
+
+  border: 1px solid #ececef;
+
+  border-radius: 14px;
+}
+
+
+.profile-avatar-large {
+  width: 58px;
+  height: 58px;
+
+  flex: 0 0 58px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+
+  border-radius: 50%;
+
+  background: #111;
+  color: #fff;
+
+  font-size: 19px;
+  font-weight: 850;
+}
+
+
+.profile-avatar-large img {
+  width: 100%;
+  height: 100%;
+
+  display: block;
+
+  object-fit: cover;
+}
+
+
+.profile-preview strong {
+  display: block;
+
+  margin-bottom: 4px;
+
+  font-size: 15px;
+  font-weight: 800;
+}
+
+
+.profile-preview span {
+  display: block;
+
+  color: #777;
+
+  font-size: 12px;
+}
+
+
+/* =========================================================
+   FORM
+   ========================================================= */
+
+.form-group {
+  margin-bottom: 21px;
+}
+
+
+.form-group label {
+  display: block;
+
+  margin-bottom: 8px;
+
+  color: #222;
+
+  font-size: 12px;
+  font-weight: 800;
+}
+
+
+.form-group input {
+  width: 100%;
+
+  min-height: 50px;
+
+  padding: 0 15px;
+
+  border: 1px solid #dfe2e7;
+  border-radius: 10px;
+
+  outline: none;
+
+  background: #fff;
+
+  color: #111;
+
+  font-size: 14px;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+
+.form-group input::placeholder {
+  color: #a1a5ab;
+}
+
+
+.form-group input:focus {
+  border-color: #111;
+
+  box-shadow:
+    0 0 0 3px rgba(17, 17, 17, 0.07);
+}
+
+
+.form-group input[readonly] {
+  background: #f5f5f6;
+
+  color: #777;
+
+  cursor: not-allowed;
+}
+
+
+.form-group small {
+  display: block;
+
+  margin-top: 7px;
+
+  color: #888;
+
+  font-size: 11px;
+
+  line-height: 1.5;
+}
+
+
+/* =========================================================
+   FORM MESSAGES
+   ========================================================= */
+
+.form-message {
+  min-height: 20px;
+
+  margin-bottom: 13px;
+
+  font-size: 12px;
+
+  line-height: 1.5;
+}
+
+
+.form-message.success {
+  color: #16733a;
+}
+
+
+.form-message.error {
+  color: #b42318;
+}
+
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+.primary-button,
+.secondary-button,
+.danger-button {
+  min-height: 46px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 18px;
+
+  border-radius: 10px;
+
+  font-size: 12px;
+  font-weight: 800;
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+
+.primary-button {
+  width: 100%;
+
+  border: 1px solid #111;
+
+  background: #111;
+
+  color: #fff;
+}
+
+
+.primary-button:hover {
+  background: #2a2a2a;
+}
+
+
+.secondary-button {
+  border: 1px solid #d9dce1;
+
+  background: #fff;
+
+  color: #111;
+}
+
+
+.secondary-button:hover {
+  background: #f3f4f6;
+
+  border-color: #bbbfc6;
+}
+
+
+.danger-button {
+  border: 1px solid #f0caca;
+
+  background: #fff;
+
+  color: #b42318;
+}
+
+
+.danger-button:hover {
+  background: #fff3f2;
+
+  border-color: #e5aaaa;
+}
+
+
+.primary-button:active,
+.secondary-button:active,
+.danger-button:active {
+  transform: translateY(1px);
+}
+
+
+/* =========================================================
+   ACCOUNT INFORMATION
+   ========================================================= */
+
+.info-list {
+  display: flex;
+  flex-direction: column;
+
+  border-top: 1px solid #eceef1;
+}
+
+
+.info-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 15px;
+
+  padding: 16px 0;
+
+  border-bottom: 1px solid #eceef1;
+}
+
+
+.info-row span {
+  color: #777;
+
+  font-size: 12px;
+}
+
+
+.info-row strong {
+  max-width: 58%;
+
+  overflow-wrap: anywhere;
+
+  text-align: right;
+
+  font-size: 12px;
+  font-weight: 800;
+}
+
+
+.role-badge,
+.status-badge {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  min-height: 28px;
+
+  padding: 0 10px;
+
+  border-radius: 999px;
+
+  font-size: 10px !important;
+
+  text-transform: capitalize;
+}
+
+
+.role-badge {
+  background: #f1f1f2;
+
+  color: #222;
+}
+
+
+.status-badge {
+  background: #ecfdf3;
+
+  color: #16733a;
+}
+
+
+/* =========================================================
+   SECURITY
+   ========================================================= */
+
+.security-card {
+  grid-column: 2;
+}
+
+
+/* =========================================================
+   ACCOUNT ACTIONS
+   ========================================================= */
+
+.actions-card {
+  grid-column: 1 / -1;
+}
+
+
+.account-actions {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 10px;
+}
+
+
+.account-actions .secondary-button,
+.account-actions .danger-button {
+  min-width: 170px;
+}
+
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.settings-footer {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 30px;
+
+  padding: 28px 6vw;
+
+  background: #111;
+
+  color: #fff;
+}
+
+
+.footer-brand {
+  display: flex;
+  flex-direction: column;
+
+  gap: 5px;
+}
+
+
+.footer-brand strong {
+  font-size: 12px;
+
+  letter-spacing: 1.5px;
+}
+
+
+.footer-brand span {
+  color: #999;
+
+  font-size: 11px;
+}
+
+
+.settings-footer > p {
+  color: #888;
+
+  font-size: 10px;
+
+  text-align: right;
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+  .settings-main {
+    width: min(92%, 720px);
+
+    padding-top: 48px;
+  }
+
+
+  .settings-layout {
+    grid-template-columns: 1fr;
+  }
+
+
+  .profile-card,
+  .security-card,
+  .actions-card {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+
+  .settings-card {
+    padding: 26px;
+  }
+
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+  .settings-header {
+    padding: 16px 5%;
+
+    gap: 15px;
+  }
+
+
+  .brand {
+    gap: 6px;
+  }
+
+
+  .brand-main {
+    font-size: 23px;
+  }
+
+
+  .brand-sub {
+    font-size: 8px;
+
+    letter-spacing: 2px;
+  }
+
+
+  .shop-button {
+    min-height: 38px;
+
+    padding: 0 13px;
+
+    font-size: 11px;
+  }
+
+
+  .settings-main {
+    width: 92%;
+
+    padding: 40px 0 60px;
+  }
+
+
+  .settings-intro {
+    margin-bottom: 30px;
+  }
+
+
+  .settings-intro h1 {
+    font-size: 38px;
+
+    letter-spacing: -2px;
+  }
+
+
+  .settings-intro > p:last-child {
+    font-size: 13px;
+  }
+
+
+  .settings-layout {
+    gap: 14px;
+  }
+
+
+  .settings-card {
+    padding: 21px;
+
+    border-radius: 15px;
+  }
+
+
+  .card-heading h2 {
+    font-size: 19px;
+  }
+
+
+  .profile-preview {
+    padding: 14px;
+
+    margin-bottom: 24px;
+  }
+
+
+  .profile-avatar-large {
+    width: 50px;
+    height: 50px;
+
+    flex-basis: 50px;
+  }
+
+
+  .form-group {
+    margin-bottom: 18px;
+  }
+
+
+  .form-group input {
+    min-height: 48px;
+
+    font-size: 13px;
+  }
+
+
+  .account-actions {
+    flex-direction: column;
+  }
+
+
+  .account-actions .secondary-button,
+  .account-actions .danger-button {
+    width: 100%;
+
+    min-width: 0;
+  }
+
+
+  .settings-footer {
+    flex-direction: column;
+    align-items: flex-start;
+
+    padding: 25px 5%;
+
+    gap: 16px;
+  }
+
+
+  .settings-footer > p {
+    text-align: left;
+  }
+
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 380px) {
+
+  .settings-intro h1 {
+    font-size: 33px;
+  }
+
+
+  .settings-card {
+    padding: 18px;
+  }
+
+
+  .info-row {
+    align-items: flex-start;
+
+    flex-direction: column;
+
+    gap: 6px;
+  }
+
+
+  .info-row strong {
+    max-width: 100%;
+
+    text-align: left;
+  }
+
+}
