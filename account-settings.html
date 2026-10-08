@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <meta
+    name="description"
+    content="Manage your SMH Collection account settings."
+  >
+
+  <meta
+    name="theme-color"
+    content="#111111"
+  >
+
+  <title>Account Settings | SMH Collection</title>
+
+  <link
+    rel="stylesheet"
+    href="assets/css/account-settings.css"
+  >
+
+</head>
+
+
+<body>
+
+
+  <!-- =========================================
+       TOP MARQUEE
+  ========================================== -->
+
+  <div class="top-marquee">
+
+    <div class="marquee-track">
+
+      <span>SMH COLLECTION</span>
+      <span>SHOP EVERYTHING</span>
+      <span>SELL EVERYTHING</span>
+      <span>FREE DELIVERY</span>
+      <span>CASH ON DELIVERY</span>
+
+      <span>SMH COLLECTION</span>
+      <span>SHOP EVERYTHING</span>
+      <span>SELL EVERYTHING</span>
+      <span>FREE DELIVERY</span>
+      <span>CASH ON DELIVERY</span>
+
+    </div>
+
+  </div>
+
+
+  <!-- =========================================
+       HEADER
+  ========================================== -->
+
+  <header class="settings-header">
+
+    <a
+      href="buyer-dashboard.html"
+      class="brand"
+      aria-label="Go to SMH Collection home"
+    >
+
+      <span class="brand-main">
+        SMH
+      </span>
+
+      <span class="brand-sub">
+        COLLECTION
+      </span>
+
+    </a>
+
+
+    <div class="header-actions">
+
+      <a
+        href="buyer-dashboard.html"
+        class="shop-button"
+      >
+        ← Shop
+      </a>
+
+    </div>
+
+  </header>
+
+
+  <!-- =========================================
+       MAIN
+  ========================================== -->
+
+  <main class="settings-main">
+
+
+    <!-- =========================================
+         INTRO
+    ========================================== -->
+
+    <section class="settings-intro">
+
+      <p class="eyebrow">
+        YOUR ACCOUNT
+      </p>
+
+      <h1>
+        Account Settings
+      </h1>
+
+      <p>
+        Manage your profile information and account
+        preferences from one place.
+      </p>
+
+    </section>
+
+
+    <!-- =========================================
+         SETTINGS LAYOUT
+    ========================================== -->
+
+    <div class="settings-layout">
+
+
+      <!-- =======================================
+           PROFILE CARD
+      ======================================== -->
+
+      <section class="settings-card profile-card">
+
+        <div class="card-heading">
+
+          <div>
+
+            <p class="eyebrow">
+              PROFILE
+            </p>
+
+            <h2>
+              Personal Information
+            </h2>
+
+            <p>
+              Keep your account information up to date.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <!-- PROFILE PREVIEW -->
+
+        <div class="profile-preview">
+
+          <div
+            class="profile-avatar-large"
+            id="profileAvatar"
+          >
+            U
+          </div>
+
+          <div>
+
+            <strong id="profileDisplayName">
+              Loading...
+            </strong>
+
+            <span id="profileDisplayEmail">
+              Loading...
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <!-- PROFILE FORM -->
+
+        <form id="profileForm">
+
+          <div class="form-group">
+
+            <label for="fullName">
+              Full Name
+            </label>
+
+            <input
+              type="text"
+              id="fullName"
+              name="fullName"
+              placeholder="Enter your full name"
+              autocomplete="name"
+              required
+            >
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label for="email">
+              Email Address
+            </label>
+
+            <input
+              type="email"
+              id="email"
+              name="email"
+              placeholder="Your email address"
+              autocomplete="email"
+              readonly
+            >
+
+            <small>
+              Your account email cannot be changed here.
+            </small>
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label for="avatarUrl">
+              Profile Image URL
+            </label>
+
+            <input
+              type="url"
+              id="avatarUrl"
+              name="avatarUrl"
+              placeholder="https://example.com/photo.jpg"
+              autocomplete="url"
+            >
+
+            <small>
+              Optional. Use a direct image URL.
+            </small>
+
+          </div>
+
+
+          <div
+            class="form-message"
+            id="profileMessage"
+            role="status"
+            aria-live="polite"
+          ></div>
+
+
+          <button
+            type="submit"
+            class="primary-button"
+            id="saveProfileButton"
+          >
+            Save Profile
+          </button>
+
+        </form>
+
+      </section>
+
+
+      <!-- =======================================
+           ACCOUNT INFORMATION
+      ======================================== -->
+
+      <section class="settings-card account-card">
+
+        <div class="card-heading">
+
+          <p class="eyebrow">
+            ACCOUNT
+          </p>
+
+          <h2>
+            Account Information
+          </h2>
+
+          <p>
+            Details about your SMH Collection account.
+          </p>
+
+        </div>
+
+
+        <div class="info-list">
+
+          <div class="info-row">
+
+            <span>
+              Account Email
+            </span>
+
+            <strong id="accountEmail">
+              Loading...
+            </strong>
+
+          </div>
+
+
+          <div class="info-row">
+
+            <span>
+              Account Type
+            </span>
+
+            <strong
+              id="accountRole"
+              class="role-badge"
+            >
+              Loading...
+            </strong>
+
+          </div>
+
+
+          <div class="info-row">
+
+            <span>
+              Account Status
+            </span>
+
+            <strong
+              id="accountStatus"
+              class="status-badge"
+            >
+              Loading...
+            </strong>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =======================================
+           SECURITY
+      ======================================== -->
+
+      <section class="settings-card security-card">
+
+        <div class="card-heading">
+
+          <p class="eyebrow">
+            SECURITY
+          </p>
+
+          <h2>
+            Password
+          </h2>
+
+          <p>
+            Change your account password securely.
+          </p>
+
+        </div>
+
+
+        <form id="passwordForm">
+
+          <div class="form-group">
+
+            <label for="newPassword">
+              New Password
+            </label>
+
+            <input
+              type="password"
+              id="newPassword"
+              name="newPassword"
+              placeholder="Enter a new password"
+              autocomplete="new-password"
+              minlength="6"
+              required
+            >
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label for="confirmPassword">
+              Confirm New Password
+            </label>
+
+            <input
+              type="password"
+              id="confirmPassword"
+              name="confirmPassword"
+              placeholder="Confirm your new password"
+              autocomplete="new-password"
+              minlength="6"
+              required
+            >
+
+          </div>
+
+
+          <div
+            class="form-message"
+            id="passwordMessage"
+            role="status"
+            aria-live="polite"
+          ></div>
+
+
+          <button
+            type="submit"
+            class="secondary-button"
+            id="changePasswordButton"
+          >
+            Change Password
+          </button>
+
+        </form>
+
+      </section>
+
+
+      <!-- =======================================
+           ACCOUNT ACTIONS
+      ======================================== -->
+
+      <section class="settings-card actions-card">
+
+        <div class="card-heading">
+
+          <p class="eyebrow">
+            QUICK ACTIONS
+          </p>
+
+          <h2>
+            Account Actions
+          </h2>
+
+        </div>
+
+
+        <div class="account-actions">
+
+          <a
+            href="buyer-dashboard.html"
+            class="secondary-button"
+          >
+            ← Back to Dashboard
+          </a>
+
+          <a
+            href="wishlist.html"
+            class="secondary-button"
+          >
+            ♡ My Wishlist
+          </a>
+
+          <button
+            type="button"
+            class="danger-button"
+            id="logoutButton"
+          >
+            ↪ Sign Out
+          </button>
+
+        </div>
+
+      </section>
+
+
+    </div>
+
+  </main>
+
+
+  <!-- =========================================
+       FOOTER
+  ========================================== -->
+
+  <footer class="settings-footer">
+
+    <div class="footer-brand">
+
+      <strong>
+        SMH COLLECTION
+      </strong>
+
+      <span>
+        Everything in one place.
+      </span>
+
+    </div>
+
+    <p>
+      ©
+      <span id="currentYear"></span>
+      SMH Collection.
+      All rights reserved.
+    </p>
+
+  </footer>
+
+
+  <!-- =========================================
+       SCRIPTS
+  ========================================== -->
+
+  <script
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+  ></script>
+
+  <script src="assets/js/supabase.js"></script>
+
+  <script src="assets/js/account-settings.js"></script>
+
+
+</body>
+
+</html>
