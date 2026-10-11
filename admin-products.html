@@ -1,0 +1,206 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#090b10">
+  <meta name="description" content="Manage the SMH Collection product catalogue and inventory.">
+  <title>Products | SMH Collection Admin</title>
+
+  <link rel="stylesheet" href="assets/css/admin-products.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/supabase.js"></script>
+  <script src="assets/js/admin-products.js" defer></script>
+</head>
+<body>
+  <div class="admin-layout">
+    <aside class="sidebar">
+      <a class="brand" href="admin-dashboard.html">
+        <span class="brand-mark">SMH</span>
+        <span>SMH Collection<small>ADMINISTRATION</small></span>
+      </a>
+
+      <p class="nav-label">WORKSPACE</p>
+      <nav class="navigation">
+        <a href="admin-dashboard.html">◫ &nbsp; Overview</a>
+        <a href="admin-orders.html">▤ &nbsp; Orders</a>
+        <a class="active" href="admin-products.html">▦ &nbsp; Products</a>
+        <a href="admin-customers.html">♙ &nbsp; Customers</a>
+        <a href="admin-staff.html">♧ &nbsp; Staff &amp; Sellers</a>
+        <a href="admin-inventory.html">▥ &nbsp; Inventory</a>
+        <a href="admin-analytics.html">▧ &nbsp; Analytics</a>
+        <a href="admin-settings.html">⚙ &nbsp; Settings</a>
+        <a href="admin-market.html">⌂ &nbsp; Visit Market</a>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <span class="admin-indicator"></span>
+        <span>Administrator<small>SMH Control Centre</small></span>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">CATALOGUE MANAGEMENT</p>
+          <h1>Products</h1>
+          <p class="subtitle">Manage listings, pricing and product availability.</p>
+        </div>
+        <button id="addProductButton" class="button primary" type="button">
+          + Add product
+        </button>
+      </header>
+
+      <div id="pageMessage" class="message" role="status" aria-live="polite">
+        Checking administrator access...
+      </div>
+
+      <section class="stats-grid">
+        <article class="stat-card">
+          <span class="stat-icon">▦</span>
+          <p>Total products</p>
+          <strong id="totalProducts">—</strong>
+          <small>All catalogue listings</small>
+        </article>
+        <article class="stat-card">
+          <span class="stat-icon blue">✓</span>
+          <p>Active products</p>
+          <strong id="activeProducts">—</strong>
+          <small>Visible listings</small>
+        </article>
+        <article class="stat-card">
+          <span class="stat-icon amber">◷</span>
+          <p>Low stock</p>
+          <strong id="lowStockProducts">—</strong>
+          <small>Stock of 1–5 units</small>
+        </article>
+        <article class="stat-card">
+          <span class="stat-icon red">!</span>
+          <p>Out of stock</p>
+          <strong id="outOfStockProducts">—</strong>
+          <small>Restocking may be needed</small>
+        </article>
+      </section>
+
+      <section class="products-panel">
+        <div class="panel-heading">
+          <div>
+            <h2>Product catalogue</h2>
+            <p>Review and maintain every product listing.</p>
+          </div>
+          <button id="refreshButton" class="button secondary" type="button">
+            ↻ Refresh
+          </button>
+        </div>
+
+        <div class="filters">
+          <label class="search-box">
+            <span>⌕</span>
+            <input id="searchInput" type="search"
+              placeholder="Search products or sellers..."
+              autocomplete="off">
+          </label>
+
+          <select id="categoryFilter" aria-label="Filter by category">
+            <option value="">All categories</option>
+          </select>
+
+          <select id="availabilityFilter" aria-label="Filter by availability">
+            <option value="">All products</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+            <option value="low">Low stock</option>
+            <option value="out">Out of stock</option>
+          </select>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Category</th>
+                <th>Seller</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="productsTableBody">
+              <tr>
+                <td colspan="7" class="table-message">Loading products...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div id="mobileProducts" class="mobile-products"></div>
+        <p id="resultCount" class="result-count">Loading products...</p>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="productDialog" class="product-dialog">
+    <form id="productForm">
+      <div class="dialog-header">
+        <div>
+          <p class="eyebrow">PRODUCT DETAILS</p>
+          <h2 id="dialogTitle">Add product</h2>
+        </div>
+        <button id="closeDialog" class="close-button" type="button"
+          aria-label="Close">×</button>
+      </div>
+
+      <div class="dialog-body">
+        <input id="productId" type="hidden">
+
+        <label for="productName">Product name *</label>
+        <input id="productName" type="text" maxlength="180" required>
+
+        <label for="productDescription">Description</label>
+        <textarea id="productDescription" rows="4" maxlength="5000"></textarea>
+
+        <label for="productCategory">Category *</label>
+        <select id="productCategory" required>
+          <option value="">Choose a category</option>
+        </select>
+
+        <div class="form-grid">
+          <div>
+            <label for="productPrice">Price (₦) *</label>
+            <input id="productPrice" type="number" min="0.01"
+              step="0.01" required>
+          </div>
+          <div>
+            <label for="productStock">Stock quantity *</label>
+            <input id="productStock" type="number" min="0"
+              step="1" required>
+          </div>
+        </div>
+
+        <label for="productImage">Image URL</label>
+        <input id="productImage" type="url" maxlength="2000"
+          placeholder="https://example.com/product.jpg">
+
+        <label class="checkbox-label">
+          <input id="productActive" type="checkbox" checked>
+          Make this product active in the marketplace
+        </label>
+
+        <p id="formMessage" class="form-message" role="status"></p>
+      </div>
+
+      <div class="dialog-actions">
+        <button id="cancelProduct" class="button secondary" type="button">
+          Cancel
+        </button>
+        <button id="saveProduct" class="button primary" type="submit">
+          Save product
+        </button>
+      </div>
+    </form>
+  </dialog>
+</body>
+</html>
