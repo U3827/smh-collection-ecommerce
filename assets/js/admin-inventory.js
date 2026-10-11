@@ -1,3 +1,4 @@
+
 /* =========================================
    SMH COLLECTION
    ADMIN INVENTORY MANAGEMENT
@@ -13,7 +14,7 @@
     let products = [];
     let categories = [];
     let currentUser = null;
-    let busyProducts = new Set();
+    let isSaving = false;
 
     const elements = {
         message: $("pageMessage"),
@@ -35,6 +36,27 @@
         backToTop: $("backToTopButton")
     };
 
+    // Support the existing Supabase file without modifying it.
+    function getSupabaseClient() {
+        if (window.supabaseClient) {
+            return window.supabaseClient;
+        }
+
+        try {
+            if (
+                typeof supabaseClient !== "undefined" &&
+                supabaseClient
+            ) {
+                window.supabaseClient = supabaseClient;
+                return supabaseClient;
+            }
+        } catch (error) {
+            console.warn("Supabase client lookup failed:", error);
+        }
+
+        return null;
+    }
+
     function escapeHTML(value) {
         return String(value ?? "").replace(/[&<>"']/g, (character) => ({
             "&": "&amp;",
@@ -46,292 +68,233 @@
     }
 
     function formatNumber(value) {
-        return new Intl.NumberFormat("en-NG").format(Number(value) || 0);
+        return Number(value || 0).toLocaleString("en-NG");
     }
 
     function formatMoney(value) {
-        return new Intl.NumberFormat("en-NG", {
-            style: "currency",
-            currency: "NGN",
+        return "₦" + Number(value || 0).toLocaleString("en-NG", {
+            minimumFractionDigits: 2,
             maximumFractionDigits: 2
-        }).format(Number(value) || 0);
+        });
     }
 
     function showMessage(message, type = "info") {
         if (!elements.message) return;
 
-        elements.message.textContent = message;
+        elements.message.textContent = message || "";
+        elements.message.className = message
+            ? `page-message ${type}`
+            : "page-message";
+
         elements.message.hidden = !message;
-        elements.message.dataset.type = type;
-    }
-
-    function getCategoryName(product) {
-        const category = categories.find(
-            (item) => item.id === product.category_id
-        );
-
-        return category?.name || "Uncategorised";
     }
 
     function getStockStatus(stock) {
-        const quantity = Number(stock) || 0;
+        const quantity = Number(stock || 0);
 
         if (quantity <= 0) {
             return {
                 label: "Out of stock",
-                className: "stock-out",
-                filter: "out-of-stock"
+                className: "out-of-stock"
             };
         }
 
         if (quantity <= LOW_STOCK_LIMIT) {
             return {
                 label: "Low stock",
-                className: "stock-low",
-                filter: "low-stock"
+                className: "low-stock"
             };
         }
 
         return {
             label: "In stock",
-            className: "stock-in",
-            filter: "in-stock"
+            className: "in-stock"
         };
     }
 
-    function getVisibility(product) {
-        return product.is_active
-            ? '<span class="status-badge status-active">Active</span>'
-            : '<span class="status-badge status-inactive">Inactive</span>';
+    function getCategoryName(categoryId) {
+        const category = categories.find(
+            (item) => String(item.id) === String(categoryId)
+        );
+
+        return category ? category.name : "Uncategorized";
     }
 
-    function productImage(product) {
-        const name = escapeHTML(product.name || "Product");
+    function getProductImage(product) {
         const imageURL = String(product.image_url || "").trim();
 
-        if (
-            imageURL &&
-            /^https?:\/\/\S+$/i.test(imageURL)
-        ) {
-            return `
-                <div class="product-thumb">
-                    <img
-                        src="${escapeHTML(imageURL)}"
-                        alt="${name}"
-                        loading="lazy"
-                        referrerpolicy="no-referrer"
-                        onerror="this.style.display='none'"
-                    >
-                </div>
-            `;
+        if (/^https?:\/\/[^\s"'<>]+$/i.test(imageURL)) {
+            return imageURL;
+        }
+
+        return "";
+    }
+
+    function productImageHTML(product) {
+        const imageURL = getProductImage(product);
+        const name = escapeHTML(product.name || "Product");
+
+        if (!imageURL) {
+            return '<div class="inventory-image-placeholder">No image</div>';
         }
 
         return `
-            <div class="product-thumb" aria-label="${name}">
-                ◇
-            </div>
+            <img
+                class="inventory-product-image"
+                src="${escapeHTML(imageURL)}"
+                alt="${name}"
+                loading="lazy"
+                onerror="this.style.display='none'"
+            >
         `;
     }
 
-    function stockUpdateControl(product) {
-        const id = escapeHTML(product.id);
-        const stock = Math.max(0, Number(product.stock) || 0);
-        const disabled = busyProducts.has(String(product.id));
+    function stockInputHTML(product, mobile = false) {
+        const productId = escapeHTML(product.id);
+        const stock = Math.max(0, Number(product.stock || 0));
 
         return `
-            <div class="stock-update">
+            <div class="${mobile ? "mobile-stock-update" : "stock-update"}">
                 <input
                     type="number"
                     min="0"
                     step="1"
-                    max="100000000"
                     value="${stock}"
-                    aria-label="New stock quantity for ${escapeHTML(product.name)}"
-                    data-stock-input="${id}"
-                    ${disabled ? "disabled" : ""}
+                    data-stock-input
+                    data-product-id="${productId}"
+                    aria-label="Stock quantity for ${escapeHTML(product.name)}"
                 >
                 <button
                     type="button"
-                    data-update-stock="${id}"
-                    ${disabled ? "disabled" : ""}
+                    class="stock-update-button"
+                    data-update-stock="${productId}"
                 >
-                    ${disabled ? "Saving…" : "Save"}
+                    Save
                 </button>
             </div>
         `;
     }
 
-    function renderDesktopRow(product) {
-        const status = getStockStatus(product.stock);
+    function renderTableRow(product) {
+        const stockStatus = getStockStatus(product.stock);
+        const visibility = product.is_active ? "Active" : "Hidden";
 
         return `
             <tr>
                 <td>
-                    <div class="product-cell">
-                        ${productImage(product)}
-                        <div class="product-info">
+                    <div class="inventory-product">
+                        ${productImageHTML(product)}
+                        <div>
                             <strong>${escapeHTML(product.name)}</strong>
                             <small>${escapeHTML(product.slug || "")}</small>
                         </div>
                     </div>
                 </td>
-                <td>${escapeHTML(getCategoryName(product))}</td>
+
+                <td>${escapeHTML(getCategoryName(product.category_id))}</td>
+
                 <td>${formatMoney(product.price)}</td>
+
                 <td>
-                    <span class="stock-number">
-                        ${formatNumber(product.stock)}
+                    <span class="stock-badge ${stockStatus.className}">
+                        ${stockStatus.label}
+                    </span>
+                    <small>${formatNumber(product.stock)} units</small>
+                </td>
+
+                <td>
+                    <span class="visibility-badge">
+                        ${visibility}
                     </span>
                 </td>
-                <td>
-                    <span class="stock-status ${status.className}">
-                        ${status.label}
-                    </span>
-                </td>
-                <td>${getVisibility(product)}</td>
-                <td>${stockUpdateControl(product)}</td>
+
+                <td>${stockInputHTML(product)}</td>
             </tr>
         `;
     }
 
     function renderMobileCard(product) {
-        const status = getStockStatus(product.stock);
+        const stockStatus = getStockStatus(product.stock);
 
         return `
             <article class="inventory-mobile-card">
-                <div class="mobile-product-heading">
-                    ${productImage(product)}
-                    <div class="product-info">
-                        <strong>${escapeHTML(product.name)}</strong>
-                        <small>${escapeHTML(product.slug || "")}</small>
-                        <small>${escapeHTML(getCategoryName(product))}</small>
-                    </div>
-                </div>
-
-                <div class="mobile-stock-grid">
-                    <div class="mobile-stock-item">
-                        <span>Price</span>
+                <div class="inventory-mobile-product">
+                    ${productImageHTML(product)}
+                    <div>
+                        <h3>${escapeHTML(product.name)}</h3>
+                        <p>${escapeHTML(getCategoryName(product.category_id))}</p>
                         <strong>${formatMoney(product.price)}</strong>
                     </div>
-
-                    <div class="mobile-stock-item">
-                        <span>Current stock</span>
-                        <strong>${formatNumber(product.stock)} units</strong>
-                    </div>
-
-                    <div class="mobile-stock-item">
-                        <span>Stock status</span>
-                        <strong>
-                            <span class="stock-status ${status.className}">
-                                ${status.label}
-                            </span>
-                        </strong>
-                    </div>
-
-                    <div class="mobile-stock-item">
-                        <span>Visibility</span>
-                        <strong>${product.is_active ? "Active" : "Inactive"}</strong>
-                    </div>
                 </div>
 
-                <label class="mobile-update-label"
-                    for="mobile-stock-${escapeHTML(product.id)}">
-                    Update stock quantity
-                </label>
-
-                <div class="mobile-stock-update">
-                    <input
-                        id="mobile-stock-${escapeHTML(product.id)}"
-                        type="number"
-                        min="0"
-                        step="1"
-                        max="100000000"
-                        value="${Math.max(0, Number(product.stock) || 0)}"
-                        aria-label="New stock quantity for ${escapeHTML(product.name)}"
-                        data-stock-input="${escapeHTML(product.id)}"
-                        ${busyProducts.has(String(product.id)) ? "disabled" : ""}
-                    >
-                    <button
-                        type="button"
-                        data-update-stock="${escapeHTML(product.id)}"
-                        ${busyProducts.has(String(product.id)) ? "disabled" : ""}
-                    >
-                        ${busyProducts.has(String(product.id)) ? "Saving…" : "Save stock"}
-                    </button>
+                <div class="inventory-mobile-details">
+                    <span>Available units</span>
+                    <strong>${formatNumber(product.stock)}</strong>
                 </div>
+
+                <div class="inventory-mobile-details">
+                    <span>Stock status</span>
+                    <span class="stock-badge ${stockStatus.className}">
+                        ${stockStatus.label}
+                    </span>
+                </div>
+
+                <div class="inventory-mobile-details">
+                    <span>Visibility</span>
+                    <strong>${product.is_active ? "Active" : "Hidden"}</strong>
+                </div>
+
+                ${stockInputHTML(product, true)}
             </article>
         `;
     }
 
-    function populateCategories() {
-        const selectedValue = elements.category.value || "all";
-
-        elements.category.innerHTML = `
-            <option value="all">All categories</option>
-            ${categories.map((category) => `
-                <option value="${escapeHTML(category.id)}">
-                    ${escapeHTML(category.name)}
-                </option>
-            `).join("")}
-        `;
-
-        const optionExists = Array.from(elements.category.options)
-            .some((option) => option.value === selectedValue);
-
-        elements.category.value = optionExists ? selectedValue : "all";
-    }
-
-    function updateStatistics() {
-        elements.totalProducts.textContent = formatNumber(products.length);
-
-        const totalUnits = products.reduce(
-            (sum, product) => sum + Math.max(0, Number(product.stock) || 0),
-            0
-        );
-
-        const lowStock = products.filter((product) => {
-            const stock = Number(product.stock) || 0;
-            return stock > 0 && stock <= LOW_STOCK_LIMIT;
-        }).length;
-
-        const outOfStock = products.filter(
-            (product) => (Number(product.stock) || 0) <= 0
-        ).length;
-
-        elements.totalUnits.textContent = formatNumber(totalUnits);
-        elements.lowStockProducts.textContent = formatNumber(lowStock);
-        elements.outOfStockProducts.textContent = formatNumber(outOfStock);
-    }
-
     function getFilteredProducts() {
-        const searchTerm = elements.search.value.trim().toLowerCase();
-        const categoryValue = elements.category.value;
-        const stockValue = elements.stock.value;
-        const visibilityValue = elements.visibility.value;
+        const searchTerm = (elements.search?.value || "")
+            .trim()
+            .toLowerCase();
+
+        const categoryValue = elements.category?.value || "";
+        const stockValue = elements.stock?.value || "";
+        const visibilityValue = elements.visibility?.value || "";
 
         return products.filter((product) => {
             const name = String(product.name || "").toLowerCase();
             const slug = String(product.slug || "").toLowerCase();
+            const categoryName = getCategoryName(
+                product.category_id
+            ).toLowerCase();
 
             const matchesSearch =
                 !searchTerm ||
                 name.includes(searchTerm) ||
-                slug.includes(searchTerm);
+                slug.includes(searchTerm) ||
+                categoryName.includes(searchTerm);
 
             const matchesCategory =
-                categoryValue === "all" ||
+                !categoryValue ||
                 String(product.category_id || "") === categoryValue;
 
-            const stock = Number(product.stock) || 0;
-            const status = getStockStatus(stock);
+            const quantity = Number(product.stock || 0);
 
-            const matchesStock =
-                stockValue === "all" ||
-                status.filter === stockValue;
+            let matchesStock = true;
 
-            const matchesVisibility =
-                visibilityValue === "all" ||
-                (visibilityValue === "active" && product.is_active) ||
-                (visibilityValue === "inactive" && !product.is_active);
+            if (stockValue === "in-stock") {
+                matchesStock = quantity > LOW_STOCK_LIMIT;
+            } else if (stockValue === "low-stock") {
+                matchesStock =
+                    quantity > 0 && quantity <= LOW_STOCK_LIMIT;
+            } else if (stockValue === "out-of-stock") {
+                matchesStock = quantity <= 0;
+            }
+
+            let matchesVisibility = true;
+
+            if (visibilityValue === "active") {
+                matchesVisibility = product.is_active === true;
+            } else if (visibilityValue === "hidden") {
+                matchesVisibility = product.is_active === false;
+            }
 
             return (
                 matchesSearch &&
@@ -343,69 +306,140 @@
     }
 
     function renderInventory() {
-        const filtered = getFilteredProducts();
+        const filteredProducts = getFilteredProducts();
 
-        elements.resultCount.textContent =
-            `${formatNumber(filtered.length)} of ${formatNumber(products.length)} products`;
-
-        if (filtered.length === 0) {
-            elements.table.innerHTML = `
-                <tr>
-                    <td colspan="7" class="empty-state">
-                        No products match your search or filters.
-                    </td>
-                </tr>
-            `;
-
-            elements.mobile.innerHTML = `
-                <div class="empty-state">
-                    No products match your search or filters.
-                </div>
-            `;
-
-            return;
+        if (elements.resultCount) {
+            elements.resultCount.textContent =
+                `${formatNumber(filteredProducts.length)} products`;
         }
 
-        elements.table.innerHTML = filtered.map(renderDesktopRow).join("");
-        elements.mobile.innerHTML = filtered.map(renderMobileCard).join("");
+        if (elements.table) {
+            elements.table.innerHTML = filteredProducts.length
+                ? filteredProducts.map(renderTableRow).join("")
+                : `
+                    <tr>
+                        <td colspan="6" class="empty-state">
+                            No products match your filters.
+                        </td>
+                    </tr>
+                `;
+        }
+
+        if (elements.mobile) {
+            elements.mobile.innerHTML = filteredProducts.length
+                ? filteredProducts.map(renderMobileCard).join("")
+                : `
+                    <div class="empty-state">
+                        No products match your filters.
+                    </div>
+                `;
+        }
+    }
+
+    function updateStatistics() {
+        const totalUnits = products.reduce(
+            (sum, product) => sum + Math.max(0, Number(product.stock || 0)),
+            0
+        );
+
+        const lowStockCount = products.filter((product) => {
+            const quantity = Number(product.stock || 0);
+            return quantity > 0 && quantity <= LOW_STOCK_LIMIT;
+        }).length;
+
+        const outOfStockCount = products.filter(
+            (product) => Number(product.stock || 0) <= 0
+        ).length;
+
+        if (elements.totalProducts) {
+            elements.totalProducts.textContent = formatNumber(products.length);
+        }
+
+        if (elements.totalUnits) {
+            elements.totalUnits.textContent = formatNumber(totalUnits);
+        }
+
+        if (elements.lowStockProducts) {
+            elements.lowStockProducts.textContent =
+                formatNumber(lowStockCount);
+        }
+
+        if (elements.outOfStockProducts) {
+            elements.outOfStockProducts.textContent =
+                formatNumber(outOfStockCount);
+        }
+    }
+
+    function populateCategoryFilter() {
+        if (!elements.category) return;
+
+        const previousValue = elements.category.value;
+
+        elements.category.innerHTML = `
+            <option value="">All categories</option>
+            ${categories.map((category) => `
+                <option value="${escapeHTML(category.id)}">
+                    ${escapeHTML(category.name)}
+                </option>
+            `).join("")}
+        `;
+
+        if (
+            previousValue &&
+            categories.some(
+                (category) => String(category.id) === previousValue
+            )
+        ) {
+            elements.category.value = previousValue;
+        }
     }
 
     async function requireAdmin() {
-        const client = window.supabaseClient;
+        const client = getSupabaseClient();
 
         if (!client) {
-            throw new Error(
-                "Supabase client was not found. Check assets/js/supabase.js."
+            showMessage(
+                "Supabase has not loaded. Check the Supabase script and refresh the page.",
+                "error"
             );
-        }
-
-        const { data, error } = await client.auth.getUser();
-
-        if (error || !data?.user) {
-            window.location.replace("login.html");
             return false;
         }
 
-        currentUser = data.user;
+        const { data: authData, error: authError } =
+            await client.auth.getUser();
+
+        if (authError || !authData?.user) {
+            window.location.href = "login.html";
+            return false;
+        }
+
+        currentUser = authData.user;
 
         const { data: profile, error: profileError } = await client
             .from("profiles")
-            .select("id,role,is_active")
+            .select("id, role, is_active")
             .eq("id", currentUser.id)
             .maybeSingle();
 
         if (profileError) {
-            throw new Error(
-                "Unable to verify your admin profile: " + profileError.message
+            console.error("Admin profile check failed:", profileError);
+            showMessage(
+                "Unable to verify your admin account. Please check your profile permissions.",
+                "error"
             );
+            return false;
         }
 
-        if (
-            !profile ||
-            profile.role !== "admin" ||
-            profile.is_active !== true
-        ) {
-            window.location.replace("login.html");
+        if (!profile || profile.role !== "admin" || profile.is_active === false) {
+            showMessage(
+                "Access denied. An active administrator account is required.",
+                "error"
+            );
+
+            window.setTimeout(() => {
+                window.location.href = "login.html";
+            }, 1800);
+
             return false;
         }
 
@@ -413,355 +447,264 @@
     }
 
     async function loadInventory() {
-        showMessage("");
+        const client = getSupabaseClient();
 
-        elements.table.innerHTML = `
-            <tr>
-                <td colspan="7" class="empty-state">
-                    Loading inventory...
-                </td>
-            </tr>
-        `;
-
-        elements.mobile.innerHTML = `
-            <div class="empty-state">Loading inventory...</div>
-        `;
-
-        const client = window.supabaseClient;
-
-        const [productResult, categoryResult] = await Promise.all([
-            client
-                .from("products")
-                .select("id,category_id,name,slug,price,stock,image_url,is_active")
-                .order("created_at", { ascending: false }),
-
-            client
-                .from("categories")
-                .select("id,name")
-                .order("name", { ascending: true })
-        ]);
-
-        if (productResult.error) {
-            throw new Error(
-                "Could not load products: " + productResult.error.message
+        if (!client) {
+            showMessage(
+                "Supabase has not loaded. Check the Supabase script and refresh the page.",
+                "error"
             );
+            return;
         }
 
-        if (categoryResult.error) {
-            throw new Error(
-                "Could not load categories: " + categoryResult.error.message
-            );
+        if (elements.refresh) {
+            elements.refresh.disabled = true;
         }
 
-        products = (productResult.data || []).map((product) => ({
-            ...product,
-            stock: Math.max(0, Number(product.stock) || 0)
-        }));
+        showMessage("Loading inventory...", "info");
 
-        categories = categoryResult.data || [];
+        try {
+            const [productResult, categoryResult] = await Promise.all([
+                client
+                    .from("products")
+                    .select(
+                        "id, category_id, name, slug, price, stock, image_url, is_active, created_at"
+                    )
+                    .order("created_at", { ascending: false }),
 
-        populateCategories();
-        updateStatistics();
-        renderInventory();
+                client
+                    .from("categories")
+                    .select("id, name")
+                    .order("name", { ascending: true })
+            ]);
+
+            if (productResult.error) {
+                throw productResult.error;
+            }
+
+            if (categoryResult.error) {
+                throw categoryResult.error;
+            }
+
+            products = productResult.data || [];
+            categories = categoryResult.data || [];
+
+            populateCategoryFilter();
+            updateStatistics();
+            renderInventory();
+
+            showMessage(
+                `Inventory loaded successfully. ${formatNumber(products.length)} products found.`,
+                "success"
+            );
+        } catch (error) {
+            console.error("Inventory loading error:", error);
+
+            showMessage(
+                error.message || "Unable to load inventory. Please try again.",
+                "error"
+            );
+
+            if (elements.table) {
+                elements.table.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="empty-state">
+                            <strong>Unable to load inventory</strong>
+                            <p>Check your connection and administrator permissions.</p>
+                        </td>
+                    </tr>
+                `;
+            }
+
+            if (elements.mobile) {
+                elements.mobile.innerHTML = `
+                    <div class="empty-state">
+                        <strong>Unable to load inventory</strong>
+                        <p>Check your connection and administrator permissions.</p>
+                    </div>
+                `;
+            }
+        } finally {
+            if (elements.refresh) {
+                elements.refresh.disabled = false;
+            }
+        }
     }
 
     async function saveStock(productId, input) {
-        if (busyProducts.has(String(productId))) return;
+        const client = getSupabaseClient();
+
+        if (!client || isSaving) return;
+
+        const newStock = Number(input?.value);
+
+        if (
+            input?.value.trim() === "" ||
+            !Number.isInteger(newStock) ||
+            newStock < 0
+        ) {
+            showMessage(
+                "Stock must be a whole number and cannot be negative.",
+                "error"
+            );
+            return;
+        }
 
         const product = products.find(
             (item) => String(item.id) === String(productId)
         );
 
         if (!product) {
-            showMessage("This product could not be found. Refresh and try again.", "error");
+            showMessage("Product not found. Refresh and try again.", "error");
             return;
         }
 
-        const rawValue = input.value.trim();
-        const newStock = Number(rawValue);
-
-        if (
-            rawValue === "" ||
-            !Number.isSafeInteger(newStock) ||
-            newStock < 0 ||
-            newStock > 100000000
-        ) {
-            showMessage(
-                "Enter a valid whole-number stock quantity from 0 to 100,000,000.",
-                "error"
-            );
-            input.focus();
+        if (newStock === Number(product.stock || 0)) {
+            showMessage("Stock quantity has not changed.", "info");
             return;
         }
 
-        if (newStock === Number(product.stock)) {
-            showMessage("The stock quantity has not changed.", "info");
-            return;
-        }
+        isSaving = true;
 
-        busyProducts.add(String(productId));
-        renderInventory();
-        showMessage("Saving stock quantity…", "info");
+        document.querySelectorAll(
+            `[data-update-stock="${CSS.escape(String(productId))}"]`
+        ).forEach((button) => {
+            button.disabled = true;
+        });
+
+        showMessage("Updating product stock...", "info");
 
         try {
-            const { data, error } = await window.supabaseClient
+            const { data, error } = await client
                 .from("products")
                 .update({ stock: newStock })
                 .eq("id", productId)
-                .select("id,stock")
+                .select("id, stock")
                 .maybeSingle();
 
             if (error) {
-                throw new Error(error.message);
+                throw error;
             }
 
             if (!data) {
                 throw new Error(
-                    "The stock update was not confirmed. Your admin account may not have permission to update this product."
+                    "Stock update was not confirmed. Check your administrator permissions."
                 );
             }
 
-            product.stock = Number(data.stock);
-            showMessage(
-                `Stock updated successfully for ${product.name}.`,
-                "success"
-            );
+            product.stock = data.stock;
 
             updateStatistics();
-        } catch (error) {
+            renderInventory();
+
             showMessage(
-                "Stock was not updated: " + error.message,
+                "Product stock updated successfully.",
+                "success"
+            );
+        } catch (error) {
+            console.error("Stock update error:", error);
+
+            showMessage(
+                error.message || "Could not update product stock.",
                 "error"
             );
         } finally {
-            busyProducts.delete(String(productId));
-            renderInventory();
+            isSaving = false;
+
+            document.querySelectorAll(
+                `[data-update-stock="${CSS.escape(String(productId))}"]`
+            ).forEach((button) => {
+                button.disabled = false;
+            });
         }
     }
 
-    function handleStockUpdate(event) {
+    function handleStockSave(event) {
         const button = event.target.closest("[data-update-stock]");
 
         if (!button) return;
 
         const productId = button.dataset.updateStock;
-        const input = document.querySelector(
-            `[data-stock-input="${CSS.escape(productId)}"]`
+        const wrapper = button.closest(
+            ".stock-update, .mobile-stock-update"
         );
+        const input = wrapper?.querySelector("[data-stock-input]");
 
-        if (input) {
-            saveStock(productId, input);
-        }
-    }
-
-    async function logout() {
-        if (!window.supabaseClient) {
-            window.location.href = "login.html";
+        if (!input) {
+            showMessage("Unable to find the stock input.", "error");
             return;
         }
 
-        const { error } = await window.supabaseClient.auth.signOut();
-
-        if (error) {
-            showMessage("Unable to log out: " + error.message, "error");
-            return;
-        }
-
-        window.location.replace("login.html");
+        saveStock(productId, input);
     }
 
     function attachEvents() {
-        elements.search.addEventListener("input", renderInventory);
-        elements.category.addEventListener("change", renderInventory);
-        elements.stock.addEventListener("change", renderInventory);
-        elements.visibility.addEventListener("change", renderInventory);
+        elements.search?.addEventListener("input", renderInventory);
+        elements.category?.addEventListener("change", renderInventory);
+        elements.stock?.addEventListener("change", renderInventory);
+        elements.visibility?.addEventListener("change", renderInventory);
 
-        elements.table.addEventListener("click", handleStockUpdate);
-        elements.mobile.addEventListener("click", handleStockUpdate);
+        elements.refresh?.addEventListener("click", loadInventory);
 
-        elements.refresh.addEventListener("click", async () => {
-            elements.refresh.disabled = true;
-            elements.refresh.textContent = "Refreshing…";
+        elements.table?.addEventListener("click", handleStockSave);
+        elements.mobile?.addEventListener("click", handleStockSave);
 
-            try {
-                await loadInventory();
-                showMessage("Inventory refreshed successfully.", "success");
-            } catch (error) {
-                showMessage(error.message, "error");
-            } finally {
-                elements.refresh.disabled = false;
-                elements.refresh.textContent = "↻ Refresh inventory";
+        elements.logout?.addEventListener("click", async () => {
+            const client = getSupabaseClient();
+
+            if (!client) {
+                window.location.href = "login.html";
+                return;
             }
-        });
 
-        elements.logout.addEventListener("click", logout);
+            const { error } = await client.auth.signOut();
 
-        elements.menu.addEventListener("click", () => {
-            elements.sidebar.classList.toggle("open");
-        });
-
-        elements.backToTop.addEventListener("click", () => {
-            window.scrollTo({ top: 0, behavior: "smooth" });
-        });
-
-        document.addEventListener("click", (event) => {
-            if (
-                window.innerWidth <= 850 &&
-                elements.sidebar.classList.contains("open") &&
-                !elements.sidebar.contains(event.target) &&
-                !elements.menu.contains(event.target)
-            ) {
-                elements.sidebar.classList.remove("open");
+            if (error) {
+                
+                console.error("Logout error:", error);
+                showMessage(
+                    "Unable to log out. Please try again.",
+                    "error"
+                );
+                return;
             }
+
+            window.location.href = "login.html";
+        });
+
+        elements.menu?.addEventListener("click", () => {
+            elements.sidebar?.classList.toggle("open");
+        });
+
+        elements.backToTop?.addEventListener("click", () => {
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
         });
     }
 
     async function init() {
-        try {
-            attachEvents();
+        attachEvents();
 
-            const allowed = await requireAdmin();
+        const allowed = await requireAdmin();
 
-            if (!allowed) return;
+        if (!allowed) return;
 
-            await loadInventory();
-        } catch (error) {
-            console.error("Admin inventory error:", error);
-            showMessage(error.message || "An unexpected error occurred.", "error");
-
-            elements.table.innerHTML = `
-         <tr>
-                <td colspan="6" class="empty-state">
-                    <strong>Unable to load inventory</strong>
-                    <p>Please refresh the page and try again.</p>
-                </td>
-            </tr>
-        `;
-        elements.mobileCards.innerHTML = `
-            <div class="empty-state">
-                <strong>Unable to load inventory</strong>
-                <p>Please refresh the page and try again.</p>
-            </div>
-        `;
-    }
-}
-
-async function updateStock(productId, inputElement) {
-    const newStock = Number(inputElement.value);
-
-    if (!Number.isInteger(newStock) || newStock < 0) {
-        showMessage("Stock must be a whole number and cannot be negative.", "error");
         await loadInventory();
-        return;
     }
 
-    inputElement.disabled = true;
+    init().catch((error) => {
+        console.error(
+            "Admin inventory initialization error:",
+            error
+        );
 
-    const { data, error } = await window.supabaseClient
-        .from("products")
-        .update({ stock: newStock })
-        .eq("id", productId)
-        .select("id, stock")
-        .maybeSingle();
-
-    inputElement.disabled = false;
-
-    if (error) {
-        console.error("Stock update error:", error);
-        showMessage(error.message || "Could not update stock.", "error");
-        await loadInventory();
-        return;
-    }
-
-    if (!data) {
         showMessage(
-            "Stock was not confirmed as updated. Check your admin permissions and product policies.",
+            error.message || "An unexpected error occurred.",
             "error"
         );
-        await loadInventory();
-        return;
-    }
-
-    showMessage("Product stock updated successfully.", "success");
-    await loadInventory();
-}
-
-function bindEvents() {
-    if (elements.search) {
-        elements.search.addEventListener("input", renderInventory);
-    }
-
-    if (elements.categoryFilter) {
-        elements.categoryFilter.addEventListener("change", renderInventory);
-    }
-
-    if (elements.stockFilter) {
-        elements.stockFilter.addEventListener("change", renderInventory);
-    }
-
-    if (elements.statusFilter) {
-        elements.statusFilter.addEventListener("change", renderInventory);
-    }
-
-    if (elements.refreshButton) {
-        elements.refreshButton.addEventListener("click", loadInventory);
-    }
-
-    if (elements.table) {
-        elements.table.addEventListener("change", event => {
-            const input = event.target.closest("[data-stock-input]");
-
-            if (!input) return;
-
-            updateStock(input.dataset.productId, input);
-        });
-    }
-
-    if (elements.mobileCards) {
-        elements.mobileCards.addEventListener("change", event => {
-            const input = event.target.closest("[data-stock-input]");
-
-            if (!input) return;
-
-            updateStock(input.dataset.productId, input);
-        });
-    }
-
-    if (elements.logoutButton) {
-        elements.logoutButton.addEventListener("click", async () => {
-            await window.supabaseClient.auth.signOut();
-            window.location.href = "login.html";
-        });
-    }
-
-    if (elements.menuButton && elements.sidebar) {
-        elements.menuButton.addEventListener("click", () => {
-            elements.sidebar.classList.toggle("open");
-        });
-    }
-
-    if (elements.sidebarOverlay && elements.sidebar) {
-        elements.sidebarOverlay.addEventListener("click", () => {
-            elements.sidebar.classList.remove("open");
-        });
-    }
-}
-
-async function init() {
-    if (!window.supabaseClient) {
-        showMessage("Supabase has not loaded. Please refresh the page.", "error");
-        return;
-    }
-
-    bindEvents();
-
-    const isAdmin = await requireAdmin();
-
-    if (!isAdmin) return;
-
-    await loadInventory();
-}
-
-init();
-
+    });
 })();
+
+       
