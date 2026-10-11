@@ -1,0 +1,536 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#070707">
+    <meta name="description" content="Browse the SMH Collection marketplace as an administrator.">
+    <title>Visit Market | SMH Collection</title>
+
+    <link rel="stylesheet" href="assets/css/buyer-dashboard.css">
+
+    <style>
+        .admin-market-notice {
+            margin: 20px 0;
+            padding: 15px 18px;
+            border: 1px solid rgba(214, 173, 85, .3);
+            border-radius: 12px;
+            background: rgba(214, 173, 85, .07);
+            color: #f0d48a;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .market-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .back-dashboard {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 42px;
+            padding: 0 16px;
+            border: 1px solid rgba(255,255,255,.14);
+            border-radius: 10px;
+            color: #f0d48a;
+            background: #101010;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .back-dashboard:hover {
+            border-color: #d6ad55;
+        }
+
+        .market-intro {
+            margin-top: 28px;
+            padding: 30px;
+            border: 1px solid rgba(255,255,255,.09);
+            border-radius: 20px;
+            background: linear-gradient(
+                120deg,
+                rgba(214,173,85,.13),
+                rgba(255,255,255,.015)
+            );
+        }
+
+        .market-intro .eyebrow {
+            color: #d6ad55;
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 3px;
+        }
+
+        .market-intro h1 {
+            margin-top: 12px;
+            font-size: clamp(27px, 5vw, 43px);
+            line-height: 1.15;
+        }
+
+        .market-intro p {
+            margin-top: 12px;
+            max-width: 650px;
+            color: #9c9c9c;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .market-controls {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(180px, 260px);
+            gap: 12px;
+            margin: 25px 0;
+        }
+
+        .market-controls input,
+        .market-controls select {
+            width: 100%;
+            min-height: 49px;
+            padding: 0 14px;
+            border: 1px solid rgba(255,255,255,.12);
+            border-radius: 12px;
+            outline: none;
+            background: #101010;
+            color: #fff;
+            font-size: 13px;
+        }
+
+        .market-controls input:focus,
+        .market-controls select:focus {
+            border-color: #d6ad55;
+        }
+
+        .market-controls select option {
+            background: #101010;
+            color: white;
+        }
+
+        .results-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 18px;
+            color: #9c9c9c;
+            font-size: 12px;
+        }
+
+        .results-row strong {
+            color: #f0d48a;
+        }
+
+        .browse-only-label {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 7px 10px;
+            border: 1px solid rgba(214,173,85,.25);
+            border-radius: 8px;
+            color: #f0d48a;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: .6px;
+        }
+
+        .market-product-card .product-info {
+            padding: 15px;
+        }
+
+        .market-product-card .product-name {
+            overflow-wrap: anywhere;
+        }
+
+        .market-product-card .product-description {
+            margin-top: 9px;
+            color: #9c9c9c;
+            font-size: 12px;
+            line-height: 1.6;
+            overflow-wrap: anywhere;
+        }
+
+        .market-product-card .product-actions {
+            display: block;
+        }
+
+        .market-product-card .browse-label {
+            display: block;
+            padding: 11px 8px;
+            border: 1px solid rgba(214,173,85,.25);
+            border-radius: 9px;
+            color: #f0d48a;
+            text-align: center;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .market-message {
+            padding: 30px 18px;
+            border: 1px dashed rgba(255,255,255,.15);
+            border-radius: 15px;
+            color: #9c9c9c;
+            text-align: center;
+            line-height: 1.8;
+            font-size: 13px;
+        }
+
+        .market-message.error {
+            color: #ff8c8c;
+        }
+
+        @media (max-width: 600px) {
+            .market-intro {
+                padding: 23px 18px;
+            }
+
+            .market-controls {
+                grid-template-columns: 1fr;
+            }
+
+            .results-row {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .market-product-card .product-info {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="top-marquee">
+        <div class="marquee-track">
+            <span>SMH COLLECTION</span>
+            <span>ADMIN MARKET PREVIEW</span>
+            <span>SHOP EVERYTHING</span>
+            <span>BROWSE PRODUCTS</span>
+            <span>SMH COLLECTION</span>
+            <span>ADMIN MARKET PREVIEW</span>
+            <span>SHOP EVERYTHING</span>
+            <span>BROWSE PRODUCTS</span>
+        </div>
+    </div>
+
+    <header class="dashboard-header">
+        <a href="admin-dashboard.html" class="brand" aria-label="Return to admin dashboard">
+            <span class="brand-main">SMH</span>
+            <span class="brand-sub">COLLECTION</span>
+        </a>
+
+        <div class="market-top">
+            <span class="browse-only-label">ADMIN BROWSE MODE</span>
+            <a href="admin-dashboard.html" class="back-dashboard">
+                &larr; Dashboard
+            </a>
+        </div>
+    </header>
+
+    <main class="dashboard-main">
+        <div class="market-intro">
+            <div class="eyebrow">THE SMH MARKETPLACE</div>
+            <h1>Explore the Collection</h1>
+            <p>
+                Browse the products available to customers. Search the catalogue,
+                filter by category and inspect product information. This page is
+                for administration preview only.
+            </p>
+        </div>
+
+        <div class="admin-market-notice">
+            <strong>Browse-only mode:</strong>
+            Cart, checkout, and order placement are not available on this page.
+            Use the Products page to manage your catalogue and the Orders page
+            to manage customer orders.
+        </div>
+
+        <section class="market-section">
+            <div class="section-heading">
+                <div>
+                    <div class="section-label">PRODUCT CATALOGUE</div>
+                    <h2>Discover Products</h2>
+                </div>
+            </div>
+
+            <div class="market-controls">
+                <input
+                    id="marketSearch"
+                    type="search"
+                    placeholder="Search products by name or description..."
+                    aria-label="Search products"
+                >
+
+                <select id="categoryFilter" aria-label="Filter by category">
+                    <option value="">All categories</option>
+                </select>
+            </div>
+
+            <div class="results-row">
+                <span id="resultCount">Loading products...</span>
+                <span>Viewing as <strong>Administrator</strong></span>
+            </div>
+
+            <div
+                id="productGrid"
+                class="product-grid"
+                aria-live="polite"
+            >
+                <div class="market-message">Loading the marketplace...</div>
+            </div>
+
+            <div id="marketStatus" class="market-message" hidden></div>
+        </section>
+    </main>
+
+    <footer class="dashboard-footer">
+        <div class="footer-brand">
+            <strong>SMH COLLECTION</strong>
+            <span>Everything in one place.</span>
+        </div>
+        <p>&copy; <span id="currentYear"></span> SMH Collection. Admin preview.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/js/supabase.js"></script>
+
+    <script>
+        document.getElementById("currentYear").textContent =
+            new Date().getFullYear();
+
+        const productGrid = document.getElementById("productGrid");
+        const marketSearch = document.getElementById("marketSearch");
+        const categoryFilter = document.getElementById("categoryFilter");
+        const resultCount = document.getElementById("resultCount");
+        const marketStatus = document.getElementById("marketStatus");
+
+        let allProducts = [];
+
+        function escapeHTML(value) {
+            return String(value ?? "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function formatPrice(value) {
+            return new Intl.NumberFormat("en-US", {
+                style: "currency",
+                currency: "USD"
+            }).format(Number(value) || 0);
+        }
+
+        function showStatus(message, isError = false) {
+            marketStatus.hidden = false;
+            marketStatus.textContent = message;
+            marketStatus.classList.toggle("error", isError);
+        }
+
+        function hideStatus() {
+            marketStatus.hidden = true;
+            marketStatus.textContent = "";
+            marketStatus.classList.remove("error");
+        }
+
+        function populateCategories(products) {
+            const categories = new Map();
+
+            products.forEach(product => {
+                const category = product.categories;
+
+                if (category && category.id && category.name) {
+                    categories.set(String(category.id), category.name);
+                }
+            });
+
+            categoryFilter.innerHTML =
+                '<option value="">All categories</option>';
+
+            [...categories.entries()]
+                .sort((a, b) => a[1].localeCompare(b[1]))
+                .forEach(([id, name]) => {
+                    const option = document.createElement("option");
+                    option.value = id;
+                    option.textContent = name;
+                    categoryFilter.appendChild(option);
+                });
+        }
+
+        function renderProducts() {
+            const searchTerm = marketSearch.value.trim().toLowerCase();
+            const selectedCategory = categoryFilter.value;
+
+            const filteredProducts = allProducts.filter(product => {
+                const searchableText = [
+                    product.name,
+                    product.description,
+                    product.categories?.name
+                ].join(" ").toLowerCase();
+
+                const matchesSearch = searchableText.includes(searchTerm);
+                const matchesCategory =
+                    !selectedCategory ||
+                    String(product.category_id || "") === selectedCategory;
+
+                return matchesSearch && matchesCategory;
+            });
+
+            resultCount.textContent =
+                `${filteredProducts.length} product${filteredProducts.length === 1 ? "" : "s"} found`;
+
+            if (!filteredProducts.length) {
+                productGrid.innerHTML = "";
+                showStatus(
+                    allProducts.length
+                        ? "No products match your search. Try another search or category."
+                        : "No active, in-stock products are available to display."
+                );
+                return;
+            }
+
+            hideStatus();
+
+            productGrid.innerHTML = filteredProducts.map(product => {
+                const name = escapeHTML(product.name);
+                const category = escapeHTML(
+                    product.categories?.name || "General"
+                );
+                const description = escapeHTML(
+                    product.description || "No product description provided."
+                );
+                const imageUrl = product.image_url
+                    ? escapeHTML(product.image_url)
+                    : "";
+
+                const imageMarkup = imageUrl
+                    ? `<img src="${imageUrl}" alt="${name}" loading="lazy">`
+                    : `<div class="product-placeholder">◇</div>`;
+
+                return `
+                    <article class="product-card market-product-card">
+                        <div class="product-image">
+                            ${imageMarkup}
+                        </div>
+
+                        <div class="product-info">
+                            <div class="product-category">${category}</div>
+                            <h3 class="product-name">${name}</h3>
+                            <p class="product-description">${description}</p>
+
+                            <div class="product-price">
+                                ${formatPrice(product.price)}
+                            </div>
+
+                            <div class="product-stock">
+                                ${Number(product.stock) || 0} available
+                            </div>
+
+                            <div class="product-actions">
+                                <span class="browse-label">
+                                    Browse Preview Only
+                                </span>
+                            </div>
+                        </div>
+                    </article>
+                `;
+            }).join("");
+        }
+
+        async function initializeMarket() {
+            if (typeof supabaseClient === "undefined" || !supabaseClient) {
+                productGrid.innerHTML = "";
+                showStatus(
+                    "The Supabase connection is unavailable. Check assets/js/supabase.js.",
+                    true
+                );
+                return;
+            }
+
+            try {
+                const { data: sessionData, error: sessionError } =
+                    await supabaseClient.auth.getSession();
+
+                if (sessionError || !sessionData.session) {
+                    window.location.replace("login.html");
+                    return;
+                }
+
+                const user = sessionData.session.user;
+
+                const { data: profile, error: profileError } =
+                    await supabaseClient
+                        .from("profiles")
+                        .select("role, is_active")
+                        .eq("id", user.id)
+                        .single();
+
+                if (
+                    profileError ||
+                    !profile ||
+                    profile.role !== "admin" ||
+                    profile.is_active !== true
+                ) {
+                    showStatus(
+                        "Administrator access is required to view this page.",
+                        true
+                    );
+                    await supabaseClient.auth.signOut();
+                    window.location.replace("login.html");
+                    return;
+                }
+
+                const { data, error } = await supabaseClient
+                    .from("products")
+                    .select(`
+                        id,
+                        category_id,
+                        name,
+                        description,
+                        price,
+                        stock,
+                        image_url,
+                        created_at,
+                        categories (
+                            id,
+                            name,
+                            slug
+                        )
+                    `)
+                    .eq("is_active", true)
+                    .gt("stock", 0)
+                    .order("created_at", { ascending: false });
+
+                if (error) {
+                    throw error;
+                }
+
+                allProducts = data || [];
+                populateCategories(allProducts);
+                renderProducts();
+
+            } catch (error) {
+                console.error("Admin market error:", error);
+                productGrid.innerHTML = "";
+                resultCount.textContent = "Products unavailable";
+                showStatus(
+                    error.message ||
+                    "Unable to load the marketplace. Please try again.",
+                    true
+                );
+            }
+        }
+
+        marketSearch.addEventListener("input", renderProducts);
+        categoryFilter.addEventListener("change", renderProducts);
+
+        initializeMarket();
+    </script>
+</body>
+</html>
