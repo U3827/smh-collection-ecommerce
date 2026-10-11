@@ -1,0 +1,280 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Staff & Users | SMH Collection Admin</title>
+  <meta name="description" content="Manage SMH Collection buyers, sellers, staff and account access.">
+  <meta name="theme-color" content="#0b1020">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="assets/css/admin-dashboard.css">
+</head>
+
+<body>
+  <div class="admin-layout">
+
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="admin-dashboard.html">
+        <span class="brand-mark">SMH</span>
+        <span class="brand-name">
+          SMH Collection
+          <small>ADMINISTRATION</small>
+        </span>
+      </a>
+
+      <div class="sidebar-label">WORKSPACE</div>
+
+      <nav class="sidebar-nav" aria-label="Main navigation">
+        <a class="nav-link" href="admin-dashboard.html">
+          <span aria-hidden="true">▦</span> Overview
+        </a>
+        <a class="nav-link" href="admin-products.html">
+          <span aria-hidden="true">▣</span> Products
+        </a>
+        <a class="nav-link" href="admin-orders.html">
+          <span aria-hidden="true">▤</span> Orders
+        </a>
+        <a class="nav-link" href="admin-customers.html">
+          <span aria-hidden="true">♙</span> Customers
+        </a>
+        <a class="nav-link active" href="admin-staff.html" aria-current="page">
+          <span aria-hidden="true">♧</span> Staff &amp; Sellers
+        </a>
+        <a class="nav-link" href="admin-analytics.html">
+          <span aria-hidden="true">▥</span> Analytics
+        </a>
+      </nav>
+
+      <div class="sidebar-label">MANAGEMENT</div>
+
+      <nav class="sidebar-nav" aria-label="Management navigation">
+        <a class="nav-link" href="admin-inventory.html">
+          <span aria-hidden="true">▧</span> Inventory
+        </a>
+        <a class="nav-link" href="admin-settings.html">
+          <span aria-hidden="true">⚙</span> Settings
+        </a>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div class="admin-mini">
+          <div class="avatar">A</div>
+          <div class="admin-mini-info">
+            <strong id="adminName">Administrator</strong>
+            <small id="adminEmail">Checking account...</small>
+          </div>
+        </div>
+
+        <button class="logout-button" id="logoutBtn" type="button">
+          ↪ Sign out
+        </button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+
+      <header class="topbar">
+        <button
+          class="menu-button"
+          id="menuBtn"
+          type="button"
+          aria-label="Toggle navigation"
+          aria-controls="sidebar"
+          aria-expanded="false"
+        >☰</button>
+
+        <div class="breadcrumb">
+          <span>SMH Collection</span>
+          <span aria-hidden="true">/</span>
+          <strong>Staff &amp; Users</strong>
+        </div>
+
+        <div class="topbar-right">
+          <span class="secure-label">● Admin workspace</span>
+          <div class="avatar top-avatar">A</div>
+        </div>
+      </header>
+
+      <section class="page-heading">
+        <div>
+          <p class="eyebrow">ACCESS MANAGEMENT</p>
+          <h1>Staff, Sellers &amp; Users</h1>
+          <p class="page-subtitle">
+            Manage registered accounts, roles and access to your store.
+          </p>
+        </div>
+      </section>
+
+      <div
+        class="notice"
+        id="staffNotice"
+        role="status"
+        aria-live="polite"
+      >
+        Preparing user management...
+      </div>
+
+      <section class="stats-grid" aria-label="Account statistics">
+
+        <article class="stat-card">
+          <div class="stat-top">
+            <span>Total Users</span>
+            <span class="stat-icon purple">♙</span>
+          </div>
+          <h2 id="totalUsers">—</h2>
+          <p>Registered accounts</p>
+        </article>
+
+        <article class="stat-card">
+          <div class="stat-top">
+            <span>Sellers</span>
+            <span class="stat-icon blue">▣</span>
+          </div>
+          <h2 id="totalSellers">—</h2>
+          <p>Seller accounts</p>
+        </article>
+
+        <article class="stat-card">
+          <div class="stat-top">
+            <span>Staff</span>
+            <span class="stat-icon orange">♧</span>
+          </div>
+          <h2 id="totalStaff">—</h2>
+          <p>Staff accounts</p>
+        </article>
+
+        <article class="stat-card">
+          <div class="stat-top">
+            <span>Inactive Accounts</span>
+            <span class="stat-icon green">⊘</span>
+          </div>
+          <h2 id="inactiveUsers">—</h2>
+          <p>Accounts marked inactive</p>
+        </article>
+
+      </section>
+
+      <section class="panel">
+        <div class="panel-heading">
+          <div>
+            <h2>Account Directory</h2>
+            <p>Search and review registered users and their assigned roles.</p>
+          </div>
+        </div>
+
+        <div class="staff-toolbar">
+          <label for="userSearch">Search accounts</label>
+          <input
+            type="search"
+            id="userSearch"
+            placeholder="Search by name or email..."
+            autocomplete="off"
+          >
+
+          <label for="roleFilter">Role</label>
+          <select id="roleFilter">
+            <option value="all">All roles</option>
+            <option value="admin">Admin</option>
+            <option value="staff">Staff</option>
+            <option value="seller">Seller</option>
+            <option value="buyer">Buyer</option>
+          </select>
+
+          <label for="statusFilter">Account status</label>
+          <select id="statusFilter">
+            <option value="all">All statuses</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </div>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">User</th>
+                <th scope="col">Email</th>
+                <th scope="col">Role</th>
+                <th scope="col">Status</th>
+                <th scope="col">Joined</th>
+                <th scope="col">Actions</th>
+              </tr>
+            </thead>
+
+            <tbody id="staffTableBody">
+              <tr>
+                <td colspan="6" class="empty-state">
+                  Loading registered accounts...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="staff-table-footer">
+          <span id="userResultsCount">Waiting for account data...</span>
+        </div>
+      </section>
+
+      <section class="panel staff-guidance">
+        <div class="panel-heading">
+          <div>
+            <h2>Role &amp; Access Guide</h2>
+            <p>Use the appropriate access level for each account.</p>
+          </div>
+        </div>
+
+        <div class="quick-actions">
+          <div class="quick-action">
+            <span class="quick-icon">♙</span>
+            <span>
+              <strong>Buyer</strong>
+              <small>Browses products, places orders and manages personal purchases.</small>
+            </span>
+          </div>
+
+          <div class="quick-action">
+            <span class="quick-icon">▣</span>
+            <span>
+              <strong>Seller</strong>
+              <small>Manages permitted selling activities according to assigned access.</small>
+            </span>
+          </div>
+
+          <div class="quick-action">
+            <span class="quick-icon">♧</span>
+            <span>
+              <strong>Staff</strong>
+              <small>Receives only the administrative permissions granted to their role.</small>
+            </span>
+          </div>
+
+          <div class="quick-action">
+            <span class="quick-icon">⚙</span>
+            <span>
+              <strong>Administrator</strong>
+              <small>Manages store operations and authorized account access.</small>
+            </span>
+          </div>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <span>© <span id="currentYear">2026</span> SMH Collection</span>
+        <span>Everything in one place.</span>
+      </footer>
+
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/supabase.js"></script>
+  <script src="assets/js/admin-staff.js"></script>
+</body>
+</html>
