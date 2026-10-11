@@ -1,0 +1,1359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#10291e">
+    <meta name="description" content="SMH Collection administrator account settings and security.">
+    <title>Account Settings | SMH Collection Admin</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --green: #153b2b;
+            --green-dark: #10291e;
+            --green-light: #e9f4ed;
+            --gold: #d5aa53;
+            --background: #f5f7f5;
+            --white: #ffffff;
+            --text: #202a24;
+            --muted: #718078;
+            --border: #e2e9e4;
+            --danger: #b42318;
+            --success: #18794e;
+            --shadow: 0 8px 28px rgba(16, 41, 30, 0.06);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--background);
+            color: var(--text);
+            font-family: "Inter", Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        button, input {
+            font: inherit;
+        }
+
+        button, a {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .layout {
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            position: fixed;
+            inset: 0 auto 0 0;
+            z-index: 100;
+            width: 250px;
+            padding: 28px 18px;
+            overflow-y: auto;
+            background: var(--green-dark);
+            color: white;
+            transition: transform 0.25s ease;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 10px 28px;
+            border-bottom: 1px solid rgba(255,255,255,0.12);
+        }
+
+        .brand-mark {
+            display: grid;
+            width: 43px;
+            height: 43px;
+            place-items: center;
+            flex-shrink: 0;
+            border-radius: 13px;
+            background: var(--gold);
+            color: var(--green-dark);
+            font-size: 17px;
+            font-weight: 800;
+        }
+
+        .brand-name {
+            font-size: 15px;
+            font-weight: 800;
+            letter-spacing: 0.2px;
+        }
+
+        .brand-subtitle {
+            color: #b8c9bf;
+            font-size: 11px;
+        }
+
+        .nav-label {
+            margin: 27px 10px 10px;
+            color: #9cb2a4;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 5px 0;
+            padding: 12px 13px;
+            border-radius: 10px;
+            color: #d5e2d9;
+            font-weight: 500;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(255,255,255,0.11);
+            color: white;
+        }
+
+        .nav-link.active {
+            box-shadow: inset 3px 0 var(--gold);
+        }
+
+        .nav-icon {
+            width: 23px;
+            text-align: center;
+            font-size: 17px;
+        }
+
+        .sidebar-footer {
+            margin-top: 35px;
+            padding: 16px 10px;
+            border-top: 1px solid rgba(255,255,255,0.12);
+            color: #b8c9bf;
+            font-size: 11px;
+        }
+
+        .main-content {
+            min-height: 100vh;
+            margin-left: 250px;
+            padding: 28px 34px 50px;
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        .topbar-left,
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .eyebrow {
+            margin: 0 0 3px;
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.4px;
+            text-transform: uppercase;
+        }
+
+        .topbar h1 {
+            margin: 0;
+            font-size: clamp(21px, 3vw, 28px);
+            line-height: 1.3;
+            letter-spacing: -0.7px;
+        }
+
+        .admin-chip {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--white);
+        }
+
+        .admin-avatar {
+            display: grid;
+            width: 34px;
+            height: 34px;
+            place-items: center;
+            border-radius: 50%;
+            background: var(--green-light);
+            color: var(--green);
+            font-weight: 800;
+        }
+
+        .admin-chip strong {
+            display: block;
+            max-width: 160px;
+            overflow: hidden;
+            font-size: 12px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .admin-chip small {
+            color: var(--muted);
+            font-size: 10px;
+        }
+
+        .menu-button {
+            display: none;
+        }
+
+        .page-intro {
+            margin-bottom: 25px;
+        }
+
+        .page-intro h2 {
+            margin: 0 0 7px;
+            font-size: 19px;
+        }
+
+        .page-intro p {
+            max-width: 700px;
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.8;
+        }
+
+        .message {
+            display: none;
+            margin-bottom: 20px;
+            padding: 13px 15px;
+            border: 1px solid transparent;
+            border-radius: 11px;
+            overflow-wrap: anywhere;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .message.success {
+            border-color: #b7e2c9;
+            background: #eefaf2;
+            color: #166534;
+        }
+
+        .message.error {
+            border-color: #f2c5c1;
+            background: #fff1f0;
+            color: var(--danger);
+        }
+
+        .message.info {
+            border-color: #cbdcf7;
+            background: #eff6ff;
+            color: #1d4f91;
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.5fr) minmax(260px, 0.8fr);
+            align-items: start;
+            gap: 22px;
+        }
+
+        .left-column,
+        .right-column {
+            display: grid;
+            gap: 22px;
+            min-width: 0;
+        }
+
+        .card {
+            min-width: 0;
+            padding: 25px;
+            border: 1px solid var(--border);
+            border-radius: 17px;
+            background: var(--white);
+            box-shadow: var(--shadow);
+        }
+
+        .card-heading {
+            display: flex;
+            align-items: flex-start;
+            gap: 13px;
+            margin-bottom: 23px;
+        }
+
+        .card-icon {
+            display: grid;
+            width: 43px;
+            height: 43px;
+            flex-shrink: 0;
+            place-items: center;
+            border-radius: 12px;
+            background: var(--green-light);
+            color: var(--green);
+            font-size: 20px;
+        }
+
+        .card-heading h3 {
+            margin: 0 0 4px;
+            font-size: 16px;
+        }
+
+        .card-heading p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        .field {
+            margin-bottom: 19px;
+        }
+
+        .field label {
+            display: block;
+            margin-bottom: 7px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .field input {
+            display: block;
+            width: 100%;
+            min-height: 47px;
+            padding: 12px 14px;
+            border: 1px solid #dbe4dd;
+            border-radius: 10px;
+            outline: none;
+            background: #fff;
+            color: var(--text);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .field input:focus {
+            border-color: var(--green);
+            box-shadow: 0 0 0 3px rgba(21,59,43,0.08);
+        }
+
+        .field input[readonly] {
+            background: #f4f6f4;
+            color: #68766d;
+            cursor: not-allowed;
+        }
+
+        .field-help {
+            display: block;
+            margin-top: 6px;
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        .button {
+            display: inline-flex;
+            min-height: 43px;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 16px;
+            border: 1px solid transparent;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 700;
+            transition: transform 0.15s, opacity 0.15s, background 0.15s;
+        }
+
+        .button:hover {
+            transform: translateY(-1px);
+        }
+
+        .button:disabled {
+            cursor: wait;
+            opacity: 0.6;
+            transform: none;
+        }
+
+        .button-primary {
+            background: var(--green);
+            color: white;
+        }
+
+        .button-primary:hover {
+            background: var(--green-dark);
+        }
+
+        .button-secondary {
+            border-color: var(--border);
+            background: white;
+            color: var(--text);
+        }
+
+        .button-danger {
+            border-color: #f2c5c1;
+            background: #fff5f4;
+            color: var(--danger);
+        }
+
+        .button-full {
+            width: 100%;
+        }
+
+        .security-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 15px 0;
+            border-bottom: 1px solid #edf1ee;
+        }
+
+        .security-item:last-child {
+            padding-bottom: 0;
+            border-bottom: 0;
+        }
+
+        .security-item-icon {
+            display: grid;
+            width: 35px;
+            height: 35px;
+            flex-shrink: 0;
+            place-items: center;
+            border-radius: 10px;
+            background: #f2f5f2;
+            font-size: 16px;
+        }
+
+        .security-item h4 {
+            margin: 0 0 4px;
+            font-size: 12px;
+        }
+
+        .security-item p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.7;
+        }
+
+        .status-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 13px 0;
+            border-bottom: 1px solid #edf1ee;
+        }
+
+        .status-row:last-child {
+            border-bottom: 0;
+        }
+
+        .status-label {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .status-value {
+            text-align: right;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 9px;
+            border-radius: 20px;
+            background: #e9f8ef;
+            color: var(--success);
+            font-size: 10px;
+            font-weight: 800;
+        }
+
+        .status-pill.inactive {
+            background: #fff0ef;
+            color: var(--danger);
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .danger-card {
+            border-color: #f1d9d7;
+        }
+
+        .danger-card .card-icon {
+            background: #fff0ef;
+            color: var(--danger);
+        }
+
+        .footer-note {
+            margin-top: 30px;
+            color: var(--muted);
+            font-size: 11px;
+            text-align: center;
+        }
+
+        .back-to-top {
+            position: fixed;
+            right: 22px;
+            bottom: 22px;
+            z-index: 50;
+            display: grid;
+            width: 43px;
+            height: 43px;
+            place-items: center;
+            border: 0;
+            border-radius: 50%;
+            background: var(--green);
+            color: white;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+        }
+
+        .overlay {
+            display: none;
+        }
+
+        @media (max-width: 1100px) {
+            .settings-grid {
+                grid-template-columns: minmax(0, 1fr);
+            }
+
+            .right-column {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .danger-card {
+                grid-column: 1 / -1;
+            }
+        }
+
+        @media (max-width: 760px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .overlay.show {
+                position: fixed;
+                inset: 0;
+                z-index: 90;
+                display: block;
+                background: rgba(0,0,0,0.45);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 20px 16px 40px;
+            }
+
+            .menu-button {
+                display: grid;
+                width: 42px;
+                height: 42px;
+                place-items: center;
+                border: 1px solid var(--border);
+                border-radius: 10px;
+                background: white;
+                font-size: 21px;
+                cursor: pointer;
+            }
+
+            .topbar {
+                align-items: flex-start;
+                margin-bottom: 25px;
+            }
+
+            .topbar-left {
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .admin-chip {
+                padding: 5px;
+            }
+
+            .admin-chip > div:last-child {
+                display: none;
+            }
+
+            .admin-avatar {
+                width: 33px;
+                height: 33px;
+            }
+
+            .card {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 520px) {
+            .right-column {
+                grid-template-columns: minmax(0, 1fr);
+            }
+
+            .danger-card {
+                grid-column: auto;
+            }
+
+            .topbar h1 {
+                font-size: 21px;
+            }
+
+            .page-intro h2 {
+                font-size: 17px;
+            }
+
+            .card-heading h3 {
+                font-size: 15px;
+            }
+
+            .button {
+                width: 100%;
+            }
+
+            .status-row {
+                align-items: flex-start;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                scroll-behavior: auto !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="brand">
+                <div class="brand-mark">SMH</div>
+                <div>
+                    <div class="brand-name">SMH Collection</div>
+                    <div class="brand-subtitle">Administration Panel</div>
+                </div>
+            </div>
+
+            <div class="nav-label">Workspace</div>
+
+            <nav aria-label="Admin navigation">
+                <a class="nav-link" href="admin-dashboard.html">
+                    <span class="nav-icon">⌂</span>
+                    <span>Dashboard</span>
+                </a>
+                <a class="nav-link" href="admin-analytics.html">
+                    <span class="nav-icon">▥</span>
+                    <span>Analytics</span>
+                </a>
+                <a class="nav-link" href="admin-orders.html">
+                    <span class="nav-icon">▤</span>
+                    <span>Orders</span>
+                </a>
+                <a class="nav-link" href="admin-products.html">
+                    <span class="nav-icon">◇</span>
+                    <span>Products</span>
+                </a>
+                <a class="nav-link" href="admin-inventory.html">
+                    <span class="nav-icon">▦</span>
+                    <span>Inventory</span>
+                </a>
+                <a class="nav-link" href="admin-customers.html">
+                    <span class="nav-icon">♙</span>
+                    <span>Customers</span>
+                </a>
+                <a class="nav-link" href="admin-staff.html">
+                    <span class="nav-icon">♧</span>
+                    <span>Staff Management</span>
+                </a>
+                <a class="nav-link" href="admin-market.html">
+                    <span class="nav-icon">▣</span>
+                    <span>Marketplace</span>
+                </a>
+            </nav>
+
+            <div class="nav-label">Account</div>
+
+            <nav aria-label="Account navigation">
+                <a class="nav-link active" href="admin-settings.html" aria-current="page">
+                    <span class="nav-icon">⚙</span>
+                    <span>Account Settings</span>
+                </a>
+                <button class="nav-link button-full" id="logoutButton"
+                    style="border:0;background:transparent;text-align:left;cursor:pointer;">
+                    <span class="nav-icon">↪</span>
+                    <span>Sign Out</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                SMH Collection<br>
+                Secure Administration
+            </div>
+        </aside>
+
+        <div class="overlay" id="overlay"></div>
+
+        <main class="main-content">
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button class="menu-button" id="menuButton"
+                        aria-label="Open navigation" aria-expanded="false">☰</button>
+                    <div>
+                        <p class="eyebrow">Administration</p>
+                        <h1>Account Settings</h1>
+                    </div>
+                </div>
+
+                <div class="topbar-right">
+                    <div class="admin-chip">
+                        <div class="admin-avatar" id="adminAvatar">A</div>
+                        <div>
+                            <strong id="topbarName">Loading account...</strong>
+                            <small>Administrator</small>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <section class="page-intro">
+                <h2>Manage your account</h2>
+                <p>
+                    Update your personal profile, review your account status
+                    and protect your administrator account.
+                </p>
+            </section>
+
+            <div class="message" id="pageMessage" role="status" aria-live="polite"></div>
+
+            <div class="settings-grid">
+                <div class="left-column">
+                    <section class="card">
+                        <div class="card-heading">
+                            <div class="card-icon">♙</div>
+                            <div>
+                                <h3>Personal information</h3>
+                                <p>Keep your administrator profile accurate and up to date.</p>
+                            </div>
+                        </div>
+
+                        <form id="profileForm">
+                            <div class="field">
+                                <label for="fullName">Full name</label>
+                                <input id="fullName" name="fullName"
+                                    type="text" maxlength="100"
+                                    autocomplete="name" required
+                                    placeholder="Enter your full name">
+                            </div>
+
+                            <div class="field">
+                                <label for="email">Email address</label>
+                                <input id="email" name="email"
+                                    type="email" autocomplete="email"
+                                    readonly aria-describedby="emailHelp">
+                                <small class="field-help" id="emailHelp">
+                                    Your sign-in email is managed by the authentication system.
+                                </small>
+                            </div>
+
+                            <div class="field">
+                                <label for="role">Account role</label>
+                                <input id="role" type="text"
+                                    value="Administrator" readonly>
+                                <small class="field-help">
+                                    Account roles cannot be changed from this page.
+                                </small>
+                            </div>
+
+                            <button class="button button-primary" id="saveProfileButton"
+                                type="submit">Save profile changes</button>
+                        </form>
+                    </section>
+
+                    <section class="card">
+                        <div class="card-heading">
+                            <div class="card-icon">♧</div>
+                            <div>
+                                <h3>Password and security</h3>
+                                <p>Use a secure password to help protect your account.</p>
+                            </div>
+                        </div>
+
+                        <div class="security-item">
+                            <div class="security-item-icon">✉</div>
+                            <div>
+                                <h4>Reset your password</h4>
+                                <p>
+                                    Receive a password reset email at your registered
+                                    sign-in address.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div style="margin-top:18px;">
+                            <button class="button button-secondary button-full"
+                                id="resetPasswordButton" type="button">
+                                Send password reset email
+                            </button>
+                        </div>
+
+                        <p class="field-help" style="margin-top:12px;">
+                            If you requested a reset, check your inbox and spam folder.
+                            Never share a password reset link with anyone.
+                        </p>
+                    </section>
+                </div>
+
+                <div class="right-column">
+                    <section class="card">
+                        <div class="card-heading">
+                            <div class="card-icon">◉</div>
+                            <div>
+                                <h3>Account status</h3>
+                                <p>Your current access information.</p>
+                            </div>
+                        </div>
+
+                        <div class="status-row">
+                            <span class="status-label">Account status</span>
+                            <span class="status-value">
+                                <span class="status-pill" id="accountStatus">
+                                    <span class="status-dot"></span>Checking
+                                </span>
+                            </span>
+                        </div>
+
+                        <div class="status-row">
+                            <span class="status-label">Account role</span>
+                            <span class="status-value" id="roleStatus">Checking</span>
+                        </div>
+
+                        <div class="status-row">
+                            <span class="status-label">Email</span>
+                            <span class="status-value" id="emailStatus">Checking</span>
+                        </div>
+
+                        <div class="status-row">
+                            <span class="status-label">Profile</span>
+                            <span class="status-value" id="profileStatus">Loading</span>
+                        </div>
+                    </section>
+
+                    <section class="card">
+                        <div class="card-heading">
+                            <div class="card-icon">⌂</div>
+                            <div>
+                                <h3>Quick links</h3>
+                                <p>Return to your admin workspace.</p>
+                            </div>
+                        </div>
+
+                        <a class="button button-secondary button-full"
+                            href="admin-dashboard.html">Go to dashboard</a>
+
+                        <a class="button button-secondary button-full"
+                            href="admin-analytics.html"
+                            style="margin-top:10px;">View analytics</a>
+                    </section>
+
+                    <section class="card danger-card">
+                        <div class="card-heading">
+                            <div class="card-icon">!</div>
+                            <div>
+                                <h3>End your session</h3>
+                                <p>Sign out when you have finished managing the store.</p>
+                            </div>
+                        </div>
+
+                        <button class="button button-danger button-full"
+                            id="securityLogoutButton" type="button">
+                            Sign out of account
+                        </button>
+                    </section>
+                </div>
+            </div>
+
+            <p class="footer-note">
+                SMH Collection Admin · Keep your login credentials private.
+            </p>
+        </main>
+    </div>
+
+    <button class="back-to-top" id="backToTopButton"
+        aria-label="Back to top" title="Back to top">↑</button>
+
+    <!-- Supabase library and your existing shared configuration -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/js/supabase.js" defer></script>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        "use strict";
+
+        const $ = (id) => document.getElementById(id);
+
+        const elements = {
+            sidebar: $("sidebar"),
+            overlay: $("overlay"),
+            menuButton: $("menuButton"),
+            logoutButton: $("logoutButton"),
+            securityLogoutButton: $("securityLogoutButton"),
+            backToTopButton: $("backToTopButton"),
+            message: $("pageMessage"),
+            profileForm: $("profileForm"),
+            fullName: $("fullName"),
+            email: $("email"),
+            role: $("role"),
+            saveButton: $("saveProfileButton"),
+            resetButton: $("resetPasswordButton"),
+            topbarName: $("topbarName"),
+            avatar: $("adminAvatar"),
+            accountStatus: $("accountStatus"),
+            roleStatus: $("roleStatus"),
+            emailStatus: $("emailStatus"),
+            profileStatus: $("profileStatus")
+        };
+
+        let currentUser = null;
+        let originalFullName = "";
+        let busy = false;
+
+        function getClient() {
+            if (window.supabaseClient) {
+                return window.supabaseClient;
+            }
+
+            if (typeof supabaseClient !== "undefined") {
+                window.supabaseClient = supabaseClient;
+                return supabaseClient;
+            }
+
+            throw new Error(
+                "Supabase has not loaded. Refresh the page and try again."
+            );
+        }
+
+        function showMessage(message, type = "info") {
+            elements.message.textContent = message;
+            elements.message.className = "message show " + type;
+
+            elements.message.scrollIntoView({
+                behavior: "smooth",
+                block: "nearest"
+            });
+        }
+
+        function clearMessage() {
+            elements.message.textContent = "";
+            elements.message.className = "message";
+        }
+
+        function setBusy(button, state, busyText) {
+            if (!button) return;
+
+            if (state) {
+                button.dataset.originalText = button.textContent.trim();
+                button.textContent = busyText;
+                button.disabled = true;
+            } else {
+                button.textContent =
+                    button.dataset.originalText || button.textContent;
+                button.disabled = false;
+            }
+        }
+
+        function setAccountStatus(active, label) {
+            elements.accountStatus.className =
+                "status-pill" + (active ? "" : " inactive");
+
+            elements.accountStatus.replaceChildren();
+
+            const dot = document.createElement("span");
+            dot.className = "status-dot";
+
+            elements.accountStatus.append(
+                dot,
+                document.createTextNode(label)
+            );
+        }
+
+        function getInitials(name) {
+            const parts = String(name || "Admin")
+                .trim()
+                .split(/\s+/)
+                .filter(Boolean);
+
+            if (parts.length === 0) return "A";
+
+            return parts.length === 1
+                ? parts[0].slice(0, 2).toUpperCase()
+                : (
+                    parts[0][0] +
+                    parts[parts.length - 1][0]
+                ).toUpperCase();
+        }
+
+        function updateNameDisplay(name) {
+            const safeName =
+                String(name || "").trim() || "Administrator";
+
+            elements.topbarName.textContent = safeName;
+            elements.avatar.textContent = getInitials(safeName);
+        }
+
+        function closeMenu() {
+            elements.sidebar.classList.remove("open");
+            elements.overlay.classList.remove("show");
+
+            elements.menuButton.setAttribute(
+                "aria-expanded",
+                "false"
+            );
+        }
+
+        async function requireAdmin() {
+            const client = getClient();
+
+            const {
+                data: sessionData,
+                error: sessionError
+            } = await client.auth.getSession();
+
+            if (sessionError) throw sessionError;
+
+            const session = sessionData?.session;
+
+            if (!session?.user) {
+                window.location.replace("login.html");
+                return false;
+            }
+
+            currentUser = session.user;
+
+            const {
+                data: profile,
+                error: profileError
+            } = await client
+                .from("profiles")
+                .select("id, full_name, email, role, is_active")
+                .eq("id", currentUser.id)
+                .maybeSingle();
+
+            if (profileError) throw profileError;
+
+            if (
+                !profile ||
+                String(profile.role || "").toLowerCase() !== "admin" ||
+                profile.is_active === false
+            ) {
+                await client.auth.signOut();
+                window.location.replace("login.html");
+                return false;
+            }
+
+            elements.fullName.value = profile.full_name || "";
+
+            elements.email.value =
+                currentUser.email || profile.email || "";
+
+            elements.role.value = "Administrator";
+
+            originalFullName = profile.full_name || "";
+
+            updateNameDisplay(originalFullName);
+
+            setAccountStatus(true, "Active");
+
+            elements.roleStatus.textContent = "Administrator";
+
+            elements.emailStatus.textContent =
+                currentUser.email ? "Registered" : "Not available";
+
+            elements.profileStatus.textContent =
+                originalFullName ? "Complete" : "Needs update";
+
+            return true;
+        }
+
+        async function saveProfile(event) {
+            event.preventDefault();
+            clearMessage();
+
+            if (busy || !currentUser) return;
+
+            const fullName = elements.fullName.value.trim();
+
+            if (fullName.length < 2) {
+                showMessage(
+                    "Please enter your full name using at least 2 characters.",
+                    "error"
+                );
+
+                elements.fullName.focus();
+                return;
+            }
+
+            if (fullName.length > 100) {
+                showMessage(
+                    "Your name must not exceed 100 characters.",
+                    "error"
+                );
+                return;
+            }
+
+            if (fullName === originalFullName) {
+                showMessage(
+                    "There are no profile changes to save.",
+                    "info"
+                );
+                return;
+            }
+
+            busy = true;
+
+            setBusy(
+                elements.saveButton,
+                true,
+                "Saving profile..."
+            );
+
+            try {
+                const client = getClient();
+
+                const {
+                    data,
+                    error
+                } = await client
+                    .from("profiles")
+                    .update({
+                        full_name: fullName,
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq("id", currentUser.id)
+                    .select("id, full_name")
+                    .maybeSingle();
+
+                if (error) throw error;
+
+                if (!data) {
+                    throw new Error(
+                        "The profile was not updated. Check your profile permissions and try again."
+                    );
+                }
+
+                originalFullName = data.full_name || fullName;
+
+                elements.fullName.value = originalFullName;
+
+                updateNameDisplay(originalFullName);
+
+                elements.profileStatus.textContent =
+                    originalFullName ? "Complete" : "Needs update";
+
+                showMessage(
+                    "Your profile was updated successfully.",
+                    "success"
+                );
+            } catch (error) {
+                console.error("Profile update failed:", error);
+
+                showMessage(
+                    error.message ||
+                    "Unable to update your profile. Please try again.",
+                    "error"
+                );
+            } finally {
+                busy = false;
+                setBusy(elements.saveButton, false);
+            }
+        }
+
+        async function sendPasswordReset() {
+            clearMessage();
+
+            if (busy) return;
+
+            const email = currentUser?.email;
+
+            if (!email) {
+                showMessage(
+                    "Your account does not have a registered email address. Please contact your system administrator.",
+                    "error"
+                );
+                return;
+            }
+
+            busy = true;
+
+            setBusy(
+                elements.resetButton,
+                true,
+                "Sending email..."
+            );
+
+            try {
+                const client = getClient();
+
+                const { error } =
+                    await client.auth.resetPasswordForEmail(email);
+
+                if (error) throw error;
+
+                showMessage(
+                    "Password reset instructions have been requested for your registered email. Check your inbox and spam folder. If no email arrives, verify your Supabase email configuration.",
+                    "success"
+                );
+            } catch (error) {
+                console.error("Password reset request failed:", error);
+
+                showMessage(
+                    error.message ||
+                    "Unable to request a password reset. Please try again.",
+                    "error"
+                );
+            } finally {
+                busy = false;
+                setBusy(elements.resetButton, false);
+            }
+        }
+
+        async function logout() {
+            if (busy) return;
+
+            const confirmed = window.confirm(
+                "Are you sure you want to sign out of SMH Collection Admin?"
+            );
+
+            if (!confirmed) return;
+
+            busy = true;
+
+            elements.logoutButton.disabled = true;
+            elements.securityLogoutButton.disabled = true;
+
+            try {
+                const client = getClient();
+
+                const { error } = await client.auth.signOut();
+
+                if (error) throw error;
+
+                window.location.replace("login.html");
+            } catch (error) {
+                console.error("Logout failed:", error);
+
+                showMessage(
+                    error.message ||
+                    "Unable to sign out. Please try again.",
+                    "error"
+                );
+
+                busy = false;
+                elements.logoutButton.disabled = false;
+                elements.securityLogoutButton.disabled = false;
+            }
+        }
+
+        elements.profileForm.addEventListener(
+            "submit",
+            saveProfile
+        );
+
+        elements.resetButton.addEventListener(
+            "click",
+            sendPasswordReset
+        );
+
+        elements.logoutButton.addEventListener("click", logout);
+
+        elements.securityLogoutButton.addEventListener(
+            "click",
+            logout
+        );
+
+        elements.menuButton.addEventListener("click", () => {
+            const isOpen =
+                elements.sidebar.classList.toggle("open");
+
+            elements.overlay.classList.toggle("show", isOpen);
+
+            elements.menuButton.setAttribute(
+                "aria-expanded",
+                String(isOpen)
+            );
+        });
+
+        elements.overlay.addEventListener("click", closeMenu);
+
+        elements.sidebar.querySelectorAll("a").forEach((link) => {
+            link.addEventListener("click", closeMenu);
+        });
+
+        elements.backToTopButton.addEventListener("click", () => {
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+        });
+
+        async function init() {
+            try {
+                const allowed = await requireAdmin();
+
+                if (!allowed) return;
+
+                showMessage(
+                    "Your administrator account settings are ready.",
+                    "success"
+                );
+            } catch (error) {
+                console.error(
+                    "Admin settings initialization failed:",
+                    error
+                );
+
+                setAccountStatus(false, "Unavailable");
+
+                elements.roleStatus.textContent = "Not verified";
+                elements.profileStatus.textContent = "Unavailable";
+
+                                showMessage(
+                    error.message ||
+                    "Unable to load account settings. Refresh the page and try again.",
+                    "error"
+                );
+            }
+        }
+
+        init();
+    });
+    </script>
+</body>
+</html>
