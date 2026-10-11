@@ -19,9 +19,7 @@
 <body>
   <div class="admin-layout">
 
-    <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
-
       <a class="brand" href="admin-dashboard.html">
         <span class="brand-mark">SMH</span>
         <span class="brand-name">
@@ -94,7 +92,6 @@
       </div>
     </aside>
 
-    <!-- MAIN DASHBOARD -->
     <main class="main-content" id="overview">
 
       <header class="topbar">
@@ -144,7 +141,6 @@
         Connecting to your store data...
       </div>
 
-      <!-- BUSINESS STATISTICS -->
       <section class="stats-grid" aria-label="Store statistics">
 
         <article class="stat-card">
@@ -185,7 +181,6 @@
 
       </section>
 
-      <!-- RECENT ORDERS -->
       <section class="content-grid">
 
         <article class="panel">
@@ -220,7 +215,6 @@
           </div>
         </article>
 
-        <!-- QUICK ACTIONS -->
         <article class="panel quick-panel">
           <div class="panel-heading">
             <div>
@@ -297,10 +291,9 @@
     </main>
   </div>
 
-  <!-- Load the Supabase library, your existing root configuration,
-       and then the dashboard logic in the correct order. -->
+  <!-- Load Supabase library, project configuration, then dashboard logic -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="supabase.js"></script>
+  <script src="assets/js/supabase.js"></script>
   <script src="assets/js/admin-dashboard.js"></script>
 </body>
 </html>
