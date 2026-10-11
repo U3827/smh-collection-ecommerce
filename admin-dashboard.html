@@ -4,16 +4,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>Admin Dashboard | SMH Collection</title>
-  <meta name="description" content="Manage SMH Collection products, orders, customers, staff and store performance.">
+  <title>Staff &amp; Sellers | SMH Collection Admin</title>
+  <meta name="description" content="Manage SMH Collection users, sellers, staff and account access.">
   <meta name="theme-color" content="#0b1020">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
   <link rel="stylesheet" href="assets/css/admin-dashboard.css">
+  <link rel="stylesheet" href="assets/css/admin-staff.css">
 </head>
 
 <body>
@@ -22,96 +21,45 @@
     <aside class="sidebar" id="sidebar">
       <a class="brand" href="admin-dashboard.html">
         <span class="brand-mark">SMH</span>
-        <span class="brand-name">
-          SMH Collection
-          <small>ADMINISTRATION</small>
-        </span>
+        <span class="brand-name">SMH Collection<small>ADMINISTRATION</small></span>
       </a>
 
       <div class="sidebar-label">WORKSPACE</div>
-
       <nav class="sidebar-nav" aria-label="Main navigation">
-        <a class="nav-link active" href="admin-dashboard.html" aria-current="page">
-          <span aria-hidden="true">▦</span>
-          Overview
-        </a>
-
-        <a class="nav-link" href="admin-products.html">
-          <span aria-hidden="true">▣</span>
-          Products
-        </a>
-
-        <a class="nav-link" href="admin-orders.html">
-          <span aria-hidden="true">▤</span>
-          Orders
-        </a>
-
-        <a class="nav-link" href="admin-customers.html">
-          <span aria-hidden="true">♙</span>
-          Customers
-        </a>
-
-        <a class="nav-link" href="admin-staff.html">
-          <span aria-hidden="true">♧</span>
-          Staff &amp; Sellers
-        </a>
-
-        <a class="nav-link" href="admin-analytics.html">
-          <span aria-hidden="true">▥</span>
-          Analytics
-        </a>
+        <a class="nav-link" href="admin-dashboard.html"><span>▦</span> Overview</a>
+        <a class="nav-link" href="admin-products.html"><span>▣</span> Products</a>
+        <a class="nav-link" href="admin-orders.html"><span>▤</span> Orders</a>
+        <a class="nav-link" href="admin-customers.html"><span>♙</span> Customers</a>
+        <a class="nav-link active" href="admin-staff.html" aria-current="page"><span>♧</span> Staff &amp; Sellers</a>
+        <a class="nav-link" href="admin-analytics.html"><span>▥</span> Analytics</a>
       </nav>
 
       <div class="sidebar-label">MANAGEMENT</div>
-
       <nav class="sidebar-nav" aria-label="Management navigation">
-        <a class="nav-link" href="admin-inventory.html">
-          <span aria-hidden="true">▧</span>
-          Inventory
-        </a>
-
-        <a class="nav-link" href="admin-settings.html">
-          <span aria-hidden="true">⚙</span>
-          Settings
-        </a>
+        <a class="nav-link" href="admin-inventory.html"><span>▧</span> Inventory</a>
+        <a class="nav-link" href="admin-settings.html"><span>⚙</span> Settings</a>
       </nav>
 
       <div class="sidebar-bottom">
         <div class="admin-mini">
           <div class="avatar">A</div>
-
           <div class="admin-mini-info">
             <strong id="adminName">Administrator</strong>
             <small id="adminEmail">Checking account...</small>
           </div>
         </div>
-
-        <button class="logout-button" id="logoutBtn" type="button">
-          ↪ Sign out
-        </button>
+        <button class="logout-button" id="logoutBtn" type="button">↪ Sign out</button>
       </div>
     </aside>
 
-    <main class="main-content" id="overview">
-
+    <main class="main-content">
       <header class="topbar">
-        <button
-          class="menu-button"
-          id="menuBtn"
-          type="button"
-          aria-label="Toggle navigation"
-          aria-controls="sidebar"
-          aria-expanded="false"
-        >
-          ☰
-        </button>
-
+        <button class="menu-button" id="menuBtn" type="button"
+          aria-label="Toggle navigation" aria-controls="sidebar" aria-expanded="false">☰</button>
         <div class="breadcrumb">
-          <span>SMH Collection</span>
-          <span aria-hidden="true">/</span>
-          <strong>Dashboard</strong>
+          <span>SMH Collection</span><span aria-hidden="true">/</span>
+          <strong>Staff &amp; Sellers</strong>
         </div>
-
         <div class="topbar-right">
           <span class="secure-label">● Admin workspace</span>
           <div class="avatar top-avatar">A</div>
@@ -120,180 +68,204 @@
 
       <section class="page-heading">
         <div>
-          <p class="eyebrow">STORE MANAGEMENT</p>
-          <h1>Dashboard Overview</h1>
-          <p class="page-subtitle" id="welcomeMessage">
-            Welcome to your store management workspace.
-          </p>
+          <p class="eyebrow">ACCESS MANAGEMENT</p>
+          <h1>Staff, Sellers &amp; Users</h1>
+          <p class="page-subtitle">Manage accounts, roles and access to your store.</p>
         </div>
-
-        <a class="store-link" href="index.html">
-          ↗ View Store
-        </a>
       </section>
 
-      <div
-        class="notice"
-        id="dashboardNotice"
-        role="status"
-        aria-live="polite"
-      >
-        Connecting to your store data...
+      <div class="notice" id="staffNotice" role="status" aria-live="polite">
+        Preparing user management...
       </div>
 
-      <section class="stats-grid" aria-label="Store statistics">
-
-        <article class="stat-card">
-          <div class="stat-top">
-            <span>Total Revenue</span>
-            <span class="stat-icon purple">₦</span>
-          </div>
-          <h2 id="totalRevenue">₦0.00</h2>
-          <p>Based on recorded orders</p>
-        </article>
-
-        <article class="stat-card">
-          <div class="stat-top">
-            <span>Total Orders</span>
-            <span class="stat-icon blue">▤</span>
-          </div>
-          <h2 id="totalOrders">0</h2>
-          <p>Orders recorded in the store</p>
-        </article>
-
-        <article class="stat-card">
-          <div class="stat-top">
-            <span>Total Products</span>
-            <span class="stat-icon orange">▣</span>
-          </div>
-          <h2 id="totalProducts">0</h2>
-          <p>Products in the catalogue</p>
-        </article>
-
-        <article class="stat-card">
-          <div class="stat-top">
-            <span>Total Customers</span>
-            <span class="stat-icon green">♙</span>
-          </div>
-          <h2 id="totalCustomers">0</h2>
-          <p>Registered buyer accounts</p>
-        </article>
-
+      <section class="staff-actions-bar" aria-label="Account actions">
+        <div>
+          <h2>Account Management</h2>
+          <p>Create seller or staff accounts and review existing users.</p>
+        </div>
+        <div class="staff-action-buttons">
+          <button class="staff-button staff-button-gold" id="addSellerBtn" type="button">＋ Add Seller</button>
+          <button class="staff-button staff-button-primary" id="addStaffBtn" type="button">＋ Add Staff</button>
+          <button class="staff-button staff-button-secondary" id="refreshUsersBtn" type="button">↻ Refresh</button>
+        </div>
       </section>
 
-      <section class="content-grid">
-
-        <article class="panel">
-          <div class="panel-heading">
-            <div>
-              <h2>Recent Orders</h2>
-              <p>Monitor customer purchases and order status.</p>
-            </div>
-
-            <a href="admin-orders.html" class="text-link">View all</a>
-          </div>
-
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th scope="col">Order</th>
-                  <th scope="col">Customer</th>
-                  <th scope="col">Amount</th>
-                  <th scope="col">Status</th>
-                </tr>
-              </thead>
-
-              <tbody id="recentOrders">
-                <tr>
-                  <td colspan="4" class="empty-state">
-                    Loading recent orders...
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+      <section class="stats-grid" aria-label="Account statistics">
+        <article class="stat-card">
+          <div class="stat-top"><span>Total Users</span><span class="stat-icon purple">♙</span></div>
+          <h2 id="totalUsers">—</h2><p>Registered accounts</p>
         </article>
-
-        <article class="panel quick-panel">
-          <div class="panel-heading">
-            <div>
-              <h2>Quick Actions</h2>
-              <p>Open a management page.</p>
-            </div>
-          </div>
-
-          <div class="quick-actions">
-
-            <a href="admin-products.html" class="quick-action">
-              <span class="quick-icon">＋</span>
-              <span>
-                <strong>Manage Products</strong>
-                <small>Add, edit and review products</small>
-              </span>
-              <span class="arrow">›</span>
-            </a>
-
-            <a href="admin-orders.html" class="quick-action">
-              <span class="quick-icon">▤</span>
-              <span>
-                <strong>Process Orders</strong>
-                <small>Review customer purchases</small>
-              </span>
-              <span class="arrow">›</span>
-            </a>
-
-            <a href="admin-staff.html" class="quick-action">
-              <span class="quick-icon">♙</span>
-              <span>
-                <strong>Manage Staff</strong>
-                <small>Manage staff access and roles</small>
-              </span>
-              <span class="arrow">›</span>
-            </a>
-
-            <a href="admin-analytics.html" class="quick-action">
-              <span class="quick-icon">▥</span>
-              <span>
-                <strong>View Analytics</strong>
-                <small>Review store performance</small>
-              </span>
-              <span class="arrow">›</span>
-            </a>
-
-            <a href="admin-inventory.html" class="quick-action">
-              <span class="quick-icon">▧</span>
-              <span>
-                <strong>Manage Inventory</strong>
-                <small>Monitor product stock levels</small>
-              </span>
-              <span class="arrow">›</span>
-            </a>
-
-            <a href="admin-settings.html" class="quick-action">
-              <span class="quick-icon">⚙</span>
-              <span>
-                <strong>Account &amp; Settings</strong>
-                <small>Review administration settings</small>
-              </span>
-              <span class="arrow">›</span>
-            </a>
-
-          </div>
+        <article class="stat-card">
+          <div class="stat-top"><span>Sellers</span><span class="stat-icon blue">▣</span></div>
+          <h2 id="totalSellers">—</h2><p>Seller accounts</p>
         </article>
+        <article class="stat-card">
+          <div class="stat-top"><span>Staff</span><span class="stat-icon orange">♧</span></div>
+          <h2 id="totalStaff">—</h2><p>Staff accounts</p>
+        </article>
+        <article class="stat-card">
+          <div class="stat-top"><span>Inactive Accounts</span><span class="stat-icon green">⊘</span></div>
+          <h2 id="inactiveUsers">—</h2><p>Accounts marked inactive</p>
+        </article>
+      </section>
+
+      <section class="panel">
+        <div class="panel-heading">
+          <div>
+            <h2>Account Directory</h2>
+            <p>Search accounts and review their assigned roles.</p>
+          </div>
+        </div>
+
+        <div class="staff-toolbar">
+          <div class="staff-field">
+            <label for="userSearch">Search accounts</label>
+            <input type="search" id="userSearch" placeholder="Name or email..." autocomplete="off">
+          </div>
+          <div class="staff-field">
+            <label for="roleFilter">Role</label>
+            <select id="roleFilter">
+              <option value="all">All roles</option>
+              <option value="admin">Admin</option>
+              <option value="staff">Staff</option>
+              <option value="seller">Seller</option>
+              <option value="buyer">Buyer</option>
+            </select>
+          </div>
+          <div class="staff-field">
+            <label for="statusFilter">Account status</label>
+            <select id="statusFilter">
+              <option value="all">All statuses</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">User</th>
+                <th scope="col">Email</th>
+                <th scope="col">Role</th>
+                <th scope="col">Status</th>
+                <th scope="col">Joined</th>
+                <th scope="col">Management</th>
+              </tr>
+            </thead>
+            <tbody id="staffTableBody">
+              <tr><td colspan="6" class="empty-state">Loading registered accounts...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="staff-table-footer"><span id="userResultsCount">Waiting for account data...</span></div>
+      </section>
+
+      <section class="panel staff-guidance">
+        <div class="panel-heading">
+          <div><h2>Role &amp; Access Guide</h2><p>Assign only the permissions each person needs.</p></div>
+        </div>
+        <div class="quick-actions">
+          <div class="quick-action"><span class="quick-icon">♙</span><span><strong>Buyer</strong><small>Browses products and manages personal orders.</small></span></div>
+          <div class="quick-action"><span class="quick-icon">▣</span><span><strong>Seller</strong><small>Manages permitted selling activities.</small></span></div>
+          <div class="quick-action"><span class="quick-icon">♧</span><span><strong>Staff</strong><small>Uses authorized operational tools.</small></span></div>
+          <div class="quick-action"><span class="quick-icon">⚙</span><span><strong>Administrator</strong><small>Manages authorized store operations and access.</small></span></div>
+        </div>
       </section>
 
       <footer class="footer">
         <span>© <span id="currentYear">2026</span> SMH Collection</span>
         <span>Everything in one place.</span>
       </footer>
-
     </main>
   </div>
 
-  <!-- Load Supabase library, project configuration, then dashboard logic -->
+  <!-- Account creation dialog -->
+  <dialog class="staff-dialog" id="accountDialog" aria-labelledby="accountDialogTitle">
+    <form id="accountForm">
+      <div class="staff-dialog-heading">
+        <div>
+          <p class="eyebrow">SMH COLLECTION</p>
+          <h2 id="accountDialogTitle">Create Account</h2>
+          <p id="accountDialogDescription">Enter the new account details.</p>
+        </div>
+        <button class="staff-dialog-close" id="closeAccountDialog" type="button" aria-label="Close">×</button>
+      </div>
+
+      <label for="newUserName">Full name</label>
+      <input id="newUserName" name="full_name" type="text" autocomplete="name" required maxlength="120">
+
+      <label for="newUserEmail">Email address</label>
+      <input id="newUserEmail" name="email" type="email" autocomplete="email" required maxlength="254">
+
+      <label for="newUserRole">Account role</label>
+      <select id="newUserRole" name="role" required>
+        <option value="seller">Seller</option>
+        <option value="staff">Staff</option>
+      </select>
+
+      <p class="staff-dialog-note">
+        Account creation will only be submitted when the secure account-management
+        service is configured. The administrator's permanent account must remain protected.
+      </p>
+
+      <div class="staff-dialog-actions">
+        <button class="staff-button staff-button-secondary" id="cancelAccountBtn" type="button">Cancel</button>
+        <button class="staff-button staff-button-primary" id="submitAccountBtn" type="submit">Create Account</button>
+      </div>
+      <p id="accountFormMessage" class="staff-form-message" role="status" aria-live="polite"></p>
+    </form>
+  </dialog>
+
+  <!-- User management dialog -->
+  <dialog class="staff-dialog" id="manageUserDialog" aria-labelledby="manageUserTitle">
+    <form id="manageUserForm">
+      <div class="staff-dialog-heading">
+        <div>
+          <p class="eyebrow">ACCOUNT CONTROLS</p>
+          <h2 id="manageUserTitle">Manage User</h2>
+          <p id="manageUserSummary">Review account details.</p>
+        </div>
+        <button class="staff-dialog-close" id="closeManageDialog" type="button" aria-label="Close">×</button>
+      </div>
+
+      <input id="manageUserId" type="hidden">
+
+      <label for="manageUserRole">Assigned role</label>
+      <select id="manageUserRole" name="role">
+        <option value="buyer">Buyer</option>
+        <option value="seller">Seller</option>
+        <option value="staff">Staff</option>
+      </select>
+
+      <label for="manageUserStatus">Account access</label>
+      <select id="manageUserStatus" name="is_active">
+        <option value="true">Active — allow access</option>
+        <option value="false">Inactive — block access</option>
+      </select>
+
+      <p id="protectedAdminMessage" class="staff-protected-message" hidden>
+        <strong>Permanent administrator protected.</strong>
+        This account cannot be demoted or blocked.
+      </p>
+
+      <p class="staff-dialog-note">
+        These controls require server-side authorization. If the secure service
+        is not configured, changes must be rejected rather than applied directly
+        from the browser.
+      </p>
+
+      <div class="staff-dialog-actions">
+        <button class="staff-button staff-button-secondary" id="cancelManageBtn" type="button">Close</button>
+        <button class="staff-button staff-button-primary" id="saveUserChangesBtn" type="submit">Save Changes</button>
+      </div>
+      <p id="manageFormMessage" class="staff-form-message" role="status" aria-live="polite"></p>
+    </form>
+  </dialog>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="assets/js/supabase.js"></script>
-  <script src="assets/js/admin-dashboard.js"></script>
+  <script src="assets/js/admin-staff.js"></script>
 </body>
 </html>
