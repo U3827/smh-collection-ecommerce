@@ -2,7 +2,8 @@
 /* =========================================
    SMH COLLECTION
    ADMIN DASHBOARD
-   Supabase authentication + role protection
+   Authentication, role protection,
+   statistics, recent orders and mobile menu
    ========================================= */
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -18,6 +19,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   let currentUser = null;
   let currentProfile = null;
 
+  // -----------------------------------------
+  // GENERAL HELPERS
+  // -----------------------------------------
+
   function showNotice(message, type = "") {
     if (!notice) return;
 
@@ -25,6 +30,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     notice.className = "notice";
 
     if (type) notice.classList.add(type);
+  }
+
+  function setText(id, value) {
+    const element = $(id);
+    if (element) element.textContent = value;
   }
 
   function formatMoney(value) {
@@ -49,47 +59,86 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function goTo(page) {
+    const basePath = "/smh-collection-ecommerce/";
     window.location.assign(
-      new URL(
-        page,
-        new URL("/smh-collection-ecommerce/", window.location.origin)
-      ).href
+      new URL(page, window.location.origin + basePath).href
     );
   }
 
-  function setText(id, value) {
-    const element = $(id);
-    if (element) element.textContent = value;
+  // -----------------------------------------
+  // MOBILE MENU
+  // Set up BEFORE checking Supabase so the
+  // menu can still respond if auth fails.
+  // -----------------------------------------
+
+  function closeSidebar() {
+    if (sidebar) sidebar.classList.remove("open");
+
+    if (menuBtn) {
+      menuBtn.setAttribute("aria-expanded", "false");
+    }
   }
 
-  function setAdminIdentity(profile, user) {
-    const name = profile.full_name || "Administrator";
-    const initial = getInitial(name);
+  if (menuBtn && sidebar) {
+    menuBtn.addEventListener("click", (event) => {
+      event.stopPropagation();
 
-    setText("adminName", name);
-    setText("adminEmail", profile.email || user.email || "");
-    setText("welcomeMessage", `Welcome back, ${name}. Here's your store overview.`);
+      const opened = sidebar.classList.toggle("open");
+      menuBtn.setAttribute("aria-expanded", String(opened));
+    });
 
-    document.querySelectorAll(".avatar").forEach((avatar) => {
-      avatar.textContent = initial;
+    sidebar.querySelectorAll(".nav-link").forEach((link) => {
+      link.addEventListener("click", () => {
+        closeSidebar();
+      });
+    });
+
+    document.addEventListener("click", (event) => {
+      if (
+        window.innerWidth <= 760 &&
+        sidebar.classList.contains("open") &&
+        !sidebar.contains(event.target) &&
+        !menuBtn.contains(event.target)
+      ) {
+        closeSidebar();
+      }
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") closeSidebar();
     });
   }
 
   // -----------------------------------------
-  // SUPABASE CLIENT CHECK
+  // FOOTER YEAR
   // -----------------------------------------
 
-  if (typeof window.supabase === "undefined" ||
-      typeof supabaseClient === "undefined") {
+  setText("currentYear", String(new Date().getFullYear()));
+
+  // -----------------------------------------
+  // SUPABASE CLIENT CHECK
+  // Your root supabase.js must initialize
+  // a client named supabaseClient.
+  // -----------------------------------------
+
+  if (
+    typeof window.supabase === "undefined" ||
+    typeof supabaseClient === "undefined"
+  ) {
     showNotice(
-      "Supabase could not load. Check that Supabase JS and assets/js/Supsbase.js are included in the correct order.",
+      "Supabase could not load. Check the root supabase.js file and ensure it loads before assets/js/admin-dashboard.js.",
       "error"
     );
+
+    console.error(
+      "Supabase is unavailable. Check the script paths and the client initialization in supabase.js."
+    );
+
     return;
   }
 
   // -----------------------------------------
-  // AUTHENTICATION + ADMIN ROLE
+  // AUTHENTICATION AND ADMIN PERMISSIONS
   // -----------------------------------------
 
   try {
@@ -122,7 +171,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (!profile) {
       showNotice(
-        "Your account profile could not be found. Contact the store administrator.",
+        "Your account profile could not be found. Please contact the store administrator.",
         "error"
       );
       return;
@@ -143,25 +192,44 @@ document.addEventListener("DOMContentLoaded", async () => {
         await supabaseClient.auth.signOut();
         goTo("login.html");
       }
+
       return;
     }
 
     currentProfile = profile;
-    setAdminIdentity(profile, currentUser);
 
-    showNotice("Administrator verified. Loading store information...", "success");
+    const name = profile.full_name || "Administrator";
+    const initial = getInitial(name);
+
+    setText("adminName", name);
+    setText("adminEmail", profile.email || user.email || "");
+    setText(
+      "welcomeMessage",
+      `Welcome back, ${name}. Here's your store overview.`
+    );
+
+    document.querySelectorAll(".avatar").forEach((avatar) => {
+      avatar.textContent = initial;
+    });
+
+    showNotice(
+      "Administrator verified. Loading store information...",
+      "success"
+    );
 
   } catch (error) {
     console.error("Admin authentication error:", error);
+
     showNotice(
       error.message || "Could not verify administrator access.",
       "error"
     );
+
     return;
   }
 
   // -----------------------------------------
-  // STATISTICS
+  // DATABASE COUNTS
   // -----------------------------------------
 
   async function countRows(table, configure) {
@@ -174,7 +242,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     const { count, error } = await query;
 
     if (error) {
-      console.warn(`Could not count ${table}:`, error.message);
+      console.warn(
+        `Could not count ${table}:`,
+        error.message
+      );
       return null;
     }
 
@@ -182,11 +253,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   async function loadStatistics() {
-    const [productCount, buyerCount, orderCount] = await Promise.all([
-      countRows("products"),
-      countRows("profiles", (query) => query.eq("role", "buyer")),
-      countRows("orders")
-    ]);
+    const [productCount, buyerCount, orderCount] =
+      await Promise.all([
+        countRows("products"),
+        countRows("profiles", (query) =>
+          query.eq("role", "buyer")
+        ),
+        countRows("orders")
+      ]);
 
     if (productCount !== null) {
       setText("totalProducts", String(productCount));
@@ -200,8 +274,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       setText("totalOrders", String(orderCount));
     }
 
-    // Revenue depends on the real order schema and payment statuses.
-    // We will connect it after verifying your orders table.
+    // Revenue will be calculated after the actual
+    // orders schema and payment rules are verified.
     setText("totalRevenue", "Pending");
   }
 
@@ -220,15 +294,20 @@ document.addEventListener("DOMContentLoaded", async () => {
       .limit(5);
 
     if (error) {
-      console.warn("Orders could not be loaded:", error.message);
+      console.warn(
+        "Orders could not be loaded:",
+        error.message
+      );
+
       tbody.innerHTML = `
         <tr>
           <td colspan="4" class="empty-state">
-            Orders are not available yet. Check the orders table and its
-            administrator read permissions.
+            Orders could not be loaded. Check the orders
+            table and administrator access permissions.
           </td>
         </tr>
       `;
+
       return;
     }
 
@@ -240,21 +319,27 @@ document.addEventListener("DOMContentLoaded", async () => {
           </td>
         </tr>
       `;
+
       return;
     }
 
     tbody.innerHTML = data.map((order) => {
       const orderId = order.id ?? "—";
       const shortId = String(orderId).slice(0, 8);
-      const customer = order.customer_name ||
+
+      const customer =
+        order.customer_name ||
         order.full_name ||
         order.buyer_name ||
         order.email ||
         "Customer";
-      const amount = order.total_amount ??
+
+      const amount =
+        order.total_amount ??
         order.total ??
         order.amount ??
         0;
+
       const status = order.status || "Pending";
 
       return `
@@ -269,42 +354,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   // -----------------------------------------
-  // MOBILE SIDEBAR
-  // -----------------------------------------
-
-  if (menuBtn && sidebar) {
-    menuBtn.addEventListener("click", () => {
-      const opened = sidebar.classList.toggle("open");
-      menuBtn.setAttribute("aria-expanded", String(opened));
-    });
-
-    sidebar.querySelectorAll(".nav-link").forEach((link) => {
-      link.addEventListener("click", () => {
-        sidebar.classList.remove("open");
-        menuBtn.setAttribute("aria-expanded", "false");
-
-        sidebar.querySelectorAll(".nav-link").forEach((item) => {
-          item.classList.remove("active");
-        });
-
-        link.classList.add("active");
-      });
-    });
-
-    document.addEventListener("click", (event) => {
-      if (
-        window.innerWidth <= 760 &&
-        sidebar.classList.contains("open") &&
-        !sidebar.contains(event.target) &&
-        !menuBtn.contains(event.target)
-      ) {
-        sidebar.classList.remove("open");
-        menuBtn.setAttribute("aria-expanded", "false");
-      }
-    });
-  }
-
-  // -----------------------------------------
   // LOGOUT
   // -----------------------------------------
 
@@ -313,17 +362,24 @@ document.addEventListener("DOMContentLoaded", async () => {
       logoutBtn.disabled = true;
       logoutBtn.textContent = "Signing out...";
 
-      const { error } = await supabaseClient.auth.signOut();
+      try {
+        const { error } = await supabaseClient.auth.signOut();
 
-      if (error) {
+        if (error) throw error;
+
+        goTo("login.html");
+
+      } catch (error) {
         console.error("Admin logout error:", error);
+
         logoutBtn.disabled = false;
         logoutBtn.textContent = "↪ Sign out";
-        showNotice("Unable to sign out. Please try again.", "error");
-        return;
-      }
 
-      goTo("login.html");
+        showNotice(
+          "Unable to sign out. Please try again.",
+          "error"
+        );
+      }
     });
   }
 
@@ -337,8 +393,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       loadRecentOrders()
     ]);
 
-    setText("currentYear", String(new Date().getFullYear()));
-
     showNotice(
       "Administrator verified. Store data has been refreshed where available.",
       "success"
@@ -351,8 +405,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   } catch (error) {
     console.error("Admin dashboard data error:", error);
+
     showNotice(
-      "Your admin session is active, but some store data could not be loaded. Check the database schema and access policies.",
+      "Your admin session is active, but some store data could not be loaded. Check your database tables and access policies.",
       "error"
     );
   }
