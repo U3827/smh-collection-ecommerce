@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#123c2d">
+    <meta name="description" content="SMH Collection Admin Inventory Management">
+    <title>Inventory Management | SMH Collection</title>
+
+    <link rel="stylesheet" href="assets/css/admin-inventory.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/js/supabase.js" defer></script>
+    <script src="assets/js/admin-inventory.js" defer></script>
+</head>
+
+<body>
+    <div class="admin-layout">
+
+        <aside class="sidebar" id="sidebar">
+            <a href="admin-dashboard.html" class="brand">
+                <span class="brand-mark">SMH</span>
+                <span class="brand-copy">
+                    <strong>SMH Collection</strong>
+                    <small>ADMINISTRATION</small>
+                </span>
+            </a>
+
+            <div class="sidebar-label">WORKSPACE</div>
+
+            <nav class="sidebar-nav" aria-label="Admin navigation">
+                <a href="admin-dashboard.html" class="nav-link">
+                    <span class="nav-icon">⌂</span>
+                    <span>Overview</span>
+                </a>
+                <a href="admin-orders.html" class="nav-link">
+                    <span class="nav-icon">▤</span>
+                    <span>Orders</span>
+                </a>
+                <a href="admin-products.html" class="nav-link">
+                    <span class="nav-icon">◇</span>
+                    <span>Products</span>
+                </a>
+                <a href="admin-customers.html" class="nav-link">
+                    <span class="nav-icon">♙</span>
+                    <span>Customers</span>
+                </a>
+                <a href="admin-staff.html" class="nav-link">
+                    <span class="nav-icon">♧</span>
+                    <span>Staff & Sellers</span>
+                </a>
+                <a href="admin-inventory.html" class="nav-link active" aria-current="page">
+                    <span class="nav-icon">▦</span>
+                    <span>Inventory</span>
+                </a>
+                <a href="admin-analytics.html" class="nav-link">
+                    <span class="nav-icon">▥</span>
+                    <span>Analytics</span>
+                </a>
+                <a href="admin-settings.html" class="nav-link">
+                    <span class="nav-icon">⚙</span>
+                    <span>Settings</span>
+                </a>
+                <a href="admin-market.html" class="nav-link">
+                    <span class="nav-icon">▣</span>
+                    <span>Marketplace</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="admin-avatar">A</div>
+                <div class="admin-identity">
+                    <strong>Administrator</strong>
+                    <small>SMH Control Centre</small>
+                </div>
+                <button type="button" id="logoutButton" class="logout-button"
+                    aria-label="Log out" title="Log out">↗</button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="topbar">
+                <button type="button" id="menuButton" class="menu-button"
+                    aria-label="Toggle navigation">☰</button>
+
+                <div class="breadcrumb">
+                    <span>Workspace</span>
+                    <span class="breadcrumb-divider">/</span>
+                    <strong>Inventory</strong>
+                </div>
+
+                <a href="admin-products.html" class="topbar-link">Manage Products ↗</a>
+            </header>
+
+            <section class="page-content">
+                <div class="page-heading">
+                    <div>
+                        <p class="eyebrow">STOCK CONTROL</p>
+                        <h1>Inventory Management</h1>
+                        <p class="page-description">
+                            Monitor product availability, identify stock risks and
+                            keep inventory information up to date.
+                        </p>
+                    </div>
+
+                    <button type="button" id="refreshButton" class="button button-secondary">
+                        ↻ Refresh inventory
+                    </button>
+                </div>
+
+                <div id="pageMessage" class="page-message" role="status" aria-live="polite" hidden></div>
+
+                <section class="stats-grid" aria-label="Inventory summary">
+                    <article class="stat-card">
+                        <div class="stat-top">
+                            <span class="stat-label">Total products</span>
+                            <span class="stat-icon icon-green">▦</span>
+                        </div>
+                        <strong class="stat-value" id="totalProducts">—</strong>
+                        <span class="stat-note">Products in the catalogue</span>
+                    </article>
+
+                    <article class="stat-card">
+                        <div class="stat-top">
+                            <span class="stat-label">Units in stock</span>
+                            <span class="stat-icon icon-gold">▤</span>
+                        </div>
+                        <strong class="stat-value" id="totalUnits">—</strong>
+                        <span class="stat-note">Combined available quantities</span>
+                    </article>
+
+                    <article class="stat-card">
+                        <div class="stat-top">
+                            <span class="stat-label">Low stock</span>
+                            <span class="stat-icon icon-orange">!</span>
+                        </div>
+                        <strong class="stat-value" id="lowStockProducts">—</strong>
+                        <span class="stat-note">Products with 5 units or fewer</span>
+                    </article>
+
+                    <article class="stat-card">
+                        <div class="stat-top">
+                            <span class="stat-label">Out of stock</span>
+                            <span class="stat-icon icon-red">×</span>
+                        </div>
+                        <strong class="stat-value" id="outOfStockProducts">—</strong>
+                        <span class="stat-note">Products with zero units</span>
+                    </article>
+                </section>
+
+                <section class="inventory-panel">
+                    <div class="panel-heading">
+                        <div>
+                            <h2>Stock overview</h2>
+                            <p>Search products and update their stock quantities.</p>
+                        </div>
+
+                        <a href="admin-products.html" class="button button-primary">
+                            + Manage products
+                        </a>
+                    </div>
+
+                    <div class="filter-bar">
+                        <div class="search-field">
+                            <label for="searchInput">Search inventory</label>
+                            <input
+                                type="search"
+                                id="searchInput"
+                                placeholder="Search product name or slug..."
+                                autocomplete="off"
+                            >
+                        </div>
+
+                        <div class="filter-field">
+                            <label for="categoryFilter">Category</label>
+                            <select id="categoryFilter">
+                                <option value="all">All categories</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-field">
+                            <label for="stockFilter">Stock status</label>
+                            <select id="stockFilter">
+                                <option value="all">All stock levels</option>
+                                <option value="in-stock">In stock</option>
+                                <option value="low-stock">Low stock (1–5)</option>
+                                <option value="out-of-stock">Out of stock</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-field">
+                            <label for="visibilityFilter">Visibility</label>
+                            <select id="visibilityFilter">
+                                <option value="all">All products</option>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="table-summary">
+                        <span id="resultCount">Loading inventory...</span>
+                        <span class="stock-threshold">Low-stock threshold: 5 units</span>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table class="inventory-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Product</th>
+                                    <th scope="col">Category</th>
+                                    <th scope="col">Price</th>
+                                    <th scope="col">Current stock</th>
+                                    <th scope="col">Stock status</th>
+                                    <th scope="col">Visibility</th>
+                                    <th scope="col">Update stock</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventoryTableBody">
+                                <tr>
+                                    <td colspan="7" class="empty-state">
+                                        Loading inventory...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div id="mobileInventory" class="mobile-inventory"></div>
+
+                    <div class="panel-footer">
+                        <p>
+                            Stock updates change the product's quantity.
+                            Use Manage Products to edit prices, descriptions and other details.
+                        </p>
+                        <button type="button" id="backToTopButton" class="text-button">
+                            Back to top ↑
+                        </button>
+                    </div>
+                </section>
+
+                <footer class="page-footer">
+                    <span>SMH Collection</span>
+                    <span>Inventory Control Centre</span>
+                </footer>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
