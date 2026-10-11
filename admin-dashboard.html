@@ -1,18 +1,473 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Staff &amp; Sellers | SMH Collection Admin</title>
-  <meta name="description" content="Manage SMH Collection users, sellers, staff and account access.">
   <meta name="theme-color" content="#0b1020">
+  <meta name="description" content="SMH Collection administration dashboard for store operations, orders, products, customers, sellers, inventory and analytics.">
+  <title>Admin Dashboard | SMH Collection</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/admin-dashboard.css">
-  <link rel="stylesheet" href="assets/css/admin-staff.css">
+
+  <style>
+    :root {
+      --page: #0b1020;
+      --panel: #111a2e;
+      --panel-soft: #172239;
+      --border: #26344d;
+      --text: #edf2ff;
+      --muted: #9aa8c2;
+      --gold: #e6b85c;
+      --blue: #6da9ff;
+      --green: #43d9a3;
+      --red: #ff777f;
+      --radius: 16px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--page);
+      color: var(--text);
+      font-family: Inter, Arial, sans-serif;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+
+    .admin-layout {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 255px minmax(0, 1fr);
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+      padding: 24px 16px;
+      background: #0d1425;
+      border-right: 1px solid var(--border);
+      z-index: 20;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 8px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 48px;
+      height: 48px;
+      flex-shrink: 0;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #f5d88e, #bd8732);
+      color: #17110a;
+      font-weight: 800;
+      font-size: 15px;
+    }
+
+    .brand-name { font-size: 14px; font-weight: 800; }
+    .brand-name small {
+      display: block;
+      margin-top: 5px;
+      color: var(--gold);
+      font-size: 10px;
+      letter-spacing: 2px;
+    }
+
+    .sidebar-label {
+      padding: 0 10px;
+      color: #71809d;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 1.7px;
+    }
+
+    .sidebar-nav { display: grid; gap: 6px; }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border: 1px solid transparent;
+      border-radius: 10px;
+      color: #aab7ce;
+      font-size: 13px;
+      font-weight: 600;
+      transition: .2s;
+    }
+
+    .nav-link > span {
+      width: 22px;
+      text-align: center;
+      font-size: 17px;
+    }
+
+    .nav-link:hover, .nav-link.active {
+      color: var(--gold);
+      background: #1b2436;
+      border-color: #344058;
+    }
+
+    .sidebar-bottom {
+      margin-top: auto;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+    }
+
+    .admin-mini { display: flex; align-items: center; gap: 11px; }
+
+    .avatar {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      flex-shrink: 0;
+      border-radius: 50%;
+      background: #293954;
+      color: var(--gold);
+      font-weight: 800;
+    }
+
+    .admin-mini-info { min-width: 0; }
+    .admin-mini-info strong {
+      display: block;
+      overflow-wrap: anywhere;
+      font-size: 12px;
+    }
+
+    .admin-mini-info small {
+      display: block;
+      margin-top: 5px;
+      overflow-wrap: anywhere;
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .logout-button {
+      width: 100%;
+      margin-top: 18px;
+      padding: 11px;
+      border: 1px solid #51313d;
+      border-radius: 10px;
+      background: #251925;
+      color: #ff9ba2;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .main-content { min-width: 0; padding: 0 28px 28px; }
+
+    .topbar {
+      min-height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .breadcrumb {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .breadcrumb strong { color: var(--text); }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .secure-label {
+      color: var(--green);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .menu-button {
+      display: none;
+      padding: 8px 11px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: var(--panel);
+      color: var(--text);
+    }
+
+    .page-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: 20px;
+      padding: 30px 0 24px;
+    }
+
+    .eyebrow {
+      margin: 0 0 9px;
+      color: var(--gold);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 2px;
+    }
+
+    h1 { margin: 0; font-size: clamp(24px, 3vw, 32px); letter-spacing: -.8px; }
+    h2 { margin: 0; font-size: 16px; }
+    p { line-height: 1.6; }
+
+    .page-subtitle { margin: 9px 0 0; color: var(--muted); font-size: 13px; }
+
+    .date-label {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .notice {
+      margin-bottom: 22px;
+      padding: 13px 15px;
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      background: var(--panel);
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .notice.success { border-color: #245c4b; color: var(--green); }
+    .notice.error { border-color: #633b43; color: #ff9ba2; }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card, .panel {
+      min-width: 0;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--panel);
+    }
+
+    .stat-card { padding: 19px; }
+
+    .stat-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .stat-icon {
+      display: grid;
+      place-items: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 11px;
+      background: #253149;
+      font-size: 17px;
+    }
+
+    .stat-icon.gold { color: var(--gold); }
+    .stat-icon.blue { color: var(--blue); }
+    .stat-icon.green { color: var(--green); }
+    .stat-icon.red { color: var(--red); }
+
+    .stat-card h2 {
+      margin-top: 18px;
+      font-size: 27px;
+      overflow-wrap: anywhere;
+    }
+
+    .stat-card p { margin: 7px 0 0; color: var(--muted); font-size: 11px; }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.65fr) minmax(250px, 1fr);
+      gap: 20px;
+      align-items: start;
+    }
+
+    .panel { margin-bottom: 20px; overflow: hidden; }
+
+    .panel-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .panel-heading p { margin: 7px 0 0; color: var(--muted); font-size: 11px; }
+
+    .text-link {
+      color: var(--gold);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .table-wrapper { width: 100%; overflow-x: auto; }
+
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+
+    th, td {
+      padding: 15px 17px;
+      border-bottom: 1px solid #202d43;
+      white-space: nowrap;
+      font-size: 11px;
+    }
+
+    th {
+      background: #131e33;
+      color: #9eacc4;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    td { color: #e1e8f6; }
+    tbody tr:last-child td { border-bottom: 0; }
+
+    .empty-state {
+      padding: 30px 15px;
+      color: var(--muted);
+      text-align: center;
+      white-space: normal;
+      line-height: 1.7;
+    }
+
+    .status {
+      display: inline-block;
+      padding: 6px 9px;
+      border-radius: 20px;
+      background: #29354b;
+      color: #d5deef;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .status.pending { background: #3b3020; color: #f2c36e; }
+    .status.confirmed, .status.delivered { background: #173a31; color: #69e2b6; }
+    .status.processing, .status.shipped { background: #1b304b; color: #85baff; }
+    .status.cancelled { background: #40252d; color: #ff9ba2; }
+
+    .quick-actions { display: grid; gap: 10px; padding: 16px; }
+
+    .quick-action {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #141f34;
+      transition: border-color .2s, transform .2s;
+    }
+
+    .quick-action:hover { border-color: #927544; transform: translateY(-1px); }
+
+    .quick-icon {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      flex-shrink: 0;
+      border-radius: 11px;
+      background: #29334a;
+      color: var(--gold);
+      font-size: 19px;
+    }
+
+    .quick-action strong { display: block; font-size: 12px; }
+    .quick-action small { display: block; margin-top: 5px; color: var(--muted); font-size: 10px; line-height: 1.5; }
+
+    .system-card { padding: 19px; }
+    .system-card h2 { margin-bottom: 15px; }
+    .system-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 11px;
+    }
+    .system-row:last-child { border-bottom: 0; }
+    .system-row span:first-child { color: var(--muted); }
+    .system-row span:last-child { text-align: right; }
+
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding-top: 22px;
+      color: #73819a;
+      font-size: 10px;
+    }
+
+    @media (max-width: 1100px) {
+      .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .dashboard-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 760px) {
+      .admin-layout { display: block; }
+      .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 270px;
+        max-width: 85vw;
+        transform: translateX(-105%);
+        transition: transform .25s ease;
+        box-shadow: 15px 0 45px #0006;
+      }
+      .sidebar.open { transform: translateX(0); }
+      .main-content { padding: 0 15px 22px; }
+      .topbar { min-height: 65px; }
+      .menu-button { display: inline-block; }
+      .breadcrumb { flex: 1; }
+      .secure-label { display: none; }
+      .top-avatar { width: 33px; height: 33px; }
+      .page-heading { padding: 25px 0 20px; }
+      .stats-grid { gap: 10px; }
+      .stat-card { padding: 14px; }
+      .stat-card h2 { font-size: 23px; }
+      .stat-top { font-size: 10px; }
+      .panel-heading { padding: 16px; }
+      th, td { padding: 13px; }
+    }
+
+    @media (max-width: 360px) {
+      .stats-grid { grid-template-columns: 1fr; }
+      .main-content { padding-right: 11px; padding-left: 11px; }
+    }
+  </style>
 </head>
 
 <body>
@@ -21,20 +476,25 @@
     <aside class="sidebar" id="sidebar">
       <a class="brand" href="admin-dashboard.html">
         <span class="brand-mark">SMH</span>
-        <span class="brand-name">SMH Collection<small>ADMINISTRATION</small></span>
+        <span class="brand-name">
+          SMH Collection
+          <small>ADMINISTRATION</small>
+        </span>
       </a>
 
       <div class="sidebar-label">WORKSPACE</div>
+
       <nav class="sidebar-nav" aria-label="Main navigation">
-        <a class="nav-link" href="admin-dashboard.html"><span>▦</span> Overview</a>
+        <a class="nav-link active" href="admin-dashboard.html" aria-current="page"><span>▦</span> Overview</a>
         <a class="nav-link" href="admin-products.html"><span>▣</span> Products</a>
         <a class="nav-link" href="admin-orders.html"><span>▤</span> Orders</a>
         <a class="nav-link" href="admin-customers.html"><span>♙</span> Customers</a>
-        <a class="nav-link active" href="admin-staff.html" aria-current="page"><span>♧</span> Staff &amp; Sellers</a>
+        <a class="nav-link" href="admin-staff.html"><span>♧</span> Staff &amp; Sellers</a>
         <a class="nav-link" href="admin-analytics.html"><span>▥</span> Analytics</a>
       </nav>
 
       <div class="sidebar-label">MANAGEMENT</div>
+
       <nav class="sidebar-nav" aria-label="Management navigation">
         <a class="nav-link" href="admin-inventory.html"><span>▧</span> Inventory</a>
         <a class="nav-link" href="admin-settings.html"><span>⚙</span> Settings</a>
@@ -42,7 +502,7 @@
 
       <div class="sidebar-bottom">
         <div class="admin-mini">
-          <div class="avatar">A</div>
+          <div class="avatar" id="sidebarAvatar">A</div>
           <div class="admin-mini-info">
             <strong id="adminName">Administrator</strong>
             <small id="adminEmail">Checking account...</small>
@@ -56,216 +516,598 @@
       <header class="topbar">
         <button class="menu-button" id="menuBtn" type="button"
           aria-label="Toggle navigation" aria-controls="sidebar" aria-expanded="false">☰</button>
+
         <div class="breadcrumb">
-          <span>SMH Collection</span><span aria-hidden="true">/</span>
-          <strong>Staff &amp; Sellers</strong>
+          <span>SMH Collection</span>
+          <span aria-hidden="true">/</span>
+          <strong>Overview</strong>
         </div>
+
         <div class="topbar-right">
           <span class="secure-label">● Admin workspace</span>
-          <div class="avatar top-avatar">A</div>
+          <div class="avatar top-avatar" id="topAvatar">A</div>
         </div>
       </header>
 
       <section class="page-heading">
         <div>
-          <p class="eyebrow">ACCESS MANAGEMENT</p>
-          <h1>Staff, Sellers &amp; Users</h1>
-          <p class="page-subtitle">Manage accounts, roles and access to your store.</p>
+          <p class="eyebrow">STORE OVERVIEW</p>
+          <h1>Admin Dashboard</h1>
+          <p class="page-subtitle" id="welcomeMessage">Welcome to SMH Collection administration.</p>
         </div>
+        <div class="date-label" id="currentDate">Loading date...</div>
       </section>
 
-      <div class="notice" id="staffNotice" role="status" aria-live="polite">
-        Preparing user management...
+      <div class="notice" id="dashboardNotice" role="status" aria-live="polite">
+        Connecting to your store...
       </div>
 
-      <section class="staff-actions-bar" aria-label="Account actions">
-        <div>
-          <h2>Account Management</h2>
-          <p>Create seller or staff accounts and review existing users.</p>
-        </div>
-        <div class="staff-action-buttons">
-          <button class="staff-button staff-button-gold" id="addSellerBtn" type="button">＋ Add Seller</button>
-          <button class="staff-button staff-button-primary" id="addStaffBtn" type="button">＋ Add Staff</button>
-          <button class="staff-button staff-button-secondary" id="refreshUsersBtn" type="button">↻ Refresh</button>
-        </div>
+      <section class="stats-grid" aria-label="Store statistics">
+        <article class="stat-card">
+          <div class="stat-top">
+            <span>Total Orders</span>
+            <span class="stat-icon gold">▤</span>
+          </div>
+          <h2 id="totalOrders">—</h2>
+          <p>Orders recorded in the store</p>
+        </article>
+
+        <article class="stat-card">
+          <div class="stat-top">
+            <span>Pending Orders</span>
+            <span class="stat-icon red">◷</span>
+          </div>
+          <h2 id="pendingOrders">—</h2>
+          <p>Orders awaiting action</p>
+        </article>
+
+        <article class="stat-card">
+          <div class="stat-top">
+            <span>Total Products</span>
+            <span class="stat-icon blue">▣</span>
+          </div>
+          <h2 id="totalProducts">—</h2>
+          <p>Products registered in the catalogue</p>
+        </article>
+
+        <article class="stat-card">
+          <div class="stat-top">
+            <span>Registered Users</span>
+            <span class="stat-icon green">♙</span>
+          </div>
+          <h2 id="totalUsers">—</h2>
+          <p>Accounts in the profiles table</p>
+        </article>
       </section>
 
-      <section class="stats-grid" aria-label="Account statistics">
-        <article class="stat-card">
-          <div class="stat-top"><span>Total Users</span><span class="stat-icon purple">♙</span></div>
-          <h2 id="totalUsers">—</h2><p>Registered accounts</p>
-        </article>
-        <article class="stat-card">
-          <div class="stat-top"><span>Sellers</span><span class="stat-icon blue">▣</span></div>
-          <h2 id="totalSellers">—</h2><p>Seller accounts</p>
-        </article>
-        <article class="stat-card">
-          <div class="stat-top"><span>Staff</span><span class="stat-icon orange">♧</span></div>
-          <h2 id="totalStaff">—</h2><p>Staff accounts</p>
-        </article>
-        <article class="stat-card">
-          <div class="stat-top"><span>Inactive Accounts</span><span class="stat-icon green">⊘</span></div>
-          <h2 id="inactiveUsers">—</h2><p>Accounts marked inactive</p>
-        </article>
+      <div class="dashboard-grid">
+        <div>
+          <section class="panel">
+            <div class="panel-heading">
+              <div>
+                <h2>Recent Orders</h2>
+                <p>Latest orders recorded by the store.</p>
+              </div>
+              <a class="text-link" href="admin-orders.html">Manage all orders →</a>
+            </div>
+
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col">Order ID</th>
+                    <th scope="col">Customer</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Amount</th>
+                    <th scope="col">Status</th>
+                  </tr>
+                </thead>
+                <tbody id="recentOrdersBody">
+                  <tr>
+                    <td colspan="5" class="empty-state">
+                      Orders will appear here when the database is connected.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-heading">
+              <div>
+                <h2>Store Management</h2>
+                <p>Quick access to essential store operations.</p>
+              </div>
+            </div>
+
+            <div class="quick-actions">
+              <a class="quick-action" href="admin-orders.html">
+                <span class="quick-icon">▤</span>
+                <span>
+                  <strong>Manage Orders</strong>
+                  <small>Review buyers, order items, totals and delivery statuses.</small>
+                </span>
+              </a>
+
+              <a class="quick-action" href="admin-products.html">
+                <span class="quick-icon">▣</span>
+                <span>
+                  <strong>Manage Products</strong>
+                  <small>Review and manage the store product catalogue.</small>
+                </span>
+              </a>
+
+              <a class="quick-action" href="admin-customers.html">
+                <span class="quick-icon">♙</span>
+                <span>
+                  <strong>Customer Directory</strong>
+                  <small>Access customer accounts and relevant account information.</small>
+                </span>
+              </a>
+
+              <a class="quick-action" href="admin-staff.html">
+                <span class="quick-icon">♧</span>
+                <span>
+                  <strong>Staff &amp; Seller Management</strong>
+                  <small>Review roles, seller accounts and account access.</small>
+                </span>
+              </a>
+
+              <a class="quick-action" href="admin-inventory.html">
+                <span class="quick-icon">▧</span>
+                <span>
+                  <strong>Inventory</strong>
+                  <small>Open the inventory management workspace.</small>
+                </span>
+              </a>
+
+              <a class="quick-action" href="admin-analytics.html">
+                <span class="quick-icon">▥</span>
+                <span>
+                  <strong>Analytics &amp; Reports</strong>
+                  <small>Open the store analytics workspace.</small>
+                </span>
+              </a>
+            </div>
+          </section>
+        </div>
+
+        <div>
+          <section class="panel">
+            <div class="panel-heading">
+              <div>
+                <h2>Order Status Overview</h2>
+                <p>Live counts from the orders table.</p>
+              </div>
+            </div>
+
+            <div class="quick-actions">
+              <div class="system-row">
+                <span>Pending</span>
+                <span id="statusPending">—</span>
+              </div>
+              <div class="system-row">
+                <span>Confirmed</span>
+                <span id="statusConfirmed">—</span>
+              </div>
+              <div class="system-row">
+                <span>Processing</span>
+                <span id="statusProcessing">—</span>
+              </div>
+              <div class="system-row">
+                <span>Shipped</span>
+                <span id="statusShipped">—</span>
+              </div>
+              <div class="system-row">
+                <span>Delivered</span>
+                <span id="statusDelivered">—</span>
+              </div>
+              <div class="system-row">
+                <span>Cancelled</span>
+                <span id="statusCancelled">—</span>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-heading">
+              <div>
+          <h2>Store Configuration</h2>
+            <p>Current business settings.</p>
+          </div>
+        </div>
+
+        <div class="system-card">
+          <div class="system-row">
+            <span>Platform</span>
+            <span>SMH Collection</span>
+          </div>
+          <div class="system-row">
+            <span>Payment method</span>
+            <span>Cash on Delivery</span>
+          </div>
+          <div class="system-row">
+            <span>Delivery charge</span>
+            <span>₦0</span>
+          </div>
+          <div class="system-row">
+            <span>Backend</span>
+            <span id="backendStatus">Checking...</span>
+          </div>
+          <div class="system-row">
+            <span>Account role</span>
+            <span id="currentRole">Checking...</span>
+          </div>
+        </div>
       </section>
 
       <section class="panel">
         <div class="panel-heading">
           <div>
-            <h2>Account Directory</h2>
-            <p>Search accounts and review their assigned roles.</p>
+            <h2>Administration</h2>
+            <p>Account and security shortcuts.</p>
           </div>
         </div>
 
-        <div class="staff-toolbar">
-          <div class="staff-field">
-            <label for="userSearch">Search accounts</label>
-            <input type="search" id="userSearch" placeholder="Name or email..." autocomplete="off">
-          </div>
-          <div class="staff-field">
-            <label for="roleFilter">Role</label>
-            <select id="roleFilter">
-              <option value="all">All roles</option>
-              <option value="admin">Admin</option>
-              <option value="staff">Staff</option>
-              <option value="seller">Seller</option>
-              <option value="buyer">Buyer</option>
-            </select>
-          </div>
-          <div class="staff-field">
-            <label for="statusFilter">Account status</label>
-            <select id="statusFilter">
-              <option value="all">All statuses</option>
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">User</th>
-                <th scope="col">Email</th>
-                <th scope="col">Role</th>
-                <th scope="col">Status</th>
-                <th scope="col">Joined</th>
-                <th scope="col">Management</th>
-              </tr>
-            </thead>
-            <tbody id="staffTableBody">
-              <tr><td colspan="6" class="empty-state">Loading registered accounts...</td></tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="staff-table-footer"><span id="userResultsCount">Waiting for account data...</span></div>
-      </section>
-
-      <section class="panel staff-guidance">
-        <div class="panel-heading">
-          <div><h2>Role &amp; Access Guide</h2><p>Assign only the permissions each person needs.</p></div>
-        </div>
         <div class="quick-actions">
-          <div class="quick-action"><span class="quick-icon">♙</span><span><strong>Buyer</strong><small>Browses products and manages personal orders.</small></span></div>
-          <div class="quick-action"><span class="quick-icon">▣</span><span><strong>Seller</strong><small>Manages permitted selling activities.</small></span></div>
-          <div class="quick-action"><span class="quick-icon">♧</span><span><strong>Staff</strong><small>Uses authorized operational tools.</small></span></div>
-          <div class="quick-action"><span class="quick-icon">⚙</span><span><strong>Administrator</strong><small>Manages authorized store operations and access.</small></span></div>
+          <a class="quick-action" href="admin-settings.html">
+            <span class="quick-icon">⚙</span>
+            <span>
+              <strong>Store Settings</strong>
+              <small>Open the administration settings page.</small>
+            </span>
+          </a>
+
+          <button class="quick-action" id="refreshDashboardBtn" type="button"
+            style="width:100%;text-align:left;color:inherit">
+            <span class="quick-icon">↻</span>
+            <span>
+              <strong>Refresh Dashboard</strong>
+              <small>Reload the available store statistics.</small>
+            </span>
+          </button>
         </div>
       </section>
-
-      <footer class="footer">
-        <span>© <span id="currentYear">2026</span> SMH Collection</span>
-        <span>Everything in one place.</span>
-      </footer>
-    </main>
+    </div>
   </div>
 
-  <!-- Account creation dialog -->
-  <dialog class="staff-dialog" id="accountDialog" aria-labelledby="accountDialogTitle">
-    <form id="accountForm">
-      <div class="staff-dialog-heading">
-        <div>
-          <p class="eyebrow">SMH COLLECTION</p>
-          <h2 id="accountDialogTitle">Create Account</h2>
-          <p id="accountDialogDescription">Enter the new account details.</p>
-        </div>
-        <button class="staff-dialog-close" id="closeAccountDialog" type="button" aria-label="Close">×</button>
-      </div>
+  <footer class="footer">
+    <span>© <span id="currentYear">2026</span> SMH Collection</span>
+    <span>Everything in one place.</span>
+  </footer>
+</main>
 
-      <label for="newUserName">Full name</label>
-      <input id="newUserName" name="full_name" type="text" autocomplete="name" required maxlength="120">
+  </div>  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>  <script src="assets/js/supabase.js"></script>  <script>
+    "use strict";
 
-      <label for="newUserEmail">Email address</label>
-      <input id="newUserEmail" name="email" type="email" autocomplete="email" required maxlength="254">
+    const dashboardNotice = document.getElementById("dashboardNotice");
 
-      <label for="newUserRole">Account role</label>
-      <select id="newUserRole" name="role" required>
-        <option value="seller">Seller</option>
-        <option value="staff">Staff</option>
-      </select>
+    const orderStatuses = [
+      "pending",
+      "confirmed",
+      "processing",
+      "shipped",
+      "delivered",
+      "cancelled"
+    ];
 
-      <p class="staff-dialog-note">
-        Account creation will only be submitted when the secure account-management
-        service is configured. The administrator's permanent account must remain protected.
-      </p>
+    function showNotice(message, type = "") {
+      dashboardNotice.textContent = message;
+      dashboardNotice.className = "notice" + (type ? " " + type : "");
+    }
 
-      <div class="staff-dialog-actions">
-        <button class="staff-button staff-button-secondary" id="cancelAccountBtn" type="button">Cancel</button>
-        <button class="staff-button staff-button-primary" id="submitAccountBtn" type="submit">Create Account</button>
-      </div>
-      <p id="accountFormMessage" class="staff-form-message" role="status" aria-live="polite"></p>
-    </form>
-  </dialog>
+    function setText(id, value) {
+      const element = document.getElementById(id);
+      if (element) element.textContent = value;
+    }
 
-  <!-- User management dialog -->
-  <dialog class="staff-dialog" id="manageUserDialog" aria-labelledby="manageUserTitle">
-    <form id="manageUserForm">
-      <div class="staff-dialog-heading">
-        <div>
-          <p class="eyebrow">ACCOUNT CONTROLS</p>
-          <h2 id="manageUserTitle">Manage User</h2>
-          <p id="manageUserSummary">Review account details.</p>
-        </div>
-        <button class="staff-dialog-close" id="closeManageDialog" type="button" aria-label="Close">×</button>
-      </div>
+    function escapeHTML(value) {
+      return String(value ?? "").replace(/[&<>"']/g, character => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      })[character]);
+    }
 
-      <input id="manageUserId" type="hidden">
+    function formatMoney(value) {
+      const amount = Number(value);
+      if (!Number.isFinite(amount)) return "—";
 
-      <label for="manageUserRole">Assigned role</label>
-      <select id="manageUserRole" name="role">
-        <option value="buyer">Buyer</option>
-        <option value="seller">Seller</option>
-        <option value="staff">Staff</option>
-      </select>
+      return new Intl.NumberFormat("en-NG", {
+        style: "currency",
+        currency: "NGN",
+        maximumFractionDigits: 2
+      }).format(amount);
+    }
 
-      <label for="manageUserStatus">Account access</label>
-      <select id="manageUserStatus" name="is_active">
-        <option value="true">Active — allow access</option>
-        <option value="false">Inactive — block access</option>
-      </select>
+    function formatDate(value) {
+      if (!value) return "—";
 
-      <p id="protectedAdminMessage" class="staff-protected-message" hidden>
-        <strong>Permanent administrator protected.</strong>
-        This account cannot be demoted or blocked.
-      </p>
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return "—";
 
-      <p class="staff-dialog-note">
-        These controls require server-side authorization. If the secure service
-        is not configured, changes must be rejected rather than applied directly
-        from the browser.
-      </p>
+      return new Intl.DateTimeFormat("en-NG", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric"
+      }).format(date);
+    }
 
-      <div class="staff-dialog-actions">
-        <button class="staff-button staff-button-secondary" id="cancelManageBtn" type="button">Close</button>
-        <button class="staff-button staff-button-primary" id="saveUserChangesBtn" type="submit">Save Changes</button>
-      </div>
-      <p id="manageFormMessage" class="staff-form-message" role="status" aria-live="polite"></p>
-    </form>
-  </dialog>
+    function setAvatar(name) {
+      const initial = String(name || "A").trim().charAt(0).toUpperCase() || "A";
+      setText("sidebarAvatar", initial);
+      setText("topAvatar", initial);
+    }
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="assets/js/supabase.js"></script>
-  <script src="assets/js/admin-staff.js"></script>
-</body>
+    function setStatusCount(status, count) {
+      const element = document.getElementById(
+        "status" + status.charAt(0).toUpperCase() + status.slice(1)
+      );
+      if (element) element.textContent = String(count);
+    }
+
+    async function getCount(table, filters = []) {
+      let query = supabaseClient
+        .from(table)
+        .select("*", { count: "exact", head: true });
+
+      for (const filter of filters) {
+        query = query.eq(filter.column, filter.value);
+      }
+
+      const { count, error } = await query;
+      if (error) throw error;
+
+      return count ?? 0;
+    }
+
+    async function loadDashboard() {
+      showNotice("Connecting to your store and loading account information...");
+
+      try {
+        if (typeof supabaseClient === "undefined") {
+          throw new Error("Supabase client is not available. Check assets/js/supabase.js.");
+        }
+
+        const { data: sessionData, error: sessionError } =
+          await supabaseClient.auth.getSession();
+
+        if (sessionError) throw sessionError;
+
+        const session = sessionData?.session;
+
+        if (!session?.user) {
+          window.location.replace("login.html");
+          return;
+        }
+
+        const user = session.user;
+
+        const { data: profile, error: profileError } = await supabaseClient
+          .from("profiles")
+          .select("id, full_name, email, role, is_active")
+          .eq("id", user.id)
+          .maybeSingle();
+
+        if (profileError) throw profileError;
+
+        if (!profile || profile.role !== "admin" || profile.is_active === false) {
+          showNotice("Access denied. An active administrator account is required.", "error");
+          await supabaseClient.auth.signOut();
+          window.location.replace("login.html");
+          return;
+        }
+
+        const name = profile.full_name || user.email || "Administrator";
+
+        setText("adminName", name);
+        setText("adminEmail", profile.email || user.email || "");
+        setText("welcomeMessage", "Welcome back, " + name + ". Here is your store overview.");
+        setText("currentRole", "Administrator");
+        setAvatar(name);
+
+        setText("currentDate", new Intl.DateTimeFormat("en-NG", {
+          weekday: "long",
+          day: "numeric",
+          month: "long",
+          year: "numeric"
+        }).format(new Date()));
+
+        setText("currentYear", new Date().getFullYear());
+
+        await loadStoreStatistics();
+        showNotice("Your administrator account is verified. Dashboard data has been refreshed.", "success");
+      } catch (error) {
+        console.error("Admin dashboard error:", error);
+
+        setText("backendStatus", "Connection issue");
+
+        showNotice(
+          "The dashboard could not load all data. Check your internet connection, Supabase configuration, table permissions, and browser console. Details: " +
+          (error.message || "Unknown error"),
+          "error"
+        );
+      }
+    }
+
+    async function loadStoreStatistics() {
+      setText("backendStatus", "Connected");
+
+      const countTasks = [
+        ["totalProducts", "products"],
+        ["totalUsers", "profiles"],
+        ["totalOrders", "orders"]
+      ];
+
+      const results = await Promise.allSettled(
+        countTasks.map(async ([elementId, table]) => ({
+          elementId,
+          count: await getCount(table)
+        }))
+      );
+
+      results.forEach((result, index) => {
+        if (result.status === "fulfilled") {
+          setText(result.value.elementId, result.value.count);
+        } else {
+          setText(countTasks[index][0], "—");
+          console.warn(
+            "Could not count " + countTasks[index][1] + ":",
+            result.reason
+          );
+        }
+      });
+
+      const statusResults = await Promise.allSettled(
+        orderStatuses.map(async status => ({
+          status,
+          count: await getCount("orders", [
+            { column: "status", value: status }
+          ])
+        }))
+      );
+
+      let pendingCount = 0;
+
+      statusResults.forEach(result => {
+        if (result.status === "fulfilled") {
+          setStatusCount(result.value.status, result.value.count);
+
+          if (result.value.status === "pending") {
+            pendingCount = result.value.count;
+          }
+        } else {
+          console.warn("Could not load order status count:", result.reason);
+        }
+      });
+
+      setText("pendingOrders", pendingCount);
+
+      await loadRecentOrders();
+    }
+
+    async function loadRecentOrders() {
+      const body = document.getElementById("recentOrdersBody");
+
+      try {
+        const { data: orders, error } = await supabaseClient
+          .from("orders")
+          .select("id, buyer_id, created_at, total_amount, status")
+          .order("created_at", { ascending: false })
+          .limit(5);
+
+        if (error) throw error;
+
+        if (!orders || orders.length === 0) {
+          body.innerHTML =
+            '<tr><td colspan="5" class="empty-state">' +
+            'No orders have been recorded yet. Real orders will appear here when buyers place them.' +
+            '</td></tr>';
+          return;
+        }
+
+        const buyerIds = [...new Set(
+          orders.map(order => order.buyer_id).filter(Boolean)
+        )];
+
+        let profilesById = {};
+
+        if (buyerIds.length) {
+          const { data: profiles, error: buyersError } = await supabaseClient
+            .from("profiles")
+            .select("id, full_name, email")
+            .in("id", buyerIds);
+
+          if (!buyersError && profiles) {
+            profilesById = Object.fromEntries(
+              profiles.map(profile => [profile.id, profile])
+            );
+          }
+        }
+
+        body.innerHTML = orders.map(order => {
+          const buyer = profilesById[order.buyer_id];
+          const customer = buyer?.full_name || buyer?.email || "Customer";
+          const status = String(order.status || "pending").toLowerCase();
+          const safeStatus = orderStatuses.includes(status) ? status : "pending";
+
+          return `
+            <tr>
+              <td>${escapeHTML(order.id)}</td>
+              <td>${escapeHTML(customer)}</td>
+              <td>${escapeHTML(formatDate(order.created_at))}</td>
+              <td>${escapeHTML(formatMoney(order.total_amount))}</td>
+              <td><span class="status ${safeStatus}">${escapeHTML(
+                safeStatus.charAt(0).toUpperCase() + safeStatus.slice(1)
+              )}</span></td>
+            </tr>
+          `;
+        }).join("");
+      } catch (error) {
+        console.warn("Recent orders could not be loaded:", error);
+
+        body.innerHTML =
+          '<tr><td colspan="5" class="empty-state">' +
+          'The order preview is unavailable. Confirm your actual orders table columns and Row Level Security policies.' +
+          '</td></tr>';
+      }
+    }
+
+    document.getElementById("refreshDashboardBtn").addEventListener("click", async () => {
+      const button = document.getElementById("refreshDashboardBtn");
+      button.disabled = true;
+
+      try {
+        await loadDashboard();
+      } finally {
+        button.disabled = false;
+      }
+    });
+
+    document.getElementById("logoutBtn").addEventListener("click", async () => {
+      const button = document.getElementById("logoutBtn");
+      button.disabled = true;
+      button.textContent = "Signing out...";
+
+      try {
+        const { error } = await supabaseClient.auth.signOut();
+        if (error) throw error;
+
+        window.location.replace("login.html");
+      } catch (error) {
+        console.error("Sign-out error:", error);
+        showNotice("Sign-out failed. Please check your connection and try again.", "error");
+        button.disabled = false;
+        button.textContent = "↪ Sign out";
+      }
+    });
+
+    const sidebar = document.getElementById("sidebar");
+    const menuButton = document.getElementById("menuBtn");
+
+    menuButton.addEventListener("click", () => {
+      const isOpen = sidebar.classList.toggle("open");
+      menuButton.setAttribute("aria-expanded", String(isOpen));
+    });
+
+    document.addEventListener("click", event => {
+      if (
+        window.innerWidth <= 760 &&
+        sidebar.classList.contains("open") &&
+        !sidebar.contains(event.target) &&
+        !menuButton.contains(event.target)
+      ) {
+        sidebar.classList.remove("open");
+        menuButton.setAttribute("aria-expanded", "false");
+      }
+    });
+
+    setText("currentYear", new Date().getFullYear());
+    loadDashboard();
+  </script></body>
 </html>
+```
+           
