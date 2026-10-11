@@ -56,6 +56,8 @@
 
   function showMessage(message, type = "") {
     const box = $("pageMessage");
+    if (!box) return;
+
     box.textContent = message;
     box.className = `message ${type}`.trim();
   }
@@ -74,7 +76,9 @@
   }
 
   function statusBadge(status) {
-    const safeStatus = STATUSES.includes(String(status).toLowerCase())
+    const safeStatus = STATUSES.includes(
+      String(status).toLowerCase()
+    )
       ? String(status).toLowerCase()
       : "pending";
 
@@ -104,6 +108,7 @@
 
     return state.orders.filter(order => {
       const buyer = getBuyer(order);
+
       const searchable = [
         order.order_number,
         order.id,
@@ -113,16 +118,16 @@
         buyer.email
       ].join(" ").toLowerCase();
 
-      const matchesSearch = !term || searchable.includes(term);
-      const matchesStatus =
-        !selectedStatus || order.status === selectedStatus;
-
-      return matchesSearch && matchesStatus;
+      return (
+        (!term || searchable.includes(term)) &&
+        (!selectedStatus || order.status === selectedStatus)
+      );
     });
   }
 
   function renderOrders() {
     const orders = filteredOrders();
+
     $("resultCount").textContent =
       `${orders.length} order${orders.length === 1 ? "" : "s"}`;
 
@@ -138,7 +143,8 @@
 
     $("ordersContainer").innerHTML = orders.map(order => {
       const itemCount = (state.items[order.id] || []).reduce(
-        (sum, item) => sum + (Number(item.quantity) || 0), 0
+        (sum, item) => sum + (Number(item.quantity) || 0),
+        0
       );
 
       return `
@@ -148,7 +154,9 @@
               <div class="order-number">
                 ${escapeHTML(order.order_number || order.id)}
               </div>
-              <div class="order-date">${escapeHTML(dateTime(order.created_at))}</div>
+              <div class="order-date">
+                ${escapeHTML(dateTime(order.created_at))}
+              </div>
             </div>
             ${statusBadge(order.status)}
           </div>
@@ -156,34 +164,57 @@
           <div class="order-card-middle">
             <div>
               <span class="detail-label">Customer</span>
-              <span class="detail-value">${escapeHTML(getBuyerName(order))}</span>
+              <span class="detail-value">
+                ${escapeHTML(getBuyerName(order))}
+              </span>
             </div>
+
             <div>
               <span class="detail-label">Phone</span>
-              <span class="detail-value">${escapeHTML(order.shipping_phone || "Not available")}</span>
+              <span class="detail-value">
+                ${escapeHTML(order.shipping_phone || "Not available")}
+              </span>
             </div>
+
             <div>
               <span class="detail-label">Items</span>
               <span class="detail-value">${itemCount}</span>
             </div>
+
             <div>
               <span class="detail-label">Payment</span>
-              <span class="detail-value">${escapeHTML(titleCase(order.payment_method || "Cash on Delivery"))}</span>
+              <span class="detail-value">
+                ${escapeHTML(titleCase(
+                  order.payment_method || "Cash on Delivery"
+                ))}
+              </span>
             </div>
+
             <div>
               <span class="detail-label">Payment status</span>
-              <span class="detail-value">${escapeHTML(titleCase(order.payment_status || "pending"))}</span>
+              <span class="detail-value">
+                ${escapeHTML(titleCase(order.payment_status || "pending"))}
+              </span>
             </div>
+
             <div>
               <span class="detail-label">Order total</span>
-              <span class="detail-value order-total">${escapeHTML(money(order.total_amount))}</span>
+              <span class="detail-value order-total">
+                ${escapeHTML(money(order.total_amount))}
+              </span>
             </div>
           </div>
 
           <div class="order-card-bottom">
-            <span class="detail-label">Order ID: ${escapeHTML(order.id)}</span>
-            <button class="button primary" type="button"
-              data-view-order="${escapeHTML(order.id)}">
+            <span class="detail-label">
+              Order ID: ${escapeHTML(order.id)}
+            </span>
+
+            <button
+              class="button primary"
+              type="button"
+              data-view-order="${escapeHTML(order.id)}"
+            >
               View details →
             </button>
           </div>
@@ -191,47 +222,61 @@
     }).join("");
   }
 
+  async function verifyAdmin() {
+    if (
+      typeof supabaseClient === "undefined" ||
+      !supabaseClient
+    ) {
+      throw new Error(
+        "Supabase connection not found. Check assets/js/supabase.js."
+      );
+    }
+
+    const { data: sessionData, error: sessionError } =
+      await supabaseClient.auth.getSession();
+
+    if (sessionError) throw sessionError;
+
+    const user = sessionData?.session?.user;
+
+    if (!user) {
+      window.location.href = "login.html";
+      return null;
+    }
+
+    const { data: profile, error: profileError } =
+      await supabaseClient
+        .from("profiles")
+        .select("id, role, is_active")
+        .eq("id", user.id)
+        .maybeSingle();
+
+    if (profileError) throw profileError;
+
+    if (
+      !profile ||
+      profile.role !== "admin" ||
+      profile.is_active !== true
+    ) {
+      throw new Error(
+        "Access denied. Only active administrators can manage orders."
+      );
+    }
+
+    return user;
+  }
+
   async function loadOrders() {
     if (state.busy) return;
+
     state.busy = true;
     $("refreshButton").disabled = true;
+
     showMessage("Loading orders from Supabase...");
 
     try {
-      if (typeof supabaseClient === "undefined" || !supabaseClient) {
-        throw new Error(
-          "Supabase connection not found. Check assets/js/supabase.js."
-        );
-      }
-
-      const { data: sessionData, error: sessionError } =
-        await supabaseClient.auth.getSession();
-
-      if (sessionError) throw sessionError;
-
-      const user = sessionData?.session?.user;
-
-      if (!user) {
-        window.location.href = "login.html";
-        return;
-      }
-
-      const { data: profile, error: profileError } =
-        await supabaseClient
-          .from("profiles")
-          .select("id, role, is_active")
-          .eq("id", user.id)
-          .maybeSingle();
-
-      if (profileError) throw profileError;
-
-      if (!profile || profile.role !== "admin" || profile.is_active !== true) {
-        showMessage(
-          "Access denied. This page is available only to active administrators.",
-          "error"
-        );
-        return;
-      }
+      const user = await verifyAdmin();
+      if (!user) return;
 
       const { data: orders, error: ordersError } =
         await supabaseClient
@@ -285,6 +330,7 @@
           if (!state.items[item.order_id]) {
             state.items[item.order_id] = [];
           }
+
           state.items[item.order_id].push(item);
         });
 
@@ -316,9 +362,9 @@
       );
     } catch (error) {
       console.error("Admin orders error:", error);
+
       showMessage(
-        error.message ||
-        "Unable to load orders. Check your Supabase permissions.",
+        error.message || "Unable to load orders. Check your permissions.",
         "error"
       );
     } finally {
@@ -331,11 +377,15 @@
     return `
       <div class="info-item">
         <span class="detail-label">${escapeHTML(label)}</span>
-        <span class="detail-value">${escapeHTML(value || "Not available")}</span>
+        <span class="detail-value">
+          ${escapeHTML(value || "Not available")}
+        </span>
       </div>`;
   }
 
   function renderOrderDetails(order) {
+    state.selectedOrder = order;
+
     const items = state.items[order.id] || [];
     const buyer = getBuyer(order);
     const dialog = $("orderDialog");
@@ -350,25 +400,44 @@
           return `
             <div class="item-row">
               <div>
-                <p><strong>${escapeHTML(item.product_name || "Product")}</strong></p>
+                <p>
+                  <strong>${escapeHTML(item.product_name || "Product")}</strong>
+                </p>
                 <small>
                   Quantity: ${Number(item.quantity) || 0}
                   · Unit price: ${escapeHTML(money(item.product_price))}
                 </small>
                 <br>
-                <small>Seller: ${escapeHTML(seller.full_name || "Seller")}</small>
+                <small>
+                  Seller: ${escapeHTML(seller.full_name || "Seller")}
+                </small>
               </div>
               <strong>${escapeHTML(money(item.item_total))}</strong>
             </div>`;
         }).join("")
       : `<p class="subtitle">No order items were found for this order.</p>`;
 
+    const paymentStatus = String(
+      order.payment_status || "pending"
+    ).trim().toLowerCase();
+
+    const paymentButtonHTML = paymentStatus === "paid"
+      ? `<p class="subtitle">✓ Payment has been marked as paid.</p>`
+      : `
+        <button
+          id="markAsPaidButton"
+          class="button primary"
+          type="button"
+        >
+          Mark as Paid
+        </button>`;
+
     $("orderDetails").innerHTML = `
       <section class="detail-section">
         <h3>Customer information</h3>
         <div class="info-grid">
           ${infoItem("Customer name", order.shipping_name || buyer.full_name)}
-          ${infoItem("Email", buyer.email)}
+          ${infoItem("Email", getBuyerEmail(order))}
           ${infoItem("Phone number", order.shipping_phone)}
           ${infoItem("Order date", dateTime(order.created_at))}
         </div>
@@ -382,7 +451,9 @@
           ${infoItem("State", order.shipping_state)}
           ${infoItem("Country", order.shipping_country)}
         </div>
-        ${order.notes ? `<p><span class="detail-label">Customer notes</span>${escapeHTML(order.notes)}</p>` : ""}
+        ${order.notes
+          ? `<p><span class="detail-label">Customer notes</span> ${escapeHTML(order.notes)}</p>`
+          : ""}
       </section>
 
       <section class="detail-section">
@@ -390,13 +461,16 @@
         ${itemHTML}
         <div class="totals">
           <div class="total-line">
-            <span>Subtotal</span><strong>${escapeHTML(money(order.subtotal))}</strong>
+            <span>Subtotal</span>
+            <strong>${escapeHTML(money(order.subtotal))}</strong>
           </div>
           <div class="total-line">
-            <span>Delivery fee</span><strong>${escapeHTML(money(order.delivery_fee))}</strong>
+            <span>Delivery fee</span>
+            <strong>${escapeHTML(money(order.delivery_fee))}</strong>
           </div>
           <div class="total-line final">
-            <span>Total</span><strong>${escapeHTML(money(order.total_amount))}</strong>
+            <span>Total</span>
+            <strong>${escapeHTML(money(order.total_amount))}</strong>
           </div>
         </div>
       </section>
@@ -404,8 +478,16 @@
       <section class="detail-section">
         <h3>Payment information</h3>
         <div class="info-grid">
-          ${infoItem("Payment method", titleCase(order.payment_method || "Cash on Delivery"))}
-          ${infoItem("Payment status", titleCase(order.payment_status || "pending"))}
+          ${infoItem(
+            "Payment method",
+            titleCase(order.payment_method || "Cash on Delivery")
+          )}
+          ${infoItem("Payment status", titleCase(paymentStatus))}
+        </div>
+
+        <div class="status-editor" style="margin-top:16px;">
+          ${paymentButtonHTML}
+          <p id="paymentSaveMessage" class="subtitle" role="status"></p>
         </div>
       </section>
 
@@ -415,20 +497,37 @@
           <label for="newOrderStatus">Choose the new status</label>
           <select id="newOrderStatus">
             ${STATUSES.map(status => `
-              <option value="${status}" ${order.status === status ? "selected" : ""}>
+              <option
+                value="${status}"
+                ${order.status === status ? "selected" : ""}
+              >
                 ${titleCase(status)}
               </option>`).join("")}
           </select>
-          <button id="saveOrderStatus" class="button primary" type="button">
+
+          <button
+            id="saveOrderStatus"
+            class="button primary"
+            type="button"
+          >
             Save status
           </button>
+
           <p id="statusSaveMessage" class="subtitle" role="status"></p>
         </div>
       </section>`;
 
-    $("saveOrderStatus").addEventListener("click", () =>
-      saveOrderStatus(order)
-    );
+    $("saveOrderStatus").addEventListener("click", () => {
+      saveOrderStatus(order);
+    });
+
+    const markPaidButton = $("markAsPaidButton");
+
+    if (markPaidButton) {
+      markPaidButton.addEventListener("click", () => {
+        markOrderAsPaid(order);
+      });
+    }
 
     if (!dialog.open) dialog.showModal();
   }
@@ -452,25 +551,7 @@
     button.textContent = "Saving...";
 
     try {
-      const { data: sessionData } =
-        await supabaseClient.auth.getSession();
-
-      const user = sessionData?.session?.user;
-
-      if (!user) throw new Error("Your session has expired. Please log in again.");
-
-      const { data: profile, error: profileError } =
-        await supabaseClient
-          .from("profiles")
-          .select("role, is_active")
-          .eq("id", user.id)
-          .maybeSingle();
-
-      if (profileError) throw profileError;
-
-      if (profile?.role !== "admin" || profile?.is_active !== true) {
-        throw new Error("Only active administrators can update order status.");
-      }
+      await verifyAdmin();
 
       const { data, error } = await supabaseClient
         .from("orders")
@@ -494,7 +575,12 @@
         status: String(data.status || nextStatus).toLowerCase()
       });
 
-      message.textContent = "Status saved successfully.";
+      const index = state.orders.findIndex(item => item.id === order.id);
+
+      if (index !== -1) {
+        state.orders[index] = { ...state.orders[index], ...order };
+      }
+
       showMessage(
         `Order ${order.order_number || order.id} updated to ${titleCase(nextStatus)}.`,
         "success"
@@ -502,16 +588,113 @@
 
       renderStats();
       renderOrders();
+      renderOrderDetails(order);
 
-      window.setTimeout(() => {
-        if ($("orderDialog").open) $("orderDialog").close();
-      }, 700);
+      const messageAfterRender = $("statusSaveMessage");
+      if (messageAfterRender) {
+        messageAfterRender.textContent = "Status saved successfully.";
+      }
     } catch (error) {
       console.error("Order status update error:", error);
-      message.textContent = error.message || "Could not save the status.";
+
+      message.textContent =
+        error.message || "Could not save the status.";
     } finally {
-      button.disabled = false;
-      button.textContent = "Save status";
+      const currentButton = $("saveOrderStatus");
+
+      if (currentButton) {
+        currentButton.disabled = false;
+        currentButton.textContent = "Save status";
+      }
+    }
+  }
+
+  async function markOrderAsPaid(order) {
+    const button = $("markAsPaidButton");
+    const message = $("paymentSaveMessage");
+
+    if (!button || !message) return;
+
+    if (
+      String(order.payment_status || "").trim().toLowerCase() === "paid"
+    ) {
+      message.textContent = "This order is already marked as paid.";
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Confirm that payment has actually been received for order ${
+        order.order_number || order.id
+      }? Only continue if the customer has paid.`
+    );
+
+    if (!confirmed) return;
+
+    button.disabled = true;
+    button.textContent = "Updating...";
+    message.textContent = "Verifying administrator access...";
+
+    try {
+      await verifyAdmin();
+
+      const { data, error } = await supabaseClient
+        .from("orders")
+        .update({
+          payment_status: "paid",
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", order.id)
+        .select("*")
+        .maybeSingle();
+
+      if (error) throw error;
+
+      if (!data) {
+        throw new Error(
+          "Payment status was not updated. Check the orders table UPDATE policy."
+        );
+      }
+
+      Object.assign(order, data);
+
+      const index = state.orders.findIndex(item => item.id === order.id);
+
+      if (index !== -1) {
+        state.orders[index] = {
+          ...state.orders[index],
+          ...data
+        };
+      }
+
+      renderOrders();
+      renderOrderDetails(order);
+
+      showMessage(
+        `Payment recorded for order ${order.order_number || order.id}.`,
+        "success"
+      );
+
+      const updatedMessage = $("paymentSaveMessage");
+
+      if (updatedMessage) {
+        updatedMessage.textContent = "Payment marked as paid successfully.";
+      }
+    } catch (error) {
+      console.error("Payment status update error:", error);
+
+      const currentMessage = $("paymentSaveMessage");
+
+      if (currentMessage) {
+        currentMessage.textContent =
+          error.message || "Unable to update payment status.";
+      }
+
+      const currentButton = $("markAsPaidButton");
+
+      if (currentButton) {
+        currentButton.disabled = false;
+        currentButton.textContent = "Mark as Paid";
+      }
     }
   }
 
@@ -520,7 +703,7 @@
     if (!button) return;
 
     const order = state.orders.find(
-      item => item.id === button.dataset.viewOrder
+      item => String(item.id) === button.dataset.viewOrder
     );
 
     if (order) renderOrderDetails(order);
@@ -536,6 +719,7 @@
   });
 
   $("refreshButton").addEventListener("click", loadOrders);
+
   $("closeDialog").addEventListener("click", () => {
     $("orderDialog").close();
   });
