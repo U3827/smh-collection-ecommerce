@@ -18,7 +18,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const manageDialog = $("manageUserDialog");
   const accountForm = $("accountForm");
   const manageForm = $("manageUserForm");
-
   const notice = $("staffNotice");
   const tableBody = $("staffTableBody");
 
@@ -65,9 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const date = new Date(value);
 
-    if (Number.isNaN(date.getTime())) {
-      return "—";
-    }
+    if (Number.isNaN(date.getTime())) return "—";
 
     return date.toLocaleDateString("en-NG", {
       day: "numeric",
@@ -77,7 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function normalizedRole(user) {
-    return String(user.role || "buyer").toLowerCase();
+    return String(user?.role || "buyer").toLowerCase();
   }
 
   function roleLabel(role) {
@@ -92,7 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function isActive(user) {
-    return user.is_active !== false;
+    return user?.is_active !== false;
   }
 
   function openDialog(dialog) {
@@ -116,12 +113,16 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!button) return;
 
     if (loading) {
-      button.dataset.originalText = button.textContent;
+      if (!button.disabled) {
+        button.dataset.originalText = button.textContent;
+      }
+
       button.textContent = loadingText;
       button.disabled = true;
     } else {
       button.textContent =
         button.dataset.originalText || button.textContent;
+
       button.disabled = false;
       delete button.dataset.originalText;
     }
@@ -194,18 +195,17 @@ document.addEventListener("DOMContentLoaded", () => {
       const active = isActive(user);
       const name = user.full_name || "Unnamed user";
       const email = user.email || "Email unavailable";
-
-      // Conservatively protect administrator accounts in the UI.
-      // Permanent-admin protection must also be enforced server-side.
       const protectedAdmin = role === "admin";
 
       return `
         <tr>
           <td>
             <strong>${escapeHTML(name)}</strong>
-            ${user.id === currentAdmin?.id
-              ? '<br><small>Current account</small>'
-              : ""}
+            ${
+              user.id === currentAdmin?.id
+                ? "<br><small>Current account</small>"
+                : ""
+            }
           </td>
 
           <td>${escapeHTML(email)}</td>
@@ -217,7 +217,9 @@ document.addEventListener("DOMContentLoaded", () => {
           </td>
 
           <td>
-            <span class="account-status ${active ? "is-active" : "is-inactive"}">
+            <span class="account-status ${
+              active ? "is-active" : "is-inactive"
+            }">
               ${active ? "Active" : "Inactive"}
             </span>
           </td>
@@ -262,7 +264,7 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error("Failed to load profiles:", error);
 
       showNotice(
-        "Could not load accounts. Check the profiles table and its Row Level Security policies.",
+        `Could not load accounts: ${error.message}`,
         "error"
       );
 
@@ -276,7 +278,7 @@ document.addEventListener("DOMContentLoaded", () => {
         `;
       }
 
-      return;
+      return false;
     }
 
     allUsers = data || [];
@@ -288,6 +290,8 @@ document.addEventListener("DOMContentLoaded", () => {
       `Account directory loaded: ${allUsers.length} account(s).`,
       "success"
     );
+
+    return true;
   }
 
   async function verifyAdministrator() {
@@ -307,7 +311,10 @@ document.addEventListener("DOMContentLoaded", () => {
       .maybeSingle();
 
     if (profileError || !profile) {
-      console.error("Administrator profile verification failed:", profileError);
+      console.error(
+        "Administrator profile verification failed:",
+        profileError
+      );
 
       showNotice(
         "Your account profile could not be verified. Contact the store administrator.",
@@ -326,7 +333,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (String(profile.role || "").toLowerCase() !== "admin") {
       const destinations = {
         buyer: "buyer-dashboard.html",
-        seller: "seller-dashboard.html"
+        seller: "seller-dashboard.html",
+        staff: "staff-dashboard.html"
       };
 
       window.location.replace(destinations[profile.role] || "login.html");
@@ -394,12 +402,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const user = allUsers.find((item) => item.id === userId);
 
     if (!user) {
-      showNotice("That account could not be found. Refresh and try again.", "error");
+      showNotice(
+        "That account could not be found. Refresh and try again.",
+        "error"
+      );
       return;
     }
 
-    // Never allow an administrator account to be edited from this UI.
-    // A server-side permanent-admin rule is still required.
     if (normalizedRole(user) === "admin") {
       showNotice(
         "Administrator accounts are protected from changes in this interface.",
@@ -415,10 +424,7 @@ document.addEventListener("DOMContentLoaded", () => {
       `Manage ${user.full_name || "User"}`
     );
 
-    setText(
-      "manageUserSummary",
-      user.email || "Email unavailable"
-    );
+    setText("manageUserSummary", user.email || "Email unavailable");
 
     $("manageUserId").value = user.id;
     $("manageUserRole").value = normalizedRole(user);
@@ -441,14 +447,47 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
     if (error) {
+      let serverMessage = "";
+
+      try {
+        const response = error.context;
+
+        if (response && typeof response.clone === "function") {
+          const responseCopy = response.clone();
+          const contentType =
+            responseCopy.headers.get("content-type") || "";
+
+          if (contentType.includes("application/json")) {
+            const body = await responseCopy.json();
+            serverMessage = body?.error || body?.message || "";
+          } else {
+            serverMessage = await responseCopy.text();
+          }
+        }
+      } catch (readError) {
+        console.warn(
+          "Could not read the server error response:",
+          readError
+        );
+      }
+
       console.error(`${functionName} failed:`, error);
+
       throw new Error(
-        "The secure account-management service is not available or rejected this request. No changes were confirmed."
+        serverMessage ||
+        error.message ||
+        "The secure service rejected the request. Check the Supabase function logs."
       );
     }
 
     if (data?.error) {
       throw new Error(data.error);
+    }
+
+    if (data?.success === false) {
+      throw new Error(
+        data.message || "The operation was not successful."
+      );
     }
 
     return data;
@@ -458,43 +497,57 @@ document.addEventListener("DOMContentLoaded", () => {
     event.preventDefault();
 
     const submitButton = $("submitAccountBtn");
-
     const fullName = $("newUserName").value.trim();
     const email = $("newUserEmail").value.trim().toLowerCase();
     const role = $("newUserRole").value;
 
-    if (!fullName || !email || !["seller", "staff"].includes(role)) {
+    if (
+      fullName.length < 2 ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
+      !["seller", "staff"].includes(role)
+    ) {
       setFormMessage(
         "accountFormMessage",
-        "Please enter a name, valid email and permitted role.",
+        "Enter a valid full name, email address and seller or staff role.",
         "error"
       );
       return;
     }
 
     setButtonLoading(submitButton, true, "Creating account...");
-    setFormMessage("accountFormMessage", "Contacting secure account service...");
+    setFormMessage(
+      "accountFormMessage",
+      "Contacting the secure account service..."
+    );
 
     try {
-      await invokeSecureFunction("admin-create-user", {
+      const result = await invokeSecureFunction("admin-create-user", {
         full_name: fullName,
         email,
         role
       });
 
+      if (result?.success !== true) {
+        throw new Error(
+          result?.message ||
+          "The server did not confirm that the account was created."
+        );
+      }
+
       setFormMessage(
         "accountFormMessage",
-        "The account service accepted the request.",
+        result.message || "The account request was successful.",
         "success"
       );
 
       showNotice(
-        "Account creation request completed. Refreshing the directory...",
+        result.message || "Account created successfully.",
         "success"
       );
 
       accountForm.reset();
       closeDialog(accountDialog);
+
       await loadUsers();
     } catch (error) {
       console.error("Account creation error:", error);
@@ -532,7 +585,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (!["true", "false"].includes(newActiveValue)) {
-      setFormMessage("manageFormMessage", "Invalid account status.", "error");
+      setFormMessage(
+        "manageFormMessage",
+        "Invalid account status.",
+        "error"
+      );
       return;
     }
 
@@ -545,20 +602,27 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
     try {
-      await invokeSecureFunction("admin-manage-user", {
+      const result = await invokeSecureFunction("admin-manage-user", {
         action: "update_user",
         user_id: selectedUser.id,
         role: newRole,
         is_active: newActiveValue === "true"
       });
 
-      showNotice(
-        "The secure service accepted the account update. Refreshing the directory...",
-        "success"
-      );
+      if (result?.success !== true) {
+        throw new Error(
+          result?.message ||
+          "The server did not confirm the account update."
+        );
+      }
 
       closeDialog(manageDialog);
       selectedUser = null;
+
+      showNotice(
+        result.message || "Account updated successfully.",
+        "success"
+      );
 
       await loadUsers();
     } catch (error) {
@@ -625,6 +689,7 @@ document.addEventListener("DOMContentLoaded", () => {
         window.location.replace("login.html");
       } catch (error) {
         console.error("Sign out failed:", error);
+
         showNotice("Could not sign out. Please try again.", "error");
 
         if (button) button.disabled = false;
@@ -657,7 +722,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
       await loadUsers();
     } catch (error) {
-      console.error("Staff management initialization failed:", error);
+      console.error(
+        "Staff management initialization failed:",
+        error
+      );
 
       showNotice(
         "An unexpected error occurred while opening staff management.",
