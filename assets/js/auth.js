@@ -2,6 +2,7 @@
 /* =========================================
    SMH COLLECTION
    AUTHENTICATION + ROLE ROUTING
+   PASSWORD RECOVERY
    GitHub Pages + Supabase
    ========================================= */
 
@@ -9,12 +10,11 @@ document.addEventListener("DOMContentLoaded", () => {
   console.log("SMH Collection Auth loaded.");
 
   const currentYear = document.getElementById("currentYear");
+  const messageBox = document.getElementById("authMessage");
 
   if (currentYear) {
     currentYear.textContent = new Date().getFullYear();
   }
-
-  const messageBox = document.getElementById("authMessage");
 
   function showMessage(message, type = "error") {
     if (!messageBox) {
@@ -47,9 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // -----------------------------------------
-  // SAFE LOCAL PAGE ROUTING
-  // Keeps navigation inside the GitHub Pages
-  // repository path.
+  // SITE ROUTING
   // -----------------------------------------
 
   const siteBase = new URL(
@@ -101,7 +99,7 @@ document.addEventListener("DOMContentLoaded", () => {
         await supabaseClient.auth.signOut();
 
         showMessage(
-          "Your account has been deactivated. Please contact SMH Collection support."
+          "Your account has been deactivated. Please contact support."
         );
         return;
       }
@@ -110,22 +108,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (profile.role === "admin") {
         goToPage("admin-dashboard.html");
-        return;
-      }
-
-      if (profile.role === "seller") {
+      } else if (profile.role === "seller") {
         goToPage("seller-dashboard.html");
-        return;
-      }
-
-      if (profile.role === "buyer") {
+      } else if (profile.role === "buyer") {
         goToPage("buyer-dashboard.html");
-        return;
+      } else if (profile.role === "staff") {
+        goToPage("staff-dashboard.html");
+      } else {
+        showMessage(
+          "Your account role is not recognized. Please contact support."
+        );
       }
-
-      showMessage(
-        "Your account role is not recognized. Please contact support."
-      );
 
     } catch (error) {
       console.error("Role routing error:", error);
@@ -182,9 +175,7 @@ document.addEventListener("DOMContentLoaded", () => {
           email,
           password,
           options: {
-            data: {
-              full_name: fullName
-            }
+            data: { full_name: fullName }
           }
         });
 
@@ -201,9 +192,7 @@ document.addEventListener("DOMContentLoaded", () => {
           "success"
         );
 
-        window.setTimeout(() => {
-          goToPage("login.html");
-        }, 1200);
+        window.setTimeout(() => goToPage("login.html"), 1200);
 
       } catch (error) {
         console.error("Signup error:", error);
@@ -276,6 +265,70 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // -----------------------------------------
+  // FORGOT PASSWORD
+  // -----------------------------------------
+
+  const forgotPasswordButton =
+    document.getElementById("forgotPassword");
+
+  if (forgotPasswordButton) {
+    forgotPasswordButton.addEventListener("click", async () => {
+      showMessage("");
+
+      const emailInput = document.getElementById("loginEmail");
+      const email = emailInput?.value.trim().toLowerCase();
+
+      if (!email) {
+        showMessage("Enter your email address first.");
+        emailInput?.focus();
+        return;
+      }
+
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showMessage("Please enter a valid email address.");
+        emailInput?.focus();
+        return;
+      }
+
+      const originalText = forgotPasswordButton.textContent;
+
+      forgotPasswordButton.disabled = true;
+      forgotPasswordButton.textContent = "Sending email...";
+
+      try {
+        const redirectTo = new URL(
+          "reset-password.html",
+          siteBase
+        ).href;
+
+        const { error } =
+          await supabaseClient.auth.resetPasswordForEmail(email, {
+            redirectTo
+          });
+
+        if (error) throw error;
+
+        showMessage(
+          "If an account exists for this email, a reset email will be sent. Check your inbox and spam folder.",
+          "success"
+        );
+
+      } catch (error) {
+        console.error("Password recovery error:", error);
+
+        showMessage(
+          error.message ||
+          "Unable to send the reset email. Please try again."
+        );
+
+      } finally {
+        forgotPasswordButton.disabled = false;
+        forgotPasswordButton.textContent = originalText;
+      }
+    });
+  }
+
+  // -----------------------------------------
   // GOOGLE SIGN-IN
   // -----------------------------------------
 
@@ -305,7 +358,8 @@ document.addEventListener("DOMContentLoaded", () => {
         console.error("Google authentication error:", error);
 
         showMessage(
-          error.message || "Google authentication failed. Please try again."
+          error.message ||
+          "Google authentication failed. Please try again."
         );
 
         button.disabled = false;
@@ -323,17 +377,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (event !== "SIGNED_IN" || !session) return;
 
-    const currentPage = window.location.pathname
-      .split("/")
-      .pop();
+    const currentPage = window.location.pathname.split("/").pop();
 
     if (
       currentPage === "login.html" ||
       currentPage === "signup.html" ||
       currentPage === ""
     ) {
-      // Avoid performing Supabase queries inside the auth callback.
-      // Defer role routing until the current callback completes.
       window.setTimeout(() => {
         routeUser();
       }, 0);
