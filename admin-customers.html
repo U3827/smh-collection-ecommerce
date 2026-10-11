@@ -1,0 +1,199 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#103c32">
+  <meta name="description" content="Manage SMH Collection customers, buyer profiles and order history.">
+  <title>Customers | SMH Collection Admin</title>  <link rel="stylesheet" href="assets/css/admin-customers.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/supabase.js"></script>
+  <script src="assets/js/admin-customers.js" defer></script>
+</head>
+<body>
+  <div class="admin-layout"><aside class="sidebar">
+  <a class="brand" href="admin-dashboard.html">
+    <span class="brand-mark">SMH</span>
+    <span>SMH Collection<small>ADMINISTRATION</small></span>
+  </a>
+
+  <p class="nav-label">WORKSPACE</p>
+
+  <nav class="navigation">
+    <a href="admin-dashboard.html">◫ &nbsp; Overview</a>
+    <a href="admin-orders.html">▤ &nbsp; Orders</a>
+    <a href="admin-products.html">▦ &nbsp; Products</a>
+    <a class="active" href="admin-customers.html">♙ &nbsp; Customers</a>
+    <a href="admin-staff.html">♧ &nbsp; Staff &amp; Sellers</a>
+    <a href="admin-inventory.html">▥ &nbsp; Inventory</a>
+    <a href="admin-analytics.html">▧ &nbsp; Analytics</a>
+    <a href="admin-settings.html">⚙ &nbsp; Settings</a>
+    <a href="admin-market.html">⌂ &nbsp; Visit Market</a>
+  </nav>
+
+  <div class="sidebar-bottom">
+    <span class="admin-indicator"></span>
+    <span>Administrator<small>SMH Control Centre</small></span>
+  </div>
+</aside>
+
+<main class="main-content">
+
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">CUSTOMER RELATIONSHIPS</p>
+      <h1>Customers</h1>
+      <p class="subtitle">
+        Understand your buyers, review their orders and manage customer records.
+      </p>
+    </div>
+
+    <button id="refreshButton" class="button secondary" type="button">
+      ↻ Refresh
+    </button>
+  </header>
+
+  <div id="pageMessage" class="message" role="status" aria-live="polite">
+    Checking administrator access...
+  </div>
+
+  <section class="stats-grid">
+    <article class="stat-card">
+      <span class="stat-icon">♙</span>
+      <p>Total buyers</p>
+      <strong id="totalCustomers">—</strong>
+      <small>Registered buyer accounts</small>
+    </article>
+
+    <article class="stat-card">
+      <span class="stat-icon green">✓</span>
+      <p>Active buyers</p>
+      <strong id="activeCustomers">—</strong>
+      <small>Accounts marked active</small>
+    </article>
+
+    <article class="stat-card">
+      <span class="stat-icon amber">▤</span>
+      <p>Total orders</p>
+      <strong id="totalCustomerOrders">—</strong>
+      <small>Orders placed by buyers</small>
+    </article>
+
+    <article class="stat-card">
+      <span class="stat-icon gold">₦</span>
+      <p>Customer spending</p>
+      <strong id="totalCustomerSpending">—</strong>
+      <small>Recorded order totals</small>
+    </article>
+  </section>
+
+  <section class="customers-panel">
+
+    <div class="panel-heading">
+      <div>
+        <h2>Buyer directory</h2>
+        <p>Search registered buyers and review their activity.</p>
+      </div>
+      <span id="resultCount" class="result-count">Loading customers...</span>
+    </div>
+
+    <div class="filters">
+      <label class="search-box">
+        <span>⌕</span>
+        <input
+          id="searchInput"
+          type="search"
+          placeholder="Search name or email..."
+          autocomplete="off"
+        >
+      </label>
+
+      <select id="statusFilter" aria-label="Filter customers by account status">
+        <option value="">All account statuses</option>
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
+      </select>
+
+      <select id="ordersFilter" aria-label="Filter customers by orders">
+        <option value="">All buyers</option>
+        <option value="ordered">Has orders</option>
+        <option value="never">No orders yet</option>
+      </select>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Customer</th>
+            <th>Email</th>
+            <th>Joined</th>
+            <th>Orders</th>
+            <th>Total spent</th>
+            <th>Account status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+
+        <tbody id="customersTableBody">
+          <tr>
+            <td colspan="7" class="table-message">
+              Loading customer records...
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div id="mobileCustomers" class="mobile-customers"></div>
+
+  </section>
+
+  <section id="customerDetails" class="customer-details" hidden>
+    <div class="details-heading">
+      <div>
+        <p class="eyebrow">CUSTOMER PROFILE</p>
+        <h2 id="detailsCustomerName">Customer details</h2>
+      </div>
+
+      <button id="closeDetailsButton" class="button secondary" type="button">
+        Close
+      </button>
+    </div>
+
+    <div id="customerProfileSummary" class="profile-summary"></div>
+
+    <div class="panel-heading">
+      <div>
+        <h3>Order history</h3>
+        <p>Orders associated with this customer.</p>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Order number</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Payment</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+
+        <tbody id="customerOrdersBody">
+          <tr>
+            <td colspan="5" class="table-message">
+              Select a customer to view their orders.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+
+  </div>
+</body>
+</html>
