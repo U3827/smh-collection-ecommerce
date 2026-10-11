@@ -1,0 +1,263 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#123c2d">
+    <meta name="description" content="SMH Collection Admin Analytics and Store Performance">
+    <title>Analytics | SMH Collection Admin</title>
+
+    <link rel="stylesheet" href="assets/css/admin-analytics.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/js/supabase.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="assets/js/admin-analytics.js" defer></script>
+</head>
+
+<body>
+    <div class="admin-layout">
+
+        <aside class="sidebar" id="sidebar">
+            <a href="admin-dashboard.html" class="brand">
+                <span class="brand-mark">SMH</span>
+                <span>
+                    <strong>SMH Collection</strong>
+                    <small>Administration</small>
+                </span>
+            </a>
+
+            <nav class="sidebar-nav" aria-label="Admin navigation">
+                <p class="nav-heading">MAIN MENU</p>
+
+                <a href="admin-dashboard.html" class="nav-link">
+                    <span>▦</span> Dashboard
+                </a>
+
+                <a href="admin-analytics.html" class="nav-link active">
+                    <span>▥</span> Analytics
+                </a>
+
+                <a href="admin-orders.html" class="nav-link">
+                    <span>▤</span> Orders
+                </a>
+
+                <a href="admin-products.html" class="nav-link">
+                    <span>▣</span> Products
+                </a>
+
+                <a href="admin-inventory.html" class="nav-link">
+                    <span>▤</span> Inventory
+                </a>
+
+                <a href="admin-customers.html" class="nav-link">
+                    <span>♙</span> Customers
+                </a>
+
+                <a href="admin-staff.html" class="nav-link">
+                    <span>♧</span> Staff
+                </a>
+
+                <a href="admin-market.html" class="nav-link">
+                    <span>⌕</span> Visit Market
+                </a>
+            </nav>
+
+            <div class="sidebar-bottom">
+                <div class="admin-identity">
+                    <div class="admin-avatar">A</div>
+                    <div>
+                        <strong>Administrator</strong>
+                        <small>Store management</small>
+                    </div>
+                </div>
+
+                <button type="button" id="logoutButton" class="logout-button">
+                    ↪ Sign out
+                </button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+
+            <header class="topbar">
+                <button
+                    type="button"
+                    id="menuButton"
+                    class="menu-button"
+                    aria-label="Toggle navigation"
+                    aria-controls="sidebar"
+                    aria-expanded="false"
+                >
+                    ☰
+                </button>
+
+                <div class="topbar-title">
+                    <span>SMH COLLECTION / ADMIN</span>
+                    <h1>Analytics</h1>
+                </div>
+
+                <button type="button" id="refreshButton" class="refresh-button">
+                    ↻ Refresh
+                </button>
+            </header>
+
+            <section class="page-intro">
+                <div>
+                    <p class="eyebrow">BUSINESS INTELLIGENCE</p>
+                    <h2>Understand your store performance.</h2>
+                    <p>
+                        Monitor revenue, orders and products using your
+                        actual store records.
+                    </p>
+                </div>
+
+                <div class="date-filter">
+                    <label for="dateRange">Reporting period</label>
+                    <select id="dateRange">
+                        <option value="7">Last 7 days</option>
+                        <option value="30" selected>Last 30 days</option>
+                        <option value="90">Last 90 days</option>
+                        <option value="365">Last 12 months</option>
+                        <option value="all">All time</option>
+                    </select>
+                </div>
+            </section>
+
+            <div id="pageMessage" class="page-message" role="status" aria-live="polite" hidden></div>
+
+            <section class="metrics-grid" aria-label="Store performance summary">
+
+                <article class="metric-card">
+                    <div class="metric-top">
+                        <span class="metric-label">Revenue</span>
+                        <span class="metric-icon">₦</span>
+                    </div>
+                    <strong id="totalRevenue" class="metric-value">—</strong>
+                    <p>From paid orders in selected period</p>
+                </article>
+
+                <article class="metric-card">
+                    <div class="metric-top">
+                        <span class="metric-label">Orders</span>
+                        <span class="metric-icon">▤</span>
+                    </div>
+                    <strong id="totalOrders" class="metric-value">—</strong>
+                    <p>Orders created in selected period</p>
+                </article>
+
+                <article class="metric-card">
+                    <div class="metric-top">
+                        <span class="metric-label">Average Order Value</span>
+                        <span class="metric-icon">↗</span>
+                    </div>
+                    <strong id="averageOrderValue" class="metric-value">—</strong>
+                    <p>Average value of paid orders</p>
+                </article>
+
+                <article class="metric-card">
+                    <div class="metric-top">
+                        <span class="metric-label">Products</span>
+                        <span class="metric-icon">▣</span>
+                    </div>
+                    <strong id="totalProducts" class="metric-value">—</strong>
+                    <p>Products currently in your catalogue</p>
+                </article>
+
+            </section>
+
+            <section class="charts-grid">
+
+                <article class="analytics-card revenue-card">
+                    <div class="card-heading">
+                        <div>
+                            <h2>Revenue trend</h2>
+                            <p>Paid order revenue over time</p>
+                        </div>
+                        <span class="chart-legend">
+                            <span class="legend-dot"></span> Revenue
+                        </span>
+                    </div>
+
+                    <div class="chart-container">
+                        <canvas id="revenueChart" role="img" aria-label="Revenue trend chart">
+                            Revenue trend chart
+                        </canvas>
+                    </div>
+                    <p id="revenueChartEmpty" class="chart-empty" hidden>
+                        No paid order revenue for this period.
+                    </p>
+                </article>
+
+                <article class="analytics-card status-card">
+                    <div class="card-heading">
+                        <div>
+                            <h2>Order status</h2>
+                            <p>Orders in the selected period</p>
+                        </div>
+                    </div>
+
+                    <div class="chart-container status-chart-container">
+                        <canvas id="orderStatusChart" role="img" aria-label="Order status breakdown chart">
+                            Order status chart
+                        </canvas>
+                    </div>
+
+                    <p id="statusChartEmpty" class="chart-empty" hidden>
+                        No orders for this period.
+                    </p>
+                </article>
+
+            </section>
+
+            <section class="analytics-card performance-card">
+                <div class="card-heading">
+                    <div>
+                        <h2>Recent order activity</h2>
+                        <p>Latest orders within the selected reporting period</p>
+                    </div>
+
+                    <a href="admin-orders.html" class="text-link">Manage orders →</a>
+                </div>
+
+                <div class="table-wrapper">
+                    <table class="analytics-table">
+                        <thead>
+                            <tr>
+                                <th>Order number</th>
+                                <th>Date</th>
+                                <th>Order status</th>
+                                <th>Payment status</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentOrdersBody">
+                            <tr>
+                                <td colspan="5" class="empty-state">
+                                    Analytics data will appear here.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <footer class="page-footer">
+                <p>SMH Collection Admin · Analytics</p>
+                <p>Store performance based on available database records.</p>
+            </footer>
+
+        </main>
+    </div>
+
+    <button
+        type="button"
+        id="backToTopButton"
+        class="back-to-top"
+        aria-label="Back to top"
+    >
+        ↑
+    </button>
+</body>
+</html>
