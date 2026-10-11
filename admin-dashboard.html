@@ -459,13 +459,13 @@
             document.getElementById("dashboardMessage");
 
         async function startAdminDashboard() {
-            if (!window.supabaseClient) {
-                dashboardMessage.textContent =
-                    "The connection could not be loaded. Please refresh the page.";
-                return;
-            }
+            if (typeof supabaseClient === "undefined" || !supabaseClient) {
+    dashboardMessage.textContent =
+        "Supabase connection is unavailable. Check assets/js/supabase.js.";
+    return;
+}
 
-            const client = window.supabaseClient;
+const client = supabaseClient;
 
             try {
                 const { data: sessionData, error: sessionError } =
@@ -548,7 +548,9 @@
 
         document.getElementById("logoutButton")
             .addEventListener("click", async () => {
-                const client = window.supabaseClient;
+                const client = typeof supabaseClient !== "undefined"
+    ? supabaseClient
+    : null;
 
                 if (client) {
                     const { error } = await client.auth.signOut();
