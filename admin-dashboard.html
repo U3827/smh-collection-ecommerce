@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,9 +7,15 @@
   <title>Admin Dashboard | SMH Collection</title>
   <meta name="description" content="SMH Collection administration dashboard.">
 
+  <meta name="theme-color" content="#0b1020">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  >
 
   <link rel="stylesheet" href="assets/css/admin-dashboard.css">
 </head>
@@ -18,9 +23,12 @@
 <body>
   <div class="admin-layout">
 
+    <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
+
       <a class="brand" href="index.html">
         <span class="brand-mark">SMH</span>
+
         <span class="brand-name">
           SMH Collection
           <small>ADMINISTRATION</small>
@@ -29,64 +37,98 @@
 
       <div class="sidebar-label">WORKSPACE</div>
 
-      <nav class="sidebar-nav" aria-label="Admin navigation">
+      <nav class="sidebar-nav" aria-label="Main navigation">
+
         <a class="nav-link active" href="#overview">
-          <span>▦</span> Overview
+          <span aria-hidden="true">▦</span>
+          Overview
         </a>
+
         <a class="nav-link" href="#products">
-          <span>▣</span> Products
+          <span aria-hidden="true">▣</span>
+          Products
         </a>
+
         <a class="nav-link" href="#orders">
-          <span>▤</span> Orders
+          <span aria-hidden="true">▤</span>
+          Orders
         </a>
+
         <a class="nav-link" href="#customers">
-          <span>♙</span> Customers
+          <span aria-hidden="true">♙</span>
+          Customers
         </a>
+
         <a class="nav-link" href="#staff">
-          <span>♧</span> Staff & Sellers
+          <span aria-hidden="true">♧</span>
+          Staff &amp; Sellers
         </a>
+
         <a class="nav-link" href="#analytics">
-          <span>▥</span> Analytics
+          <span aria-hidden="true">▥</span>
+          Analytics
         </a>
+
       </nav>
 
       <div class="sidebar-label">MANAGEMENT</div>
 
-      <nav class="sidebar-nav">
+      <nav class="sidebar-nav" aria-label="Management navigation">
+
         <a class="nav-link" href="#inventory">
-          <span>▧</span> Inventory
+          <span aria-hidden="true">▧</span>
+          Inventory
         </a>
+
         <a class="nav-link" href="#settings">
-          <span>⚙</span> Settings
+          <span aria-hidden="true">⚙</span>
+          Settings
         </a>
+
       </nav>
 
       <div class="sidebar-bottom">
+
         <div class="admin-mini">
           <div class="avatar">A</div>
+
           <div class="admin-mini-info">
             <strong id="adminName">Administrator</strong>
             <small id="adminEmail">Checking account...</small>
           </div>
         </div>
 
-        <button class="logout-button" id="logoutBtn" type="button">
+        <button
+          class="logout-button"
+          id="logoutBtn"
+          type="button"
+        >
           ↪ Sign out
         </button>
+
       </div>
     </aside>
 
+    <!-- MAIN CONTENT -->
     <main class="main-content" id="overview">
 
+      <!-- TOP BAR -->
       <header class="topbar">
-        <button class="menu-button" id="menuBtn"
-          type="button" aria-label="Toggle navigation">
+
+        <button
+          class="menu-button"
+          id="menuBtn"
+          type="button"
+          aria-label="Toggle navigation"
+          aria-controls="sidebar"
+          aria-expanded="false"
+        >
           ☰
         </button>
 
         <div class="breadcrumb">
           <span>SMH Collection</span>
-          <span>/</span>
+          <span aria-hidden="true">/</span>
           <strong>Dashboard</strong>
         </div>
 
@@ -94,12 +136,17 @@
           <span class="secure-label">● Admin workspace</span>
           <div class="avatar top-avatar">A</div>
         </div>
+
       </header>
 
+      <!-- PAGE HEADING -->
       <section class="page-heading">
+
         <div>
           <p class="eyebrow">STORE MANAGEMENT</p>
+
           <h1>Dashboard Overview</h1>
+
           <p class="page-subtitle" id="welcomeMessage">
             Welcome to your store management workspace.
           </p>
@@ -108,218 +155,312 @@
         <a class="store-link" href="index.html">
           ↗ View Store
         </a>
+
       </section>
 
-      <div class="notice" id="dashboardNotice" role="status">
+      <!-- STATUS / NOTIFICATIONS -->
+      <div
+        class="notice"
+        id="dashboardNotice"
+        role="status"
+        aria-live="polite"
+      >
         Connecting to your store data...
       </div>
 
+      <!-- STATISTICS -->
       <section class="stats-grid" aria-label="Store statistics">
 
         <article class="stat-card">
+
           <div class="stat-top">
             <span>Total Revenue</span>
-            <span class="stat-icon purple">$</span>
+            <span class="stat-icon purple">₦</span>
           </div>
+
           <h2 id="totalRevenue">₦0.00</h2>
+
           <p>Based on recorded orders</p>
+
         </article>
 
         <article class="stat-card">
+
           <div class="stat-top">
             <span>Total Orders</span>
             <span class="stat-icon blue">▤</span>
           </div>
+
           <h2 id="totalOrders">0</h2>
+
           <p>Orders recorded in the store</p>
+
         </article>
 
         <article class="stat-card">
+
           <div class="stat-top">
             <span>Total Products</span>
             <span class="stat-icon orange">▣</span>
           </div>
+
           <h2 id="totalProducts">0</h2>
+
           <p>Products in the catalogue</p>
+
         </article>
 
         <article class="stat-card">
+
           <div class="stat-top">
             <span>Total Customers</span>
             <span class="stat-icon green">♙</span>
           </div>
+
           <h2 id="totalCustomers">0</h2>
+
           <p>Registered buyer accounts</p>
+
         </article>
 
       </section>
 
+      <!-- RECENT ORDERS AND QUICK ACTIONS -->
       <section class="content-grid">
 
         <article class="panel" id="orders">
+
           <div class="panel-heading">
+
             <div>
               <h2>Recent Orders</h2>
               <p>Monitor customer purchases and order status.</p>
             </div>
+
             <a href="#orders" class="text-link">View all</a>
+
           </div>
 
           <div class="table-wrapper">
+
             <table>
               <thead>
                 <tr>
-                  <th>Order</th>
-                  <th>Customer</th>
-                  <th>Amount</th>
-                  <th>Status</th>
+                  <th scope="col">Order</th>
+                  <th scope="col">Customer</th>
+                  <th scope="col">Amount</th>
+                  <th scope="col">Status</th>
                 </tr>
               </thead>
+
               <tbody id="recentOrders">
+
                 <tr>
                   <td colspan="4" class="empty-state">
-                    Order information will appear here after the database
-                    connection is configured.
+                    Order information will appear here when available.
                   </td>
                 </tr>
+
               </tbody>
             </table>
+
           </div>
+
         </article>
 
         <article class="panel quick-panel">
+
           <div class="panel-heading">
+
             <div>
               <h2>Quick Actions</h2>
               <p>Shortcuts for store management.</p>
             </div>
+
           </div>
 
           <div class="quick-actions">
+
             <a href="#products" class="quick-action">
+
               <span class="quick-icon">＋</span>
+
               <span>
                 <strong>Manage Products</strong>
                 <small>Review your store catalogue</small>
               </span>
+
               <span class="arrow">›</span>
+
             </a>
 
             <a href="#orders" class="quick-action">
+
               <span class="quick-icon">▤</span>
+
               <span>
                 <strong>Process Orders</strong>
                 <small>Review customer purchases</small>
               </span>
+
               <span class="arrow">›</span>
+
             </a>
 
             <a href="#staff" class="quick-action">
+
               <span class="quick-icon">♙</span>
+
               <span>
                 <strong>Manage Staff</strong>
                 <small>Review staff and seller access</small>
               </span>
+
               <span class="arrow">›</span>
+
             </a>
 
             <a href="#analytics" class="quick-action">
+
               <span class="quick-icon">▥</span>
+
               <span>
                 <strong>View Analytics</strong>
                 <small>Review store performance</small>
               </span>
+
               <span class="arrow">›</span>
+
             </a>
+
           </div>
+
         </article>
 
       </section>
 
+      <!-- PRODUCTS -->
       <section class="panel lower-panel" id="products">
+
         <div class="panel-heading">
           <div>
             <h2>Product Management</h2>
-            <p>Your product management workspace will appear here.</p>
+            <p>Manage the products available in your store.</p>
           </div>
         </div>
+
         <p class="section-placeholder">
           Product listing, creation, editing, stock control and deletion
-          will be connected in the next development steps.
+          will be connected to your database in the next development steps.
         </p>
+
       </section>
 
+      <!-- CUSTOMERS -->
       <section class="panel lower-panel" id="customers">
+
         <div class="panel-heading">
           <div>
             <h2>Customer Management</h2>
             <p>Manage registered buyers.</p>
           </div>
         </div>
+
         <p class="section-placeholder">
-          Customer records and account management will be connected to
-          Supabase.
+          Customer records, account status and customer management
+          will be connected to Supabase.
         </p>
+
       </section>
 
+      <!-- STAFF -->
       <section class="panel lower-panel" id="staff">
+
         <div class="panel-heading">
           <div>
-            <h2>Staff & Sellers</h2>
-            <p>Manage store team access.</p>
+            <h2>Staff &amp; Sellers</h2>
+            <p>Manage your store team and access.</p>
           </div>
         </div>
+
         <p class="section-placeholder">
-          Staff creation, role assignment and account status management
-          will be implemented with appropriate access controls.
+          Staff account creation, role assignment, seller management
+          and account status controls will be implemented with appropriate
+          server-side permissions.
         </p>
+
       </section>
 
+      <!-- ANALYTICS -->
       <section class="panel lower-panel" id="analytics">
+
         <div class="panel-heading">
           <div>
             <h2>Store Analytics</h2>
             <p>Understand your store's performance.</p>
           </div>
         </div>
+
         <p class="section-placeholder">
-          Sales summaries and other analytics will be added after the
-          database tables are verified.
+          Sales summaries, order trends and performance analytics
+          will be added after the database schema is verified.
         </p>
+
       </section>
 
+      <!-- INVENTORY -->
       <section class="panel lower-panel" id="inventory">
+
         <div class="panel-heading">
           <div>
-            <h2>Inventory</h2>
-            <p>Monitor product stock.</p>
+            <h2>Inventory Management</h2>
+            <p>Monitor available product stock.</p>
           </div>
         </div>
+
         <p class="section-placeholder">
-          Inventory tracking will be connected to your product schema.
+          Stock levels, low-stock alerts and inventory updates
+          will be connected to your products database.
         </p>
+
       </section>
 
+      <!-- SETTINGS -->
       <section class="panel lower-panel" id="settings">
+
         <div class="panel-heading">
           <div>
             <h2>Admin Settings</h2>
             <p>Store administration and account preferences.</p>
           </div>
         </div>
+
         <p class="section-placeholder">
-          Settings will be implemented after the main admin functions.
+          Store settings and administrator preferences will be implemented
+          after the main management functions.
         </p>
+
       </section>
 
+      <!-- FOOTER -->
       <footer class="footer">
-        <span>© <span id="currentYear">2026</span> SMH Collection</span>
+
+        <span>
+          © <span id="currentYear">2026</span> SMH Collection
+        </span>
+
         <span>Everything in one place.</span>
+
       </footer>
 
     </main>
+
   </div>
 
+  <!-- Load Supabase before the admin dashboard JavaScript -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/Supsbase.js"></script>
   <script src="assets/js/admin-dashboard.js"></script>
+
 </body>
 </html>
