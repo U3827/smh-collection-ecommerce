@@ -1,0 +1,145 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#10131c">
+  <meta name="description" content="Manage customer orders for SMH Collection.">
+  <title>Order Management | SMH Collection Admin</title>
+  <link rel="stylesheet" href="assets/css/admin-orders.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/supabase.js"></script>
+  <script src="assets/js/admin-orders.js" defer></script>
+</head>
+<body>
+  <div class="admin-layout">
+    <aside class="sidebar">
+      <a class="brand" href="admin-dashboard.html">
+        <span class="brand-mark">SMH</span>
+        <span>SMH Collection<small>ADMINISTRATION</small></span>
+      </a>
+
+      <p class="nav-label">WORKSPACE</p>
+      <nav class="navigation">
+        <a href="admin-dashboard.html">◫ &nbsp; Overview</a>
+        <a class="active" href="admin-orders.html">▤ &nbsp; Orders</a>
+        <a href="admin-products.html">▦ &nbsp; Products</a>
+        <a href="admin-customers.html">♙ &nbsp; Customers</a>
+        <a href="admin-staff.html">♧ &nbsp; Staff &amp; Sellers</a>
+        <a href="admin-inventory.html">▥ &nbsp; Inventory</a>
+        <a href="admin-analytics.html">▧ &nbsp; Analytics</a>
+        <a href="admin-settings.html">⚙ &nbsp; Settings</a>
+        <a href="admin-market.html">⌂ &nbsp; Visit Market</a>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <span class="admin-indicator"></span>
+        <span>Administrator<small>SMH Control Centre</small></span>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">ORDER MANAGEMENT</p>
+          <h1>Orders</h1>
+          <p class="subtitle">Track purchases and manage order fulfilment.</p>
+        </div>
+        <button id="refreshButton" class="button secondary" type="button">
+          ↻ Refresh
+        </button>
+      </header>
+
+      <div id="pageMessage" class="message" role="status" aria-live="polite">
+        Checking administrator access...
+      </div>
+
+      <section class="stats-grid" aria-label="Order summary">
+        <article class="stat-card">
+          <span class="stat-icon">▤</span>
+          <p>Total orders</p>
+          <strong id="totalOrders">—</strong>
+          <small>All recorded orders</small>
+        </article>
+        <article class="stat-card">
+          <span class="stat-icon amber">◷</span>
+          <p>Pending</p>
+          <strong id="pendingOrders">—</strong>
+          <small>Awaiting confirmation</small>
+        </article>
+        <article class="stat-card">
+          <span class="stat-icon blue">↗</span>
+          <p>In progress</p>
+          <strong id="activeOrders">—</strong>
+          <small>Confirmed, processing or shipped</small>
+        </article>
+        <article class="stat-card">
+          <span class="stat-icon green">✓</span>
+          <p>Delivered</p>
+          <strong id="deliveredOrders">—</strong>
+          <small>Successfully delivered</small>
+        </article>
+      </section>
+
+      <section class="orders-panel">
+        <div class="panel-heading">
+          <div>
+            <h2>All orders</h2>
+            <p>Search orders and review customer information.</p>
+          </div>
+          <span id="resultCount" class="result-count">0 orders</span>
+        </div>
+
+        <div class="filters">
+          <label class="search-box">
+            <span>⌕</span>
+            <input id="searchInput" type="search"
+              placeholder="Search order number or customer..."
+              autocomplete="off">
+          </label>
+
+          <select id="statusFilter" aria-label="Filter by status">
+            <option value="">All statuses</option>
+            <option value="pending">Pending</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="processing">Processing</option>
+            <option value="shipped">Shipped</option>
+            <option value="delivered">Delivered</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+
+          <button id="clearFilters" class="button secondary" type="button">
+            Clear filters
+          </button>
+        </div>
+
+        <div id="ordersContainer" class="orders-list">
+          <div class="empty-state">
+            <span class="empty-icon">▤</span>
+            <h3>Loading orders</h3>
+            <p>Please wait while we retrieve your order records.</p>
+          </div>
+        </div>
+      </section>
+
+      <footer class="page-footer">
+        <span>SMH Collection Admin</span>
+        <span>Order Management</span>
+      </footer>
+    </main>
+  </div>
+
+  <dialog id="orderDialog" class="order-dialog">
+    <div class="dialog-header">
+      <div>
+        <p class="eyebrow">ORDER DETAILS</p>
+        <h2 id="dialogOrderNumber">Order</h2>
+      </div>
+      <button id="closeDialog" class="close-button"
+        type="button" aria-label="Close order details">×</button>
+    </div>
+    <div id="orderDetails" class="dialog-body"></div>
+  </dialog>
+</body>
+</html>
