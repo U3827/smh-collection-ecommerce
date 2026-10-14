@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://u3827.github.io/smh-collection-ecommerce/sitemap.xml
